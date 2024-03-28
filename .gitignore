@@ -1,0 +1,6 @@
+.vscode
+bin
+obj
+linked-list.cbp
+linked-list.depend
+main.exe
