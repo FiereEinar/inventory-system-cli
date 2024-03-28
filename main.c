@@ -24,6 +24,7 @@ void printLinkedlist(const struct Node *p);
 void addItem(struct Node **head);
 void deleteItem(struct Node **head);
 int getListSize(const struct Node *head);
+void updateStock(struct Node **head);
 void addTestItem(struct Node **head, char name[], int stocks, double price);
 char* getCurrentTime();
 void printHelp();
@@ -41,17 +42,64 @@ int main()
     addTestItem(&head, "scissors", 15, 56);
 
     do {
-        printf("\n\nEnter your action: ");
+        printf("\n\nCommand: ");
         scanf("%s", x);
 
         // here we just examine the action that the user wants to take
         if (strcmp(x, "help") == 0) printHelp();
-        if (strcmp(x, "read") == 0) printLinkedlist(head);
+        if (strcmp(x, "view") == 0) printLinkedlist(head);
         if (strcmp(x, "add") == 0) addItem(&head);
         if (strcmp(x, "delete") == 0) deleteItem(&head);
+        if (strcmp(x, "update") == 0) updateStock(&head);
     } while (strcmp(x, "exit") != 0);
 
     return 0;
+}
+
+void updateStock(struct Node **head)
+{
+    system("cls");
+    printLinkedlist(*head);
+
+    char toUpdate[10];
+    int index;
+
+    printf("\n\nEnter the index of the item: ");
+    scanf("%d", &index);
+
+    printf("\nWhat do you want to update?[name/stock/price]: ");
+    scanf("%s", toUpdate);
+
+    struct Node *current = *head;
+    int j = 1;
+
+    while(index != j)
+    {
+        current = current->next;
+        j++;
+    }
+
+    if (strcmp(toUpdate, "name") == 0)
+    {
+        printf("Enter a new name: ");
+        scanf("%s", current->data.name);
+    }
+    else if (strcmp(toUpdate, "stock") == 0)
+    {
+        printf("Enter an updated stock: ");
+        scanf("%d", &current->data.stocks);
+    }
+    else if (strcmp(toUpdate, "price") == 0)
+    {
+        printf("Enter an updated price: ");
+        scanf("%lf", &current->data.price);
+    }
+    else {
+        printf("\nError: Check your spelling");
+    }
+
+    printf("\nUpdated Successfully!");
+    printLinkedlist(*head);
 }
 
 void deleteItem(struct Node **head)
@@ -74,10 +122,13 @@ void deleteItem(struct Node **head)
 
     // we create a current variable so that we don't manipulate the pointer of the head
     struct Node *current = *head;
+    // we keep track of the deleted Node to free its memory since it was dynamically allocated
+    struct Node *deleted = NULL;
     int j = 1;
 
     // if the user is trying to delete the first item, we simply set the head to point to the next node
     if (index == 1) {
+        deleted = *head;
         *head = current->next;
     } else {
         // to delete a Node, we traverse to the Node right before the Node TO BE DELETED
@@ -87,11 +138,14 @@ void deleteItem(struct Node **head)
             current = current->next;
             j++;
         }
+        deleted = current->next;
         // now that were at the Node right before the Node TO BE DELETED,
         // the (current->next) is the TO BE DELETED so we simply overwrite it
         // by setting it to point to the next Node of the Node TO BE DELETED
         current->next = current->next->next;
     }
+    // free the memory
+    free(deleted);
     // after deleting the item, reprint the list
     printf("\nItem deleted successfully!");
     printLinkedlist(*head);
@@ -112,11 +166,13 @@ int getListSize(const struct Node *head)
 void printHelp()
 {
     system("cls");
+    printf("\nAvailable Commands: ");
     printf("\n1. help \t print all available commands.");
     printf("\n2. exit \t exit out the operation.");
-    printf("\n3. read \t print all items in the inventory.");
+    printf("\n3. view \t print all items in the inventory.");
     printf("\n4. add \t\t add an item to inventory.");
-    printf("\n4. delete \t delete an item to inventory.");
+    printf("\n5. delete \t delete an item to inventory.");
+    printf("\n6. update \t update an item to inventory.");
 }
 
 char* getCurrentTime()
@@ -136,6 +192,7 @@ char* getCurrentTime()
 void addItem(struct Node **head)
 {
     system("cls");
+    printf("Adding an item.\n\n");
     // create a new instance of the Item struct
     struct Item newItem;
 
@@ -176,9 +233,10 @@ void addItem(struct Node **head)
         current->next = newNode;
     }
     printf("\nItem added!");
-    printf("\nType 'read' to view inventory");
+    printLinkedlist(*head);
 }
 
+// for development purposes only
 void addTestItem(struct Node **head, char name[], int stocks, double price)
 {
     struct Item newItem;
@@ -202,7 +260,6 @@ void addTestItem(struct Node **head, char name[], int stocks, double price)
         current->next = newNode;
     }
     printf("\nItem added!");
-    printf("\nType 'read' to view inventory");
 }
 
 // print the linked list value
