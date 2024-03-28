@@ -22,7 +22,7 @@ struct Node
 
 void printLinkedlist(const struct Node *p);
 void addItem(struct Node **head);
-
+void deleteItem(struct Node **head);
 int getListSize(const struct Node *head);
 void addTestItem(struct Node **head, char name[], int stocks, double price);
 char* getCurrentTime();
@@ -48,13 +48,54 @@ int main()
         if (strcmp(x, "help") == 0) printHelp();
         if (strcmp(x, "read") == 0) printLinkedlist(head);
         if (strcmp(x, "add") == 0) addItem(&head);
-
+        if (strcmp(x, "delete") == 0) deleteItem(&head);
     } while (strcmp(x, "exit") != 0);
 
     return 0;
 }
 
+void deleteItem(struct Node **head)
+{
+    system("cls");
 
+    // this will hold the index of item to be deleted
+    int index;
+    printLinkedlist(*head);
+
+    printf("\n\nEnter the index of the item you want to delete: ");
+    scanf("%d", &index);
+
+    // if the number entered by user is not in the list we give them an error
+    if (index > getListSize(*head) || index <= 0)
+    {
+        printf("\nError: Item does not exist. Please try again");
+        return;
+    }
+
+    // we create a current variable so that we don't manipulate the pointer of the head
+    struct Node *current = *head;
+    int j = 1;
+
+    // if the user is trying to delete the first item, we simply set the head to point to the next node
+    if (index == 1) {
+        *head = current->next;
+    } else {
+        // to delete a Node, we traverse to the Node right before the Node TO BE DELETED
+        // this is why the while loop is (index - 1)
+        while(index - 1 != j)
+        {
+            current = current->next;
+            j++;
+        }
+        // now that were at the Node right before the Node TO BE DELETED,
+        // the (current->next) is the TO BE DELETED so we simply overwrite it
+        // by setting it to point to the next Node of the Node TO BE DELETED
+        current->next = current->next->next;
+    }
+    // after deleting the item, reprint the list
+    printf("\nItem deleted successfully!");
+    printLinkedlist(*head);
+}
 
 int getListSize(const struct Node *head)
 {
