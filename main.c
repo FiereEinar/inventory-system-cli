@@ -29,7 +29,7 @@ void printLinkedlist(const struct Node *p);
 void addItem(struct Node **head);
 void deleteItem(struct Node **head);
 int getListSize(const struct Node *head);
-void updateStock(struct Node **head);
+void updateItem(struct Node **head);
 void searchItem(const struct Node **head);
 void addTestItem(struct Node **head, char name[], int stocks, double price);
 char* getCurrentTime();
@@ -44,7 +44,7 @@ int main()
     char action[15];
     printf("\nType 'help' to see all available commands.");
 
-    printf("\nAdding test items for developments purposes only.");
+    printf("\nAdding test items for development purposes only.");
     addTestItem(&head, "pencil", 25, 10);
     addTestItem(&head, "paper", 50, 40);
     addTestItem(&head, "scissors", 15, 56);
@@ -62,7 +62,7 @@ int main()
         if (strcmp(action, "view") == 0) printLinkedlist(head);
         if (strcmp(action, "add") == 0) addItem(&head);
         if (strcmp(action, "delete") == 0) deleteItem(&head);
-        if (strcmp(action, "update") == 0) updateStock(&head);
+        if (strcmp(action, "update") == 0) updateItem(&head);
         if (strcmp(action, "search") == 0) searchItem(&head);
     } while (strcmp(action, "exit") != 0);
 
@@ -114,7 +114,7 @@ void searchItem(const struct Node **list)
     }
     // print all the result
     printLinkedlist(results);
-    // TODO: free the memory
+    // free the memory of results
     freeLinkedList(results);
 }
 
@@ -219,7 +219,7 @@ void deleteItem(struct Node **head)
     printf("\n\nItem deleted successfully!");
 }
 
-void updateStock(struct Node **head)
+void updateItem(struct Node **head)
 {
     system("cls");
     printf("Updating an item.\n\n");
