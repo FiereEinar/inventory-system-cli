@@ -3,12 +3,14 @@
 #include <string.h>
 #include <time.h>
 
+#define NAME_SIZE 20
+
 // I'm using linked list because it makes that list management easier.
 // adding, deleting, updating, etc. is so much easier than using traditional arrays
 // structure of an individual item
 struct Item
 {
-    char name[20];
+    char name[NAME_SIZE];
     int stocks;
     double price;
     char dateAdded[30];
@@ -125,9 +127,17 @@ void addItem(struct Node **head)
     // create a new instance of the Item struct
     struct Item newItem;
 
+    scanf("%c");
     // prompt the user with all the data and store it in that newItem structure
     printf("Enter the name of item: ");
-    scanf("%s", newItem.name);
+    // use fgets to allow string with spaces
+    fgets(newItem.name, NAME_SIZE, stdin);
+
+    // clear the newline character
+    size_t len = strlen(newItem.name);
+    if (len > 0 && newItem.name[len - 1] == '\n')
+        newItem.name[len - 1] = '\0'; // replace newline with null character
+    //scanf("%s", newItem.name);
 
     printf("Enter the stocks of item: ");
     scanf("%d", &newItem.stocks);
