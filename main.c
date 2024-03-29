@@ -114,6 +114,8 @@ void searchItem(const struct Node **list)
     }
     // print all the result
     printLinkedlist(results);
+    // TODO: free the memory
+    freeLinkedList(results);
 }
 
 void addItem(struct Node **head)
@@ -387,9 +389,26 @@ void printLinkedlist(const struct Node *p)
     // but instead we are printing each the contents.
     while (p != NULL)
     {
-        printf("\n%d. %-20s\t%d\t\tP%.2lf\t\t%s\t\t%s",
-               i, p->data.name, p->data.stocks, p->data.price, p->data.dateAdded, p->data.lastUpdated);
+        printf
+        (
+            "\n%d. %-20s\t%d\t\tP%.2lf\t\t%s\t\t%s",
+            i, p->data.name, p->data.stocks, p->data.price, p->data.dateAdded, p->data.lastUpdated
+        );
         p = p->next;
         i++;
+    }
+}
+
+void freeLinkedList(struct Node *head) {
+    struct Node *current = head;
+    struct Node *next;
+
+    while (current != NULL) {
+        // store the next node before freeing the current one
+        next = current->next;
+        // free the memory allocated for the current node
+        free(current);
+        // move to the next node
+        current = next;
     }
 }
