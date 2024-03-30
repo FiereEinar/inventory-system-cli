@@ -7,6 +7,7 @@
 
 // I'm using linked list because it makes that list management easier.
 // adding, deleting, updating, etc. is so much easier than using traditional arrays
+
 // structure of an individual item
 struct Item
 {
@@ -27,12 +28,13 @@ struct Node
 };
 
 // function prototypes
-void printLinkedlist(const struct Node *p);
+void printLinkedlist(const struct Node *head);
 void addItem(struct Node **head);
 void deleteItem(struct Node **head);
 int getListSize(const struct Node *head);
 void updateItem(struct Node **head);
-void searchItem(const struct Node **head);
+void searchItem(struct Node **head);
+void freeLinkedList(struct Node **head);
 void addTestItem(struct Node **head, char name[], int stocks, double price);
 char* getCurrentTime();
 char* getCurrentDate();
@@ -67,11 +69,11 @@ int main()
         if (strcmp(action, "update") == 0) updateItem(&head);
         if (strcmp(action, "search") == 0) searchItem(&head);
     } while (strcmp(action, "exit") != 0);
-
+    // TODO: maybe clear the memory of head? there's an available function for that
     return 0;
 }
 
-void searchItem(const struct Node **list)
+void searchItem(struct Node **list)
 {
     system("cls");
     printf("Searching an item.\n\n");
@@ -84,6 +86,7 @@ void searchItem(const struct Node **list)
     // tracker for the tail
     struct Node *last = NULL;
 
+    // TODO: maybe use fgets()
     printf("\n\nEnter a keyword: ");
     scanf("%s", searchTerm);
 
@@ -91,33 +94,33 @@ void searchItem(const struct Node **list)
 
     // we traverse the list and on each iteration, check if searchTerm is a substring of the current data name
     while(current != NULL) {
-        // strstr() is a function in <string.h> that will check if a string is a substring of another string
+        // strstr() is a function in <string.h> that will check if a string is a substring of another string. AKA if it fits the searchTerm
         if(strstr(current->data.name, searchTerm) != NULL) {
             // if true we create a new instance of Node with the same data
             struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
             newNode->data = current->data;
             newNode->next = NULL;
 
-            // then store it in the results, result is also a linked list just like the head in main()
-            // this first checks if this is the first elements being stored
+            // then store it in the results
+            // this checks if this is the first element being stored
             if(results == NULL) {
                 results = newNode;
                 // we keep track of the tail of the list so that we don't have to loop our way there
                 last = results;
             } else {
-                // if its not the first Node, go to the tail and add it there
+                // if its not the first Node, go to the tail (last) and add it there
                 last->next = newNode;
                 // keep track of tail
                 last = newNode;
             }
         }
-        // go to next node
+        // go to next node (iterator)
         current = current->next;
     }
     // print all the result
     printLinkedlist(results);
     // free the memory of results
-    freeLinkedList(results);
+    freeLinkedList(&results);
 }
 
 void addItem(struct Node **head)
@@ -133,7 +136,7 @@ void addItem(struct Node **head)
     // use fgets to allow string with spaces
     fgets(newItem.name, NAME_SIZE, stdin);
 
-    // clear the newline character
+    // clear the newline character from fgets()
     size_t len = strlen(newItem.name);
     if (len > 0 && newItem.name[len - 1] == '\n')
         newItem.name[len - 1] = '\0'; // replace newline with null character
@@ -162,6 +165,7 @@ void addItem(struct Node **head)
         *head = newNode;
     // otherwise we need to traverse the end of the list and add it there
     } else {
+        // TODO: create a tail in main() so that we don't have to traverse our way to the tail
         // here we create a (current) variable to prevent our head from being manipulated
         struct Node *current = *head;
         // it is guaranteed that at the end of the list, its next property will always be NULL
@@ -257,21 +261,22 @@ void updateItem(struct Node **head)
 
     // after that, we simply determine what the user wants to update and prompt the user for new data
     switch(toUpdate) {
-    case 1:
-        printf("\nEnter a new name of %s: ", current->data.name);
-        scanf("%s", current->data.name);
-        break;
-    case 2:
-        printf("\nEnter an updated stock of %s: ", current->data.name);
-        scanf("%d", &current->data.stocks);
-        break;
-    case 3:
-        printf("\nEnter an updated price of %s: ", current->data.name);
-        scanf("%lf", &current->data.price);
-        break;
-    default:
-        printf("\nError: Incorrect number entered.");
-        break;
+        case 1:
+            printf("\nEnter a new name of %s: ", current->data.name);
+            // TODO: use fgets()
+            scanf("%s", current->data.name);
+            break;
+        case 2:
+            printf("\nEnter an updated stock of %s: ", current->data.name);
+            scanf("%d", &current->data.stocks);
+            break;
+        case 3:
+            printf("\nEnter an updated price of %s: ", current->data.name);
+            scanf("%lf", &current->data.price);
+            break;
+        default:
+            printf("\nError: Incorrect number entered.");
+            break;
     }
 
     // update the lastUpdated data
@@ -391,26 +396,27 @@ void addTestItem(struct Node **head, char name[], int stocks, double price)
 }
 
 // print the linked list values
-void printLinkedlist(const struct Node *p)
+void printLinkedlist(const struct Node *head)
 {
     int i = 1;
     printf("\nItem:\t\t\tStocks:\t\tPrice:\t\tDate Added:\t\t\tLast Updated:");
-    // here we are using the same logic that we've used in the addItem function,
-    // but instead we are printing each the contents.
-    while (p != NULL)
+    // loop over the entire list and print the data on each iteration
+    while (head != NULL)
     {
         printf
         (
             "\n%d. %-20s\t%d\t\tP%.2lf\t\t%s\t\t%s",
-            i, p->data.name, p->data.stocks, p->data.price, p->data.dateAdded, p->data.lastUpdated
+            i, head->data.name, head->data.stocks, head->data.price, head->data.dateAdded, head->data.lastUpdated
         );
-        p = p->next;
+        // iterator
+        head = head->next;
         i++;
     }
 }
 
-void freeLinkedList(struct Node *head) {
-    struct Node *current = head;
+void freeLinkedList(struct Node **head)
+{
+    struct Node *current = *head;
     struct Node *next;
 
     while (current != NULL) {
