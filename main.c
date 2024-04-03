@@ -4,6 +4,7 @@
 #include <time.h>
 
 #define NAME_SIZE 20
+#define ID_LENGTH 10
 
 // I'm using linked list because it makes that list management easier.
 // adding, deleting, updating, etc. is so much easier than using traditional arrays
@@ -16,6 +17,7 @@ struct Item
     double price;
     char dateAdded[30];
     char lastUpdated[30];
+    char id[ID_LENGTH];
 };
 
 // structure of an individual node in a linked list
@@ -34,10 +36,12 @@ void deleteItem(struct Node **head);
 int getListSize(const struct Node *head);
 void updateItem(struct Node **head);
 void searchItem(struct Node **head);
+void sellItem(struct Node **list);
 void freeLinkedList(struct Node **head);
 void addTestItem(struct Node **head, char name[], int stocks, double price);
 char* getCurrentTime();
 char* getCurrentDate();
+char *generateId(char placeholder[]);
 void printHelp();
 
 int main()
@@ -50,14 +54,19 @@ int main()
 
     printf("\nAdding test items for development purposes only.");
     addTestItem(&head, "pencil", 25, 10);
-    addTestItem(&head, "paper", 50, 40);
+    sleep(1);
+    addTestItem(&head, "paper", 50, 1140);
+    sleep(1);
     addTestItem(&head, "scissors", 15, 56);
-    addTestItem(&head, "ballpen", 18, 10);
-    addTestItem(&head, "scraper", 46, 12);
+    sleep(1);
+    addTestItem(&head, "ballpen", 18, 120);
+    sleep(1);
+    addTestItem(&head, "scraper", 46, 912);
+    sleep(1);
     addTestItem(&head, "comb", 4, 46);
 
     do {
-        printf("\n\nCommand: ");
+        printf("\n\n>>> ");
         scanf("%s", action);
 
         // here we just examine the action that the user wants to take
@@ -68,9 +77,17 @@ int main()
         if (strcmp(action, "delete") == 0) deleteItem(&head);
         if (strcmp(action, "update") == 0) updateItem(&head);
         if (strcmp(action, "search") == 0) searchItem(&head);
+        if (strcmp(action, "sale") == 0) sellItem(&head);
     } while (strcmp(action, "exit") != 0);
     // TODO: maybe clear the memory of head? there's an available function for that
     return 0;
+}
+
+void sellItem(struct Node **list)
+{
+
+    printf("\n\nEnter a keyword: ");
+    //scanf("%s", searchTerm);
 }
 
 void searchItem(struct Node **list)
@@ -151,6 +168,8 @@ void addItem(struct Node **head)
     // get the current date and time
     sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
     sprintf(newItem.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());
+
+    generateId(newItem.id);
 
     // we then create a new Node structure, it is dynamically allocated in the memory
     // so that it doesn't get cleared when this function exits.
@@ -366,6 +385,30 @@ char* getCurrentDate()
     return dateString;
 }
 
+char *generateId(char placeholder[])
+{
+    char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    char nums[] = "1234567890";
+    //static char id[ID_LENGTH] = "";
+    srand(time(NULL));
+
+    placeholder[0] = '\0';
+
+    // get 4 random characters
+    for (int i = 0; i < 4; i++)
+    {
+        char temp[2] = {chars[rand() % strlen(chars)], '\0'};
+        strcat(placeholder, temp);
+    }
+
+    // get 4 random numbers
+    for (int i = 0; i < 4; i++)
+    {
+        char temp[2] = {nums[rand() % strlen(nums)], '\0'};
+        strcat(placeholder, temp);
+    }
+}
+
 // for development purposes only
 void addTestItem(struct Node **head, char name[], int stocks, double price)
 {
@@ -377,6 +420,8 @@ void addTestItem(struct Node **head, char name[], int stocks, double price)
 
     sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
     sprintf(newItem.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());
+
+    generateId(newItem.id);
 
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->data = newItem;
@@ -399,14 +444,16 @@ void addTestItem(struct Node **head, char name[], int stocks, double price)
 void printLinkedlist(const struct Node *head)
 {
     int i = 1;
-    printf("\nItem:\t\t\tStocks:\t\tPrice:\t\tDate Added:\t\t\tLast Updated:");
+    printf("\nItem:\t\t\tStocks:\t Price:\t\t Date Added:\t\t Last Updated:\t\tId:");
     // loop over the entire list and print the data on each iteration
     while (head != NULL)
     {
+        // TODO: truncate the name if it's too long
+        // if (strlen(head->data.name) >= 8) printf("\n");
         printf
         (
-            "\n%d. %-20s\t%d\t\tP%.2lf\t\t%s\t\t%s",
-            i, head->data.name, head->data.stocks, head->data.price, head->data.dateAdded, head->data.lastUpdated
+            "\n%d. %-20s\t%d\t P%-14.2lf %s\t %s\t %s",
+            i, head->data.name, head->data.stocks, head->data.price, head->data.dateAdded, head->data.lastUpdated, head->data.id
         );
         // iterator
         head = head->next;
