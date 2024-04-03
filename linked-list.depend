@@ -1,7 +1,0 @@
-# depslib dependency file v1.0
-1711614415 source:c:\codes\comprog 2\linked-list\main.c
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<time.h>
-
