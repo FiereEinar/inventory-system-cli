@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 #define NAME_SIZE 20
 #define ID_LENGTH 10
@@ -14,6 +15,7 @@
 struct Item
 {
     char name[NAME_SIZE];
+    int baseStocks;
     int stocks;
     double price;
     char dateAdded[30];
@@ -35,58 +37,105 @@ void deleteItem(struct Node **head);
 int getListSize(const struct Node *head);
 void updateItem(struct Node **head);
 void searchItem(struct Node **head);
-void sellItem(struct Node **list);
+void sellItem(struct Node **head);
 void freeLinkedList(struct Node **head);
 void addTestItem(struct Node **head, char name[], int stocks, double price);
 char* getCurrentTime();
 char* getCurrentDate();
 char *generateId(char placeholder[]);
 void printHelp();
+void printActions();
 
 int main()
 {
+    srand(time(NULL));
     // the head is initially set to NULL
     struct Node *head = NULL;
     // action is the placeholder for determining the action that the user wants to take
-    char action[15];
+    char action[5];
     printf("\nType 'help' to see all available commands.");
 
     printf("\nAdding test items for development purposes only.");
     addTestItem(&head, "pencil", 25, 10);
-    sleep(1);
     addTestItem(&head, "paper", 50, 1140);
-    sleep(1);
     addTestItem(&head, "scissors", 15, 56);
-    sleep(1);
     addTestItem(&head, "ballpen", 18, 120);
-    sleep(1);
     addTestItem(&head, "scraper", 46, 912);
-    sleep(1);
     addTestItem(&head, "comb", 4, 46);
 
+    printActions();
     do {
         printf("\n\n>>> ");
         scanf("%s", action);
 
-        // here we just examine the action that the user wants to take
-        // on each action taken we provide an address to the head that way the functions can access it or manipulate it
-        if (strcmp(action, "help") == 0) printHelp();
-        if (strcmp(action, "view") == 0) printLinkedlist(head);
-        if (strcmp(action, "add") == 0) addItem(&head);
-        if (strcmp(action, "delete") == 0) deleteItem(&head);
-        if (strcmp(action, "update") == 0) updateItem(&head);
-        if (strcmp(action, "search") == 0) searchItem(&head);
-        if (strcmp(action, "sale") == 0) sellItem(&head);
-    } while (strcmp(action, "exit") != 0);
+        //if (strcmp(action, "1") == 0) printHelp();
+        if (strcmp(action, "1") == 0) printLinkedlist(head);
+        if (strcmp(action, "2") == 0) addItem(&head);
+        if (strcmp(action, "3") == 0) deleteItem(&head);
+        if (strcmp(action, "4") == 0) updateItem(&head);
+        if (strcmp(action, "5") == 0) searchItem(&head);
+        if (strcmp(action, "6") == 0) sellItem(&head);
+        if (strcmp(action, "b") == 0) printActions();
+    } while (strcmp(action, "q") != 0);
     // TODO: maybe clear the memory of head? there's an available function for that
     return 0;
 }
 
-void sellItem(struct Node **list)
+void printActions()
 {
+    system("cls");
+    printf("\nWhat do you want to do?\n");
 
-    printf("\n\nEnter a keyword: ");
-    //scanf("%s", searchTerm);
+//    printf("\n1. print all available commands.");
+//    printf("\n2. exit out the operation.");
+    printf("\n1. view all items in the inventory.");
+    printf("\n2. add an item to inventory.");
+    printf("\n3. delete an item to inventory.");
+    printf("\n4. update an item to inventory.");
+    printf("\n5. search an item to inventory.");
+    printf("\n6. sell an item.");
+
+    printf("\n\nEnter 'q' to exit.");
+    printf("\nEnter 'b' to go back.");
+}
+
+void sellItem(struct Node **head)
+{
+    system("cls");
+    // TODO: fix an unknown issue here
+    struct Node *current = *head;
+    char itemId[ID_LENGTH];
+    int quantity;
+    int updated = 0;
+
+    printf("\nType [x] to exit.");
+    printf("\n\nEnter the item ID: \n>>> ");
+    scanf("%s", itemId);
+
+    if (strcmp(itemId, "x") == 0 || strcmp(itemId, "X") == 0)
+    {
+        printActions();
+        return;
+    }
+    printf("\n\nEnter the quantity purchased: \n>>> ");
+    scanf("%d", &quantity);
+
+    while (current != NULL) {
+        if (strcmp(current->data.id, itemId) == 0) {
+            current->data.stocks -= quantity;
+            updated = 1;
+            break; // exit the loop once item is found and updated
+        }
+        current = current->next;
+    }
+    if (updated == 0)
+    {
+        printf("\nItem not found");
+        return;
+    }
+    printLinkedlist(*head);
+    printf("\n\nPurchase deducted to stocks successfully!");
+    printf("\n\nEnter 'b' to go back.");
 }
 
 void searchItem(struct Node **list)
@@ -137,6 +186,7 @@ void searchItem(struct Node **list)
     printLinkedlist(results);
     // free the memory of results
     freeLinkedList(&results);
+    printf("\n\nEnter 'b' to go back.");
 }
 
 void addItem(struct Node **head)
@@ -148,7 +198,7 @@ void addItem(struct Node **head)
 
     scanf("%c");
     // prompt the user with all the data and store it in that newItem structure
-    printf("Enter the name of item: ");
+    printf("Enter the name of item: \n>>> ");
     // use fgets to allow string with spaces
     fgets(newItem.name, NAME_SIZE, stdin);
 
@@ -158,10 +208,11 @@ void addItem(struct Node **head)
         newItem.name[len - 1] = '\0'; // replace newline with null character
     //scanf("%s", newItem.name);
 
-    printf("Enter the stocks of item: ");
+    printf("Enter the stocks of item: \n>>> ");
     scanf("%d", &newItem.stocks);
+    newItem.baseStocks = newItem.stocks;
 
-    printf("Enter the price of item: ");
+    printf("Enter the price of item: \n>>> ");
     scanf("%lf", &newItem.price);
 
     // get the current date and time
@@ -200,6 +251,7 @@ void addItem(struct Node **head)
     }
     printLinkedlist(*head);
     printf("\n\nItem added successfully!");
+    printf("\nEnter 'b' to go back.");
 }
 
 void deleteItem(struct Node **head)
@@ -250,6 +302,7 @@ void deleteItem(struct Node **head)
     // after deleting the item, reprint the list
     printLinkedlist(*head);
     printf("\n\nItem deleted successfully!");
+    printf("\nEnter 'b' to go back.");
 }
 
 void updateItem(struct Node **head)
@@ -258,16 +311,17 @@ void updateItem(struct Node **head)
     printf("Updating an item.\n\n");
     printLinkedlist(*head);
 
+    int addedStocks;
     int toUpdate;
     // this will hold the index of item to be deleted
     char idToDelete[ID_LENGTH];
 
     // prompt the user for some details
-    printf("\n\nEnter the ID of the item: ");
+    printf("\n\nEnter the ID of the item: \n>>> ");
     scanf("%s", idToDelete);
 
     printf("\nOptions: [ 1. name | 2. stocks | 3. price ]");
-    printf("\nWhat do you want to update?: ");
+    printf("\nWhat do you want to update?: \n>>> ");
     scanf("%d", &toUpdate);
 
     // we create a current variable so that we don't manipulate the pointer of the head
@@ -290,7 +344,7 @@ void updateItem(struct Node **head)
     // after that, we simply determine what the user wants to update and prompt the user for new data
     switch(toUpdate) {
         case 1:
-            printf("\nEnter a new name of %s: ", current->data.name);
+            printf("\nEnter a new name of %s: \n>>> ", current->data.name);
             // TODO: use fgets()
             scanf("%c");
             fgets(current->data.name, NAME_SIZE, stdin);
@@ -302,11 +356,13 @@ void updateItem(struct Node **head)
             // scanf("%s", current->data.name);
             break;
         case 2:
-            printf("\nEnter an updated stock of %s: ", current->data.name);
-            scanf("%d", &current->data.stocks);
+            printf("\nEnter the amount of stocks added in %s: \n>>> ", current->data.name);
+            scanf("%d", &addedStocks);
+            current->data.stocks += addedStocks;
+            current->data.baseStocks = current->data.stocks;
             break;
         case 3:
-            printf("\nEnter an updated price of %s: ", current->data.name);
+            printf("\nEnter an updated price of %s: \n>>> ", current->data.name);
             scanf("%lf", &current->data.price);
             break;
         default:
@@ -319,6 +375,7 @@ void updateItem(struct Node **head)
 
     printLinkedlist(*head);
     printf("\n\nUpdated Successfully!");
+    printf("\nEnter 'b' to go back.");
 }
 
 int getListSize(const struct Node *head)
@@ -344,6 +401,7 @@ void printHelp()
     printf("\n5. delete \t delete an item to inventory.");
     printf("\n6. update \t update an item to inventory.");
     printf("\n7. search\t search an item to inventory.");
+    printf("\n8. sale\t\t point of sale.");
 }
 
 char* getCurrentTime() {
@@ -405,8 +463,6 @@ char *generateId(char placeholder[])
 {
     char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char nums[] = "1234567890";
-    //static char id[ID_LENGTH] = "";
-    srand(time(NULL));
 
     placeholder[0] = '\0';
 
@@ -432,6 +488,7 @@ void addTestItem(struct Node **head, char name[], int stocks, double price)
 
     strcpy(newItem.name, name);
     newItem.stocks = stocks;
+    newItem.baseStocks = stocks;
     newItem.price = price;
 
     sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
@@ -468,8 +525,8 @@ void printLinkedlist(const struct Node *head)
         // if (strlen(head->data.name) >= 8) printf("\n");
         printf
         (
-            "\n%d. %-20s\t%d\t P%-14.2lf %s\t %s\t %s",
-            i, head->data.name, head->data.stocks, head->data.price, head->data.dateAdded, head->data.lastUpdated, head->data.id
+            "\n%d. %-20s\t%d/%d\t P%-14.2lf %s\t %s\t %s",
+            i, head->data.name, head->data.stocks, head->data.baseStocks, head->data.price, head->data.dateAdded, head->data.lastUpdated, head->data.id
         );
         // iterator
         head = head->next;
