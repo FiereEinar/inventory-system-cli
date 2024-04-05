@@ -17,11 +17,11 @@ int main()
 
     // Adding test items for development purposes only
     addTestItem(&head, monthlyProfits, "pencil", 25, 10);
-    addTestItem(&head, monthlyProfits, "paper", 10, 55);
-    addTestItem(&head, monthlyProfits, "scissors", 15, 56);
-    addTestItem(&head, monthlyProfits, "ballpen", 18, 12);
-    addTestItem(&head, monthlyProfits, "scraper", 5, 200);
-    addTestItem(&head, monthlyProfits, "comb", 4, 46);
+    // addTestItem(&head, monthlyProfits, "paper", 10, 55);
+    // addTestItem(&head, monthlyProfits, "scissors", 15, 56);
+    // addTestItem(&head, monthlyProfits, "ballpen", 18, 12);
+    // addTestItem(&head, monthlyProfits, "scraper", 5, 200);
+    // addTestItem(&head, monthlyProfits, "comb", 4, 46);
 
     printActions();
     do {
@@ -31,10 +31,11 @@ int main()
         if (strcmp(action, "1") == 0) viewInventory(head);
         if (strcmp(action, "2") == 0) addItem(&head, monthlyProfits);
         if (strcmp(action, "3") == 0) deleteItem(&head, monthlyProfits);
-        if (strcmp(action, "4") == 0) updateItem(&head);                    // TODO: separate the restock option
-        if (strcmp(action, "5") == 0) searchItem(&head);
-        if (strcmp(action, "6") == 0) sellItem(&head, monthlyProfits);      // TODO: restrict selling if quantity is greater than stocks
-        if (strcmp(action, "7") == 0) viewReports(monthlyProfits);
+        if (strcmp(action, "4") == 0) editItem(&head);
+        if (strcmp(action, "5") == 0) restockItem(&head, monthlyProfits);
+        if (strcmp(action, "6") == 0) searchItem(&head);
+        if (strcmp(action, "7") == 0) sellItem(&head, monthlyProfits);      // TODO: restrict selling if quantity is greater than stocks
+        if (strcmp(action, "8") == 0) viewReports(monthlyProfits);
 
         if (strcmp(action, "b") == 0) printActions();
     } while (strcmp(action, "q") != 0);
@@ -71,6 +72,7 @@ void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[])
         "July", "August", "September", "October", "November", "December"
     };
 
+    // initialize the monthly data
     for (int i = 0; i < MONTHS; ++i) 
     {
         strcpy(monthlyProfits[i].month, months[i]);
@@ -88,10 +90,11 @@ void printActions()
     printf("\n1. view all items in the inventory.");
     printf("\n2. add an item in the inventory.");
     printf("\n3. delete an item in the inventory.");
-    printf("\n4. update an item in the inventory.");
-    printf("\n5. search an item in the inventory.");
-    printf("\n6. sell an item.");
-    printf("\n7. view sales report.");
+    printf("\n4. edit an item in the inventory.");
+    printf("\n5. restock an item in the inventory.");
+    printf("\n6. search an item in the inventory.");
+    printf("\n7. sell an item.");
+    printf("\n8. view sales report.");
 
     printf("\n\nEnter 'q' to exit.");
 }
@@ -112,7 +115,7 @@ int getListSize(const struct Node *head)
 void printLinkedlist(const struct Node *head)
 {
     int i = 1;
-    printf("\nItem:\t\t\tStocks:\t Selling Price:\t Date Added:\t\t Last Updated:\t\t Id:");
+    printf("\nItem:\t\t\tStocks:\t Selling Price:\t Profit/item:\t Id:");
     // loop over the entire list and print the data on each iteration
     while (head != NULL)
     {
@@ -120,8 +123,8 @@ void printLinkedlist(const struct Node *head)
         // if (strlen(head->data.name) >= 8) { / ... / }
         printf
         (
-            "\n%d. %-20s\t%d/%d\t P%-14.2lf %s\t %s\t %s",
-            i, head->data.name, head->data.stocks, head->data.baseStocks, head->data.price, head->data.dateAdded, head->data.lastUpdated, head->data.id
+            "\n%d. %-20s\t%d/%d\t P%-14.2lf %.2lf\t\t %s",
+            i, head->data.name, head->data.stocks, head->data.baseStocks, head->data.price, head->data.profit, head->data.id
         );
         // iterator
         head = head->next;

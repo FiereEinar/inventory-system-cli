@@ -26,8 +26,17 @@ void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     printf("\n\nEnter the quantity purchased: \n>>> ");
     scanf("%lf", &quantity);
 
+    // find the item in the list
     while (current != NULL) {
         if (strcmp(current->data.id, itemId) == 0) {
+            // if there's not enough stocks, don't proceed
+            if (current->data.stocks < quantity)
+            {
+                printf("\nNot enough stocks to fulfill the purchase.");
+                return;
+            }
+
+
             current->data.stocks -= (int)quantity;
             monthlyProfits[getCurrentDateInt()].profit += quantity * (current->data.price - current->data.originalPrice);
             monthlyProfits[getCurrentDateInt()].revenue += quantity * current->data.price;
@@ -36,14 +45,61 @@ void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
         }
         current = current->next;
     }
+
     if (updated == 0)
     {
         printf("\nItem not found");
         return;
     }
+
     printLinkedlist(*head);
     printf("\n\nPurchase deducted to stocks successfully!");
     printf("\n\nEnter 'b' to go back.");
+}
+
+void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
+{
+    system("cls");
+    printf("Restocking an item.\n\n");
+    printLinkedlist(*head);
+
+    int addedStocks;
+    double additionalCosts;
+    char idToDelete[ID_LENGTH];
+
+    // prompt the user for some details
+    printf("\n\nEnter the ID of the item: \n>>> ");
+    scanf("%s", idToDelete);
+
+    // we create a current variable so that we don't manipulate the pointer of the head
+    struct Node *current = *head;
+    // traverse to the Node/item that the user wants to update
+    while(current->next != NULL)
+    {
+        if (strcmp(current->data.id, idToDelete) == 0) break;
+        current = current->next;
+    }
+
+    // if we didn't find the item, give them an error
+    if (strcmp(current->data.id, idToDelete) != 0)
+    {
+        printf("\nError: Item does not exist. Please try again");
+        return;
+    }
+
+    printf("\nEnter the amount of stocks added in %s: \n>>> ", current->data.name);
+    scanf("%d", &addedStocks);
+    current->data.stocks += addedStocks;
+    current->data.baseStocks = current->data.stocks;
+
+    printf("\nAny additional costs? (gas, transportation, etc.) \n>>> ");
+    scanf("%lf", &additionalCosts);
+
+    monthlyProfits[getCurrentDateInt()].costs += (addedStocks * current->data.originalPrice) + additionalCosts;
+
+    printLinkedlist(*head);
+    printf("\n\nStocks added succesfully!");
+    printf("\nEnter 'b' to go back.");
 }
 
 void searchItem(struct Node **list)
@@ -104,7 +160,7 @@ void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     // create a new instance of the Item struct
     struct Item newItem;
 
-    scanf("%c");
+    fflush(stdin);
     // prompt the user with all the data and store it in that newItem structure
     printf("Enter the name of item: \n>>> ");
     // use fgets to allow string with spaces
@@ -133,6 +189,7 @@ void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     generateId(newItem.id);
     // tally the cost
     monthlyProfits[getCurrentDateInt()].costs += newItem.stocks * newItem.originalPrice;
+    newItem.profit = newItem.price - newItem.originalPrice;
 
     // we then create a new Node structure, it is dynamically allocated in the memory
     // so that it doesn't get cleared when this function exits.
@@ -218,13 +275,12 @@ void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     printf("\nEnter 'b' to go back.");
 }
 
-void updateItem(struct Node **head)
+void editItem(struct Node **head)
 {
     system("cls");
     printf("Updating an item.\n\n");
     printLinkedlist(*head);
 
-    int addedStocks;
     int toUpdate;
     // this will hold the index of item to be deleted
     char idToDelete[ID_LENGTH];
@@ -233,7 +289,7 @@ void updateItem(struct Node **head)
     printf("\n\nEnter the ID of the item: \n>>> ");
     scanf("%s", idToDelete);
 
-    printf("\nOptions: [ 1. name | 2. stocks | 3. price ]");
+    printf("\nOptions: [ 1. name | 2. original price | 3. selling price ]");
     printf("\nWhat do you want to update?: \n>>> ");
     scanf("%d", &toUpdate);
 
@@ -257,25 +313,23 @@ void updateItem(struct Node **head)
     switch(toUpdate) {
         case 1:
             printf("\nEnter a new name of %s: \n>>> ", current->data.name);
-            // TODO: use fgets()
-            scanf("%c");
+            fflush(stdin);
             fgets(current->data.name, NAME_SIZE, stdin);
 
             // clear the newline character from fgets()
             size_t len = strlen(current->data.name);
             if (len > 0 && current->data.name[len - 1] == '\n')
                 current->data.name[len - 1] = '\0';
-            // scanf("%s", current->data.name);
             break;
         case 2:
-            printf("\nEnter the amount of stocks added in %s: \n>>> ", current->data.name);
-            scanf("%d", &addedStocks);
-            current->data.stocks += addedStocks;
-            current->data.baseStocks = current->data.stocks;
+            printf("\nEnter an updated original price of %s(Original: %.2lf): \n>>> ", current->data.name, current->data.originalPrice);
+            scanf("%lf", &current->data.originalPrice);
+            current->data.profit = current->data.price - current->data.originalPrice;
             break;
         case 3:
-            printf("\nEnter an updated price of %s: \n>>> ", current->data.name);
+            printf("\nEnter an updated selling price of %s: \n>>> ", current->data.name);
             scanf("%lf", &current->data.price);
+            current->data.profit = current->data.price - current->data.originalPrice;
             break;
         default:
             printf("\nError: Incorrect number entered.");
@@ -300,6 +354,7 @@ void addTestItem(struct Node **head, struct ProfitPerMonth monthlyProfits[], cha
     newItem.baseStocks = stocks;
     newItem.price = price;
     newItem.originalPrice = price - 5;
+    newItem.profit = newItem.price - newItem.originalPrice;
 
     sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
     sprintf(newItem.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());

@@ -13,6 +13,7 @@ struct Item
     int stocks;
     double price;
     double originalPrice;
+    double profit;
     char dateAdded[30];
     char lastUpdated[30];
     char id[ID_LENGTH];
@@ -38,10 +39,11 @@ struct ProfitPerMonth
 // item
 void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
 void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
-void updateItem(struct Node **head);
+void editItem(struct Node **head);
 void searchItem(struct Node **head);
 void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
 void addTestItem(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price);
+void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
 
 // utils
 char* getCurrentTime();
