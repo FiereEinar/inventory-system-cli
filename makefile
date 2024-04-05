@@ -18,4 +18,4 @@ $(BINARY): $(OBJECTS)
 	$(CC) $(CFLAGS) -c -o $@ $^
 
 clean:
-	rm -rf $(BINARY) $(OBJECTS)
+	del $(OBJECTS)

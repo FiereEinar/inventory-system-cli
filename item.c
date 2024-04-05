@@ -3,17 +3,15 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <stdbool.h>
 
 #include "main.h"
 
-void sellItem(struct Node **head)
+void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
     system("cls");
-    // TODO: fix an unknown issue here
     struct Node *current = *head;
     char itemId[ID_LENGTH];
-    int quantity;
+    double quantity;
     int updated = 0;
 
     printf("\nType [x] to exit.");
@@ -26,11 +24,13 @@ void sellItem(struct Node **head)
         return;
     }
     printf("\n\nEnter the quantity purchased: \n>>> ");
-    scanf("%d", &quantity);
+    scanf("%lf", &quantity);
 
     while (current != NULL) {
         if (strcmp(current->data.id, itemId) == 0) {
-            current->data.stocks -= quantity;
+            current->data.stocks -= (int)quantity;
+            monthlyProfits[getCurrentDateInt()].profit += quantity * (current->data.price - current->data.originalPrice);
+            monthlyProfits[getCurrentDateInt()].revenue += quantity * current->data.price;
             updated = 1;
             break; // exit the loop once item is found and updated
         }
@@ -97,7 +97,7 @@ void searchItem(struct Node **list)
     printf("\n\nEnter 'b' to go back.");
 }
 
-void addItem(struct Node **head)
+void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
     system("cls");
     printf("Adding an item.\n\n");
@@ -120,14 +120,19 @@ void addItem(struct Node **head)
     scanf("%d", &newItem.stocks);
     newItem.baseStocks = newItem.stocks;
 
-    printf("Enter the price of item: \n>>> ");
+    printf("Enter the selling price of item: \n>>> ");
     scanf("%lf", &newItem.price);
+
+    printf("Enter the original price of item: \n>>> ");
+    scanf("%lf", &newItem.originalPrice);
 
     // get the current date and time
     sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
     sprintf(newItem.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());
 
     generateId(newItem.id);
+    // tally the cost
+    monthlyProfits[getCurrentDateInt()].costs += newItem.stocks * newItem.originalPrice;
 
     // we then create a new Node structure, it is dynamically allocated in the memory
     // so that it doesn't get cleared when this function exits.
@@ -162,7 +167,7 @@ void addItem(struct Node **head)
     printf("\nEnter 'b' to go back.");
 }
 
-void deleteItem(struct Node **head)
+void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
     system("cls");
     printf("Deleting an item.\n\n");
@@ -234,7 +239,6 @@ void updateItem(struct Node **head)
 
     // we create a current variable so that we don't manipulate the pointer of the head
     struct Node *current = *head;
-    int j = 1;
     // traverse to the Node/item that the user wants to update
     while(current->next != NULL)
     {
@@ -287,7 +291,7 @@ void updateItem(struct Node **head)
 }
 
 // for development purposes only
-void addTestItem(struct Node **head, char name[], int stocks, double price)
+void addTestItem(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price)
 {
     struct Item newItem;
 
@@ -295,11 +299,13 @@ void addTestItem(struct Node **head, char name[], int stocks, double price)
     newItem.stocks = stocks;
     newItem.baseStocks = stocks;
     newItem.price = price;
+    newItem.originalPrice = price - 5;
 
     sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
     sprintf(newItem.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());
 
     generateId(newItem.id);
+    monthlyProfits[getCurrentDateInt()].costs += newItem.stocks * newItem.originalPrice;
 
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->data = newItem;

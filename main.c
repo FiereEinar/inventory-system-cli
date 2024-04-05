@@ -10,54 +10,90 @@
 int main()
 {
     srand(time(NULL));
-    // the head is initially set to NULL
     struct Node *head = NULL;
-    // action is the placeholder for determining the action that the user wants to take
-    char action[5];
-    printf("\nType 'help' to see all available commands.");
+    struct ProfitPerMonth monthlyProfits[MONTHS];
+    initMonthlyProfits(monthlyProfits);             // fill the monthly values with zero and sets monthly names
+    char action[5];                                 // action of user, string because there are 'b' or 'q' options
 
-    printf("\nAdding test items for development purposes only.");
-    addTestItem(&head, "pencil", 25, 10);
-    addTestItem(&head, "paper", 50, 1140);
-    addTestItem(&head, "scissors", 15, 56);
-    addTestItem(&head, "ballpen", 18, 120);
-    addTestItem(&head, "scraper", 46, 912);
-    addTestItem(&head, "comb", 4, 46);
+    // Adding test items for development purposes only
+    addTestItem(&head, monthlyProfits, "pencil", 25, 10);
+    addTestItem(&head, monthlyProfits, "paper", 10, 55);
+    addTestItem(&head, monthlyProfits, "scissors", 15, 56);
+    addTestItem(&head, monthlyProfits, "ballpen", 18, 12);
+    addTestItem(&head, monthlyProfits, "scraper", 5, 200);
+    addTestItem(&head, monthlyProfits, "comb", 4, 46);
 
     printActions();
     do {
         printf("\n\n>>> ");
         scanf("%s", action);
 
-        //if (strcmp(action, "1") == 0) printHelp();
-        if (strcmp(action, "1") == 0) printLinkedlist(head);
-        if (strcmp(action, "2") == 0) addItem(&head);
-        if (strcmp(action, "3") == 0) deleteItem(&head);
-        if (strcmp(action, "4") == 0) updateItem(&head);
+        if (strcmp(action, "1") == 0) viewInventory(head);
+        if (strcmp(action, "2") == 0) addItem(&head, monthlyProfits);
+        if (strcmp(action, "3") == 0) deleteItem(&head, monthlyProfits);
+        if (strcmp(action, "4") == 0) updateItem(&head);                    // TODO: separate the restock option
         if (strcmp(action, "5") == 0) searchItem(&head);
-        if (strcmp(action, "6") == 0) sellItem(&head);
+        if (strcmp(action, "6") == 0) sellItem(&head, monthlyProfits);      // TODO: restrict selling if quantity is greater than stocks
+        if (strcmp(action, "7") == 0) viewReports(monthlyProfits);
+
         if (strcmp(action, "b") == 0) printActions();
     } while (strcmp(action, "q") != 0);
     // TODO: maybe clear the memory of head? there's an available function for that
     return 0;
 }
 
+void viewInventory(const struct Node *head)
+{
+    printLinkedlist(head);
+    printf("\n\nEnter 'b' to go back.");
+}
+
+void viewReports(struct ProfitPerMonth monthlyProfits[])
+{
+    printf("Month:\t\t\tCost:\t\tRevenue:\t\tProfit:\n");
+    for (int i = 0; i < MONTHS; i++)
+    {
+        printf
+        (
+            "%-15s\t\t%-10.2lf\t%-10.2lf\t\t%-10.2lf\n", 
+            monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].revenue, monthlyProfits[i].profit
+        );
+    }
+    printf("\n\nEnter 'q' to exit.");
+    printf("\nEnter 'b' to go back.");
+}
+
+void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[])
+{
+    char months[MONTHS][15] = 
+    {
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    };
+
+    for (int i = 0; i < MONTHS; ++i) 
+    {
+        strcpy(monthlyProfits[i].month, months[i]);
+        monthlyProfits[i].costs = 0.0;
+        monthlyProfits[i].revenue = 0.0;
+        monthlyProfits[i].profit = 0.0;
+    }
+}
+
 void printActions()
 {
     system("cls");
-    printf("\nWhat do you want to do?\n");
+    printf("\nEnter the action you want to take:\n");
 
-//    printf("\n1. print all available commands.");
-//    printf("\n2. exit out the operation.");
     printf("\n1. view all items in the inventory.");
-    printf("\n2. add an item to inventory.");
-    printf("\n3. delete an item to inventory.");
-    printf("\n4. update an item to inventory.");
-    printf("\n5. search an item to inventory.");
+    printf("\n2. add an item in the inventory.");
+    printf("\n3. delete an item in the inventory.");
+    printf("\n4. update an item in the inventory.");
+    printf("\n5. search an item in the inventory.");
     printf("\n6. sell an item.");
+    printf("\n7. view sales report.");
 
     printf("\n\nEnter 'q' to exit.");
-    printf("\nEnter 'b' to go back.");
 }
 
 int getListSize(const struct Node *head)
@@ -72,30 +108,16 @@ int getListSize(const struct Node *head)
     return size;
 }
 
-void printHelp()
-{
-    system("cls");
-    printf("\nAvailable Commands: ");
-    printf("\n1. help \t print all available commands.");
-    printf("\n2. exit \t exit out the operation.");
-    printf("\n3. view \t print all items in the inventory.");
-    printf("\n4. add \t\t add an item to inventory.");
-    printf("\n5. delete \t delete an item to inventory.");
-    printf("\n6. update \t update an item to inventory.");
-    printf("\n7. search\t search an item to inventory.");
-    printf("\n8. sale\t\t point of sale.");
-}
-
 // print the linked list values
 void printLinkedlist(const struct Node *head)
 {
     int i = 1;
-    printf("\nItem:\t\t\tStocks:\t Price:\t\t Date Added:\t\t Last Updated:\t\t Id:");
+    printf("\nItem:\t\t\tStocks:\t Selling Price:\t Date Added:\t\t Last Updated:\t\t Id:");
     // loop over the entire list and print the data on each iteration
     while (head != NULL)
     {
         // TODO: truncate the name if it's too long
-        // if (strlen(head->data.name) >= 8) printf("\n");
+        // if (strlen(head->data.name) >= 8) { / ... / }
         printf
         (
             "\n%d. %-20s\t%d/%d\t P%-14.2lf %s\t %s\t %s",

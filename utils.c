@@ -83,3 +83,13 @@ char *generateId(char placeholder[])
         strcat(placeholder, temp);
     }
 }
+
+int getCurrentDateInt()
+{
+    time_t rawtime;
+    struct tm *info;
+    time(&rawtime);
+    info = localtime(&rawtime);
+
+    return info->tm_mon;
+}
