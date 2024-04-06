@@ -36,7 +36,7 @@ void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
                 return;
             }
 
-
+            // once the item is found, update the stocks and tally the profit and revenue
             current->data.stocks -= (int)quantity;
             monthlyProfits[getCurrentDateInt()].profit += quantity * (current->data.price - current->data.originalPrice);
             monthlyProfits[getCurrentDateInt()].revenue += quantity * current->data.price;
@@ -62,6 +62,7 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     system("cls");
     printf("Restocking an item.\n\n");
     printLinkedlist(*head);
+
     if (*head == NULL)
     {
         printf("\nNo item to restock.");
@@ -69,7 +70,6 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
         return;
     }
     
-
     int addedStocks;
     double additionalCosts;
     char idToDelete[ID_LENGTH];
@@ -102,11 +102,28 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     printf("\nAny additional costs? (gas, transportation, etc.) \n>>> ");
     scanf("%lf", &additionalCosts);
 
+    // tally the costs
     monthlyProfits[getCurrentDateInt()].costs += (addedStocks * current->data.originalPrice) + additionalCosts;
+    // update the lastUpdated data
+    sprintf(current->data.lastUpdated, "%s / %s", getCurrentDate(), getCurrentTime());
 
     printLinkedlist(*head);
     printf("\n\nStocks added succesfully!");
     printf("\nEnter 'b' to go back.");
+}
+
+struct Node *getItemById(struct Node *list, char itemId[])
+{
+    struct Node *current = list;
+
+    while (current != NULL)
+    {
+        if (strcmp(current->data.id, itemId) == 0)
+            return current;
+        
+        current = current->next;
+    }
+    return NULL;
 }
 
 void searchItem(struct Node **list)
@@ -136,7 +153,7 @@ void searchItem(struct Node **list)
 
     // we traverse the list and on each iteration, check if searchTerm is a substring of the current data name
     while(current != NULL) {
-        // strstr() is a function in <string.h> that will check if a string is a substring of another string. AKA if it fits the searchTerm
+        // strstr() is a function in <string.h> that will check if a string is a substring of another string. in simple term, if it fits the searchTerm
         if(strstr(current->data.name, searchTerm) != NULL) {
             // if true we create a new instance of Node with the same data
             struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
@@ -170,21 +187,19 @@ void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
     system("cls");
     printf("Adding an item.\n\n");
-    // create a new instance of the Item struct
+    // using item struct to store values, less variable declaration needed
     struct Item newItem;
     double additionalCosts;
 
-    fflush(stdin);
     // prompt the user with all the data and store it in that newItem structure
+    fflush(stdin);
     printf("Enter the name of item: \n>>> ");
     // use fgets to allow string with spaces
     fgets(newItem.name, NAME_SIZE, stdin);
-
     // clear the newline character from fgets()
     size_t len = strlen(newItem.name);
     if (len > 0 && newItem.name[len - 1] == '\n')
-        newItem.name[len - 1] = '\0'; // replace newline with null character
-    //scanf("%s", newItem.name);
+        newItem.name[len - 1] = '\0';
 
     printf("Enter the stocks of item: \n>>> ");
     scanf("%d", &newItem.stocks);
@@ -196,49 +211,11 @@ void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     printf("Enter the original price of item: \n>>> ");
     scanf("%lf", &newItem.originalPrice);
 
-    printf("\nAny additional costs? (gas, transportation, etc.) \n>>> ");
+    printf("Any additional costs? (gas, transportation, etc.) \n>>> ");
     scanf("%lf", &additionalCosts);
-
-    // get the current date and time
-    sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
-    sprintf(newItem.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());
-
-    generateId(newItem.id);
-    // tally the cost
-    monthlyProfits[getCurrentDateInt()].costs += (newItem.stocks * newItem.originalPrice) + additionalCosts;
-    newItem.profit = newItem.price - newItem.originalPrice;
-
-    // we then create a new Node structure, it is dynamically allocated in the memory
-    // so that it doesn't get cleared when this function exits.
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-    // here we just set the data property of the Node to our Item struct
-    newNode->data = newItem;
-    // the next will be null since this new Item Node will be added at the end of the list
-    newNode->next = NULL;
-
-    // if this is the first item that is added then we simply set the head to our newly created Node
-    if (*head == NULL) {
-        *head = newNode;
-    // otherwise we need to traverse the end of the list and add it there
-    } else {
-        // TODO: create a tail in main() so that we don't have to traverse our way to the tail
-        // here we create a (current) variable to prevent our head from being manipulated
-        struct Node *current = *head;
-        // it is guaranteed that at the end of the list, its next property will always be NULL
-        // so we use it to check wether or not we have reached the end of the list
-        while(current->next != NULL)
-        {
-            // we traverse the list by simply setting our current pointer to point to the next Node
-            // this will continue until the next property in NULL and that means we have reach the end
-            current = current->next;
-        }
-        // after we reached the end, we simply set the next pointer
-        // (that was recently pointing to NULL) to point to our newly created Node
-        current->next = newNode;
-    }
-    printLinkedlist(*head);
-    printf("\n\nItem added successfully!");
-    printf("\nEnter 'b' to go back.");
+    
+    // after getting all the necessary data from user, add it to the list
+    addItemToList(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, additionalCosts);
 }
 
 void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
@@ -338,7 +315,7 @@ void editItem(struct Node **head)
     scanf("%s", idToDelete);
 
     printf("\nOptions: [ 1. name | 2. original price | 3. selling price ]");
-    printf("\nWhat do you want to update?: \n>>> ");
+    printf("\nWhat do you want to edit?: \n>>> ");
     scanf("%d", &toUpdate);
 
     // we create a current variable so that we don't manipulate the pointer of the head
@@ -385,44 +362,50 @@ void editItem(struct Node **head)
     }
 
     // update the lastUpdated data
-    sprintf(current->data.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());
+    sprintf(current->data.lastUpdated, "%s / %s", getCurrentDate(), getCurrentTime());
 
     printLinkedlist(*head);
     printf("\n\nUpdated Successfully!");
     printf("\nEnter 'b' to go back.");
 }
 
-// for development purposes only
-void addTestItem(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price)
+void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost)
 {
+    // tbh, i could've just passed the entire Item struct, but im using this function for generating test items as well so...
     struct Item newItem;
 
+    // append all the data
     strcpy(newItem.name, name);
     newItem.stocks = stocks;
     newItem.baseStocks = stocks;
     newItem.price = price;
-    newItem.originalPrice = price - 5;
+    newItem.originalPrice = originalPrice;
     newItem.profit = newItem.price - newItem.originalPrice;
 
-    sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
-    sprintf(newItem.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());
+    sprintf(newItem.dateAdded, "%s / %s", getCurrentDate(), getCurrentTime());
+    sprintf(newItem.lastUpdated, "%s / %s", getCurrentDate(), getCurrentTime());
 
     generateId(newItem.id);
-    monthlyProfits[getCurrentDateInt()].costs += newItem.stocks * newItem.originalPrice;
+    // tally the costs
+    monthlyProfits[getCurrentDateInt()].costs += (newItem.stocks * newItem.originalPrice) + additionalCost;
 
+    // create a dynamically allocated node 
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->data = newItem;
     newNode->next = NULL;
 
+    // the logic for adding it to the list
     if (*head == NULL) {
         *head = newNode;
     } else {
         struct Node *current = *head;
         while(current->next != NULL)
-        {
             current = current->next;
-        }
+        
         current->next = newNode;
     }
-    printf("\nItem added!");
+
+    printLinkedlist(*head);
+    printf("\n\nItem added successfully!");
+    printf("\nEnter 'b' to go back.");
 }

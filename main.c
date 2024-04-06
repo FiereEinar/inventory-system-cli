@@ -16,12 +16,12 @@ int main()
     char action[5];                                 // action of user, string because there are 'b' or 'q' options
 
     // Adding test items for development purposes only
-    addTestItem(&head, monthlyProfits, "pencil", 25, 10);
-    // addTestItem(&head, monthlyProfits, "paper", 10, 55);
-    // addTestItem(&head, monthlyProfits, "scissors", 15, 56);
-    // addTestItem(&head, monthlyProfits, "ballpen", 18, 12);
-    // addTestItem(&head, monthlyProfits, "scraper", 5, 200);
-    // addTestItem(&head, monthlyProfits, "comb", 4, 46);
+    addItemToList(&head, monthlyProfits, "pencil", 25, 10, 5, 15);
+    addItemToList(&head, monthlyProfits, "paper", 10, 55, 44, 15);
+    addItemToList(&head, monthlyProfits, "scissors", 15, 56, 47, 15);
+    addItemToList(&head, monthlyProfits, "ballpen", 18, 12, 10, 15);
+    addItemToList(&head, monthlyProfits, "scraper", 5, 200, 150, 15);
+    addItemToList(&head, monthlyProfits, "comb", 4, 46, 40, 15);
 
     printActions();
     do {
@@ -43,25 +43,60 @@ int main()
     return 0;
 }
 
-void viewInventory(const struct Node *head)
+void viewInventory(struct Node *head)
 {
+    char action[ID_LENGTH];
+
     printLinkedlist(head);
+    printf("\n\nEnter 'b' to go back.");
+    printf("\nEnter the item ID to view more details about an item.");
+
+    printf("\n>>> ");
+    fflush(stdin);
+    scanf("%s", action);
+
+    if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) {
+        printActions();
+    } else {
+        struct Node *itemData = getItemById(head, action);
+        if (itemData == NULL) {
+            printf("\nItem not found, please try again.");
+            return;
+        }
+        printItemData(itemData->data);
+    } 
+}
+
+void printItemData(struct Item item)
+{
+    system("cls");
+    printf("\nMore details about the item: \n");
+    printf("\nItem Name:\t\t\t\t%s", item.name);
+    printf("\nStocks:\t\t\t\t\t%d / %d", item.stocks, item.baseStocks);
+    printf("\nPrice:\t\t\t\t\t%.2lf", item.price);
+    printf("\nOriginal Price:\t\t\t\t%.2lf", item.originalPrice);
+    printf("\nProfit per item:\t\t\t%.2lf", item.profit);
+    printf("\nDate Added:\t\t\t\t%s", item.dateAdded);
+    printf("\nLast Updated:\t\t\t\t%s", item.lastUpdated);
+    printf("\nItem ID:\t\t\t\t%s", item.id);
+
     printf("\n\nEnter 'b' to go back.");
 }
 
 void viewReports(struct ProfitPerMonth monthlyProfits[])
 {
-    printf("Month:\t\t\tCost:\t\tRevenue:\t\tProfit:\n");
+    printf("Month:\t\t\t\tCosts:\t\tRevenue:\t\tProfit:\n");
     for (int i = 0; i < MONTHS; i++)
     {
         printf
         (
-            "%-15s\t\tP%-10.2lf\tP%-10.2lf\t\tP%-10.2lf\n", 
-            monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].revenue, monthlyProfits[i].profit
+            "%d. %-15s\t\tP%-10.2lf\tP%-10.2lf\t\tP%-10.2lf\n", 
+            i + 1, monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].revenue, monthlyProfits[i].profit
         );
     }
-    printf("\nTotal Costs:\t\t\t\t\t\t\tP%.2lf", getTotalCosts(monthlyProfits));
-    printf("\nTotal Profit:\t\t\t\t\t\t\tP%.2lf", getTotalProfit(monthlyProfits));
+    printf("\nTotal Costs:\t\t\t\t\t\t\t\tP%.2lf", getTotalCosts(monthlyProfits));
+    printf("\nTotal Revenue:\t\t\t\t\t\t\t\tP%.2lf", getTotalRevenue(monthlyProfits));
+    printf("\nTotal Profit:\t\t\t\t\t\t\t\tP%.2lf", getTotalProfit(monthlyProfits));
 
     printf("\n\nEnter 'q' to exit.");
     printf("\nEnter 'b' to go back.");
@@ -83,6 +118,16 @@ double getTotalCosts(struct ProfitPerMonth monthlyProfits[])
 
     for (int i = 0; i < MONTHS; i++)
         total += monthlyProfits[i].costs;
+
+    return total;
+}
+
+double getTotalRevenue(struct ProfitPerMonth monthlyProfits[])
+{
+    double total = 0;
+
+    for (int i = 0; i < MONTHS; i++)
+        total += monthlyProfits[i].revenue;
 
     return total;
 }

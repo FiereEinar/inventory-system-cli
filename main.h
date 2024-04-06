@@ -41,8 +41,9 @@ void editItem(struct Node **head);
 void searchItem(struct Node **head);
 void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], double deduction);
 void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
-void addTestItem(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price);
+void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);
 void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
+struct Node *getItemById(struct Node *list, char itemId[]);
 
 // utils
 char* getCurrentTime();
@@ -54,9 +55,11 @@ int getCurrentDateInt();
 void printLinkedlist(const struct Node *head);
 void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[]);
 int getListSize(const struct Node *head);
-void viewInventory(const struct Node *head);
+void viewInventory(struct Node *head);
 double getTotalProfit(struct ProfitPerMonth monthlyProfits[]);
 double getTotalCosts(struct ProfitPerMonth monthlyProfits[]);
+double getTotalRevenue(struct ProfitPerMonth monthlyProfits[]);
 void printActions();
 void freeLinkedList(struct Node **head);
 void viewReports(struct ProfitPerMonth monthlyProfits[]);
+void printItemData(struct Item item);
