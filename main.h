@@ -1,6 +1,7 @@
 #define NAME_SIZE 20
 #define ID_LENGTH 10
 #define MONTHS 12
+#define SLEEP_TIME 3
 
 // structure of an individual item
 struct Item
@@ -43,7 +44,7 @@ void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], dou
 void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
 void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);
 void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
-struct Node *getItemById(struct Node *list, char itemId[]);
+struct Node *getItemById(struct Node **list, char itemId[]);
 
 // utils
 char* getCurrentTime();
@@ -55,7 +56,8 @@ int getCurrentDateInt();
 void printLinkedlist(const struct Node *head);
 void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[]);
 int getListSize(const struct Node *head);
-void viewInventory(struct Node *head);
+void viewInventory(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
+void viewItemDetails(struct Node **head);
 double getTotalProfit(struct ProfitPerMonth monthlyProfits[]);
 double getTotalCosts(struct ProfitPerMonth monthlyProfits[]);
 double getTotalRevenue(struct ProfitPerMonth monthlyProfits[]);
@@ -63,3 +65,17 @@ void printActions();
 void freeLinkedList(struct Node **head);
 void viewReports(struct ProfitPerMonth monthlyProfits[]);
 void printItemData(struct Item item);
+
+// display
+void inventoryPage(struct Node **head);
+void printItemList(struct Node **head);
+void printItemHeader();
+void menuPage();
+void topBar(char *text);
+void bannerFullBorder();
+void bannerBlankBorderTextCen (char *text);
+void bannerBlankBorderText (char *text);
+void bannerBlankBorderTextLeft (char *text);
+void bannerBlankBorder ();
+void bannerUserInput();
+void bannerFullBorderSection ();

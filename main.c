@@ -13,7 +13,7 @@ int main()
     struct Node *head = NULL;
     struct ProfitPerMonth monthlyProfits[MONTHS];
     initMonthlyProfits(monthlyProfits);             // fill the monthly values with zero and sets monthly names
-    char action[5];                                 // action of user, string because there are 'b' or 'q' options
+    char action;
 
     // Adding test items for development purposes only
     addItemToList(&head, monthlyProfits, "pencil", 25, 10, 5, 15);
@@ -23,48 +23,107 @@ int main()
     addItemToList(&head, monthlyProfits, "scraper", 5, 200, 150, 15);
     addItemToList(&head, monthlyProfits, "comb", 4, 46, 40, 15);
 
-    printActions();
-    do {
-        printf("\n\n>>> ");
-        scanf("%s", action);
+    while (true) {
+        system("cls");
+        menuPage();
 
-        if (strcmp(action, "1") == 0) viewInventory(head);
-        if (strcmp(action, "2") == 0) addItem(&head, monthlyProfits);
-        if (strcmp(action, "3") == 0) deleteItem(&head, monthlyProfits);
-        if (strcmp(action, "4") == 0) editItem(&head);
-        if (strcmp(action, "5") == 0) restockItem(&head, monthlyProfits);
-        if (strcmp(action, "6") == 0) searchItem(&head);
-        if (strcmp(action, "7") == 0) sellItem(&head, monthlyProfits);      // TODO: restrict selling if quantity is greater than stocks
-        if (strcmp(action, "8") == 0) viewReports(monthlyProfits);
+        bannerUserInput();
+        scanf("%c", &action);
 
-        if (strcmp(action, "b") == 0) printActions();
-    } while (strcmp(action, "q") != 0);
+        switch (action)
+        {
+        case '1':
+            viewInventory(&head, monthlyProfits);
+            break;
+        case '2':
+            sellItem(&head, monthlyProfits);
+            break;
+        case '3':
+            system("cls");
+            viewReports(monthlyProfits);
+            break;
+        case 'q':
+            return 0;
+        }
+        // if (strcmp(action, "1") == 0) viewInventory(&head, monthlyProfits);
+        // if (strcmp(action, "1") == 0) viewInventory(head);
+        // if (strcmp(action, "2") == 0) addItem(&head, monthlyProfits);
+        // if (strcmp(action, "3") == 0) deleteItem(&head, monthlyProfits);
+        // if (strcmp(action, "4") == 0) editItem(&head);
+        // if (strcmp(action, "5") == 0) restockItem(&head, monthlyProfits);
+        // if (strcmp(action, "6") == 0) searchItem(&head);
+        // if (strcmp(action, "7") == 0) sellItem(&head, monthlyProfits);
+        // if (strcmp(action, "8") == 0) viewReports(monthlyProfits);
+        // if (strcmp(action, "b") == 0) printActions();
+    }
     // TODO: maybe clear the memory of head? there's an available function for that
-    return 0;
 }
 
-void viewInventory(struct Node *head)
+void viewInventory(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
-    char action[ID_LENGTH];
+    char action;
+    system("cls");
 
-    printLinkedlist(head);
-    printf("\n\nEnter 'b' to go back.");
-    printf("\nEnter the item ID to view more details about an item.");
+    inventoryPage(head);
 
-    printf("\n>>> ");
-    fflush(stdin);
-    scanf("%s", action);
+    while (true) {
+        bannerUserInput();
+        fflush(stdin);
+        scanf("%c", &action);
 
-    if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) {
-        printActions();
-    } else {
-        struct Node *itemData = getItemById(head, action);
-        if (itemData == NULL) {
-            printf("\nItem not found, please try again.");
+        switch (action)
+        {
+        case '1':
+            addItem(head, monthlyProfits);
+            system("cls");
+            inventoryPage(head);
+            break;
+        case '2':
+            deleteItem(head, monthlyProfits);
+            system("cls");
+            inventoryPage(head);
+            break;
+        case '3':
+            editItem(head);
+            system("cls");
+            inventoryPage(head);
+            break;
+        case '4':
+            restockItem(head, monthlyProfits);
+            system("cls");
+            inventoryPage(head);
+            break;
+        case '5':
+            searchItem(head);
+            break;
+        case '6':
+            viewItemDetails(head);
+            break;
+        case 'b':
             return;
         }
-        printItemData(itemData->data);
-    } 
+    }
+}
+
+void viewItemDetails(struct Node **head)
+{
+    char itemId[ID_LENGTH];
+
+    printf("Enter the item ID:");
+    bannerUserInput();
+    scanf("%s", itemId);
+
+    struct Node *itemData = getItemById(head, itemId);
+
+    if (itemData == NULL) {
+        printf("\nItem not found, please try again.");
+        sleep(SLEEP_TIME);
+        system("cls");
+        inventoryPage(head);
+        return;
+    }
+    
+    printItemData(itemData->data);
 }
 
 void printItemData(struct Item item)
@@ -98,8 +157,11 @@ void viewReports(struct ProfitPerMonth monthlyProfits[])
     printf("\nTotal Revenue:\t\t\t\t\t\t\t\tP%.2lf", getTotalRevenue(monthlyProfits));
     printf("\nTotal Profit:\t\t\t\t\t\t\t\tP%.2lf", getTotalProfit(monthlyProfits));
 
-    printf("\n\nEnter 'q' to exit.");
-    printf("\nEnter 'b' to go back.");
+    char back;
+    printf("\n\nEnter 'b' to go back.");
+    bannerUserInput();
+    fflush(stdin);
+    scanf("%c", &back);
 }
 
 double getTotalProfit(struct ProfitPerMonth monthlyProfits[])
@@ -153,14 +215,17 @@ void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[])
 void printActions()
 {
     system("cls");
+    topBar("Inventory Management System");
     printf("\nEnter the action you want to take:\n");
 
     printf("\n1. view all items in the inventory.");
+
     printf("\n2. add an item in the inventory.");
     printf("\n3. delete an item in the inventory.");
     printf("\n4. edit an item in the inventory.");
     printf("\n5. restock an item in the inventory.");
     printf("\n6. search an item in the inventory.");
+    
     printf("\n7. sell an item.");
     printf("\n8. view sales report.");
 

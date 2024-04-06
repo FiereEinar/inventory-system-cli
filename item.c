@@ -23,7 +23,7 @@ void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
         printActions();
         return;
     }
-    printf("\n\nEnter the quantity purchased: \n>>> ");
+    printf("Enter the quantity purchased: \n>>> ");
     scanf("%lf", &quantity);
 
     // find the item in the list
@@ -33,6 +33,7 @@ void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
             if (current->data.stocks < quantity)
             {
                 printf("\nNot enough stocks to fulfill the purchase.");
+                sleep(SLEEP_TIME);
                 return;
             }
 
@@ -49,6 +50,7 @@ void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     if (updated == 0)
     {
         printf("\nItem not found");
+        sleep(SLEEP_TIME);
         return;
     }
 
@@ -59,14 +61,12 @@ void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 
 void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
-    system("cls");
-    printf("Restocking an item.\n\n");
-    printLinkedlist(*head);
+    printf("Restocking an item.");
 
     if (*head == NULL)
     {
         printf("\nNo item to restock.");
-        printf("\nEnter 'b' to go back.");
+        sleep(SLEEP_TIME);
         return;
     }
     
@@ -91,6 +91,7 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     if (strcmp(current->data.id, idToDelete) != 0)
     {
         printf("\nError: Item does not exist. Please try again");
+        sleep(SLEEP_TIME);
         return;
     }
 
@@ -99,22 +100,18 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     current->data.stocks += addedStocks;
     current->data.baseStocks = current->data.stocks;
 
-    printf("\nAny additional costs? (gas, transportation, etc.) \n>>> ");
+    printf("Any additional costs? (gas, transportation, etc.) \n>>> ");
     scanf("%lf", &additionalCosts);
 
     // tally the costs
     monthlyProfits[getCurrentDateInt()].costs += (addedStocks * current->data.originalPrice) + additionalCosts;
     // update the lastUpdated data
     sprintf(current->data.lastUpdated, "%s / %s", getCurrentDate(), getCurrentTime());
-
-    printLinkedlist(*head);
-    printf("\n\nStocks added succesfully!");
-    printf("\nEnter 'b' to go back.");
 }
 
-struct Node *getItemById(struct Node *list, char itemId[])
+struct Node *getItemById(struct Node **list, char itemId[])
 {
-    struct Node *current = list;
+    struct Node *current = *list;
 
     while (current != NULL)
     {
@@ -128,9 +125,8 @@ struct Node *getItemById(struct Node *list, char itemId[])
 
 void searchItem(struct Node **list)
 {
-    system("cls");
-    printf("Searching an item.\n\n");
-    printLinkedlist(*list);
+    printf("Searching an item.");
+
     if (*list == NULL)
     {
         printf("\nNo item to search.");
@@ -149,7 +145,7 @@ void searchItem(struct Node **list)
     printf("\n\nEnter a keyword: ");
     scanf("%s", searchTerm);
 
-    printf("\nSearch: %s", searchTerm);
+    printf("\nSearching for: %s\n", searchTerm);
 
     // we traverse the list and on each iteration, check if searchTerm is a substring of the current data name
     while(current != NULL) {
@@ -176,16 +172,15 @@ void searchItem(struct Node **list)
         // go to next node (iterator)
         current = current->next;
     }
+    system("cls");
     // print all the result
-    printLinkedlist(results);
+    inventoryPage(&results);
     // free the memory of results
     freeLinkedList(&results);
-    printf("\n\nEnter 'b' to go back.");
 }
 
 void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
-    system("cls");
     printf("Adding an item.\n\n");
     // using item struct to store values, less variable declaration needed
     struct Item newItem;
@@ -220,19 +215,18 @@ void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 
 void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
-    system("cls");
-    printf("Deleting an item.\n\n");
-    printLinkedlist(*head);
+    printf("Deleting an item.");
     if (*head == NULL)
     {
         printf("\nNo item to delete.");
-        printf("\nEnter 'b' to go back.");
+        sleep(SLEEP_TIME);
         return;
     }
     // this will hold the index of item to be deleted
     char idToDelete[ID_LENGTH];
 
     printf("\n\nEnter the ID of the item you want to delete: ");
+    bannerUserInput();
     scanf("%s", idToDelete);
 
     // we create a current variable so that we don't manipulate the pointer of the head
@@ -260,6 +254,7 @@ void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
         if (current->next == NULL)
         {
             printf("\nError: Item does not exist. Please try again");
+            sleep(SLEEP_TIME);
             return;
         }
         double deduction = current->data.originalPrice * current->data.stocks;
@@ -274,10 +269,6 @@ void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     }
     // free the memory
     free(deleted);
-    // after deleting the item, reprint the list
-    printLinkedlist(*head);
-    printf("\n\nItem deleted successfully!");
-    printf("\nEnter 'b' to go back.");
 }
 
 // crazy function
@@ -285,7 +276,7 @@ void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], dou
 {
     char action;
 
-    printf("\nD you want to deduct the total costs of deleted item to your monthly costs report?[y/n]\n>>> ");
+    printf("Do you want to deduct the total costs of deleted item to your monthly costs report?[y/n]\n>>> ");
     fflush(stdin);
     scanf("%c", &action);
 
@@ -297,12 +288,12 @@ void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], dou
 
 void editItem(struct Node **head)
 {
-    system("cls");
-    printf("Editing an item.\n\n");
-    printLinkedlist(*head);
+    printf("Editing an item.");
+
     if (*head == NULL)
     {
         printf("\nNo item to edit.");
+        sleep(SLEEP_TIME);
         return;
     }
 
@@ -314,8 +305,8 @@ void editItem(struct Node **head)
     printf("\n\nEnter the ID of the item: \n>>> ");
     scanf("%s", idToDelete);
 
-    printf("\nOptions: [ 1. name | 2. original price | 3. selling price ]");
-    printf("\nWhat do you want to edit?: \n>>> ");
+    printf("Options: [ 1. name | 2. original price | 3. selling price ]\n");
+    printf("What do you want to edit?: \n>>> ");
     scanf("%d", &toUpdate);
 
     // we create a current variable so that we don't manipulate the pointer of the head
@@ -331,13 +322,14 @@ void editItem(struct Node **head)
     if (strcmp(current->data.id, idToDelete) != 0)
     {
         printf("\nError: Item does not exist. Please try again");
+        sleep(SLEEP_TIME);
         return;
     }
 
     // after that, we simply determine what the user wants to update and prompt the user for new data
     switch(toUpdate) {
         case 1:
-            printf("\nEnter a new name of %s: \n>>> ", current->data.name);
+            printf("Enter a new name of %s: \n>>> ", current->data.name);
             fflush(stdin);
             fgets(current->data.name, NAME_SIZE, stdin);
 
@@ -347,26 +339,22 @@ void editItem(struct Node **head)
                 current->data.name[len - 1] = '\0';
             break;
         case 2:
-            printf("\nEnter an updated original price of %s(Original: %.2lf): \n>>> ", current->data.name, current->data.originalPrice);
+            printf("Enter an updated original price of %s(Original: %.2lf): \n>>> ", current->data.name, current->data.originalPrice);
             scanf("%lf", &current->data.originalPrice);
             current->data.profit = current->data.price - current->data.originalPrice;
             break;
         case 3:
-            printf("\nEnter an updated selling price of %s: \n>>> ", current->data.name);
+            printf("Enter an updated selling price of %s: \n>>> ", current->data.name);
             scanf("%lf", &current->data.price);
             current->data.profit = current->data.price - current->data.originalPrice;
             break;
         default:
-            printf("\nError: Incorrect number entered.");
+            printf("Error: Incorrect number entered.");
             break;
     }
 
     // update the lastUpdated data
     sprintf(current->data.lastUpdated, "%s / %s", getCurrentDate(), getCurrentTime());
-
-    printLinkedlist(*head);
-    printf("\n\nUpdated Successfully!");
-    printf("\nEnter 'b' to go back.");
 }
 
 void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost)
@@ -404,8 +392,4 @@ void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], c
         
         current->next = newNode;
     }
-
-    printLinkedlist(*head);
-    printf("\n\nItem added successfully!");
-    printf("\nEnter 'b' to go back.");
 }
