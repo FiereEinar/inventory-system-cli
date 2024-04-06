@@ -62,7 +62,7 @@ char* getCurrentDate()
     return dateString;
 }
 
-char *generateId(char placeholder[])
+void generateId(char placeholder[])
 {
     char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char nums[] = "1234567890";

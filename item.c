@@ -62,6 +62,13 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     system("cls");
     printf("Restocking an item.\n\n");
     printLinkedlist(*head);
+    if (*head == NULL)
+    {
+        printf("\nNo item to restock.");
+        printf("\nEnter 'b' to go back.");
+        return;
+    }
+    
 
     int addedStocks;
     double additionalCosts;
@@ -107,6 +114,12 @@ void searchItem(struct Node **list)
     system("cls");
     printf("Searching an item.\n\n");
     printLinkedlist(*list);
+    if (*list == NULL)
+    {
+        printf("\nNo item to search.");
+        printf("\nEnter 'b' to go back.");
+        return;
+    }
 
     char searchTerm[20];
     struct Node *current = *list;
@@ -159,6 +172,7 @@ void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     printf("Adding an item.\n\n");
     // create a new instance of the Item struct
     struct Item newItem;
+    double additionalCosts;
 
     fflush(stdin);
     // prompt the user with all the data and store it in that newItem structure
@@ -182,13 +196,16 @@ void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     printf("Enter the original price of item: \n>>> ");
     scanf("%lf", &newItem.originalPrice);
 
+    printf("\nAny additional costs? (gas, transportation, etc.) \n>>> ");
+    scanf("%lf", &additionalCosts);
+
     // get the current date and time
     sprintf(newItem.dateAdded, "%s | %s", getCurrentDate(), getCurrentTime());
     sprintf(newItem.lastUpdated, "%s | %s", getCurrentDate(), getCurrentTime());
 
     generateId(newItem.id);
     // tally the cost
-    monthlyProfits[getCurrentDateInt()].costs += newItem.stocks * newItem.originalPrice;
+    monthlyProfits[getCurrentDateInt()].costs += (newItem.stocks * newItem.originalPrice) + additionalCosts;
     newItem.profit = newItem.price - newItem.originalPrice;
 
     // we then create a new Node structure, it is dynamically allocated in the memory
@@ -229,6 +246,12 @@ void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     system("cls");
     printf("Deleting an item.\n\n");
     printLinkedlist(*head);
+    if (*head == NULL)
+    {
+        printf("\nNo item to delete.");
+        printf("\nEnter 'b' to go back.");
+        return;
+    }
     // this will hold the index of item to be deleted
     char idToDelete[ID_LENGTH];
 
@@ -242,8 +265,11 @@ void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 
     // if the user is trying to delete the first item, we simply set the head to point to the next node
     if (strcmp(current->data.id, idToDelete) == 0) {
+        double deduction = current->data.originalPrice * current->data.stocks;
+        reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
         deleted = *head;
-        *head = current->next;
+        if (current->next == NULL) *head = NULL;
+        else *head = current->next;
     } else {
         // to delete a Node, we traverse to the Node right before the Node TO BE DELETED
         while(current->next != NULL)
@@ -259,13 +285,15 @@ void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
             printf("\nError: Item does not exist. Please try again");
             return;
         }
-
+        double deduction = current->data.originalPrice * current->data.stocks;
+        reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
         // if we did find it and break out the loop, proceed here
         deleted = current->next;
         // now that were at the Node right before the Node TO BE DELETED,
         // the (current->next) is the TO BE DELETED so we simply overwrite it
         // by setting it to point to the next Node of the Node TO BE DELETED
-        current->next = current->next->next;
+        if (current->next->next == NULL) current->next = NULL;
+        else current->next = current->next->next;
     }
     // free the memory
     free(deleted);
@@ -275,11 +303,31 @@ void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     printf("\nEnter 'b' to go back.");
 }
 
+// crazy function
+void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], double deduction)
+{
+    char action;
+
+    printf("\nD you want to deduct the total costs of deleted item to your monthly costs report?[y/n]\n>>> ");
+    fflush(stdin);
+    scanf("%c", &action);
+
+    if (action == 'y' || action == 'Y') {
+        monthlyProfits[getCurrentDateInt()].costs -= deduction;
+        printf("\nCosts deducted.");
+    }
+}
+
 void editItem(struct Node **head)
 {
     system("cls");
-    printf("Updating an item.\n\n");
+    printf("Editing an item.\n\n");
     printLinkedlist(*head);
+    if (*head == NULL)
+    {
+        printf("\nNo item to edit.");
+        return;
+    }
 
     int toUpdate;
     // this will hold the index of item to be deleted

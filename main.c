@@ -56,12 +56,35 @@ void viewReports(struct ProfitPerMonth monthlyProfits[])
     {
         printf
         (
-            "%-15s\t\t%-10.2lf\t%-10.2lf\t\t%-10.2lf\n", 
+            "%-15s\t\tP%-10.2lf\tP%-10.2lf\t\tP%-10.2lf\n", 
             monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].revenue, monthlyProfits[i].profit
         );
     }
+    printf("\nTotal Costs:\t\t\t\t\t\t\tP%.2lf", getTotalCosts(monthlyProfits));
+    printf("\nTotal Profit:\t\t\t\t\t\t\tP%.2lf", getTotalProfit(monthlyProfits));
+
     printf("\n\nEnter 'q' to exit.");
     printf("\nEnter 'b' to go back.");
+}
+
+double getTotalProfit(struct ProfitPerMonth monthlyProfits[])
+{
+    double total = 0;
+
+    for (int i = 0; i < MONTHS; i++)
+        total += monthlyProfits[i].profit;
+
+    return total;
+}
+
+double getTotalCosts(struct ProfitPerMonth monthlyProfits[])
+{
+    double total = 0;
+
+    for (int i = 0; i < MONTHS; i++)
+        total += monthlyProfits[i].costs;
+
+    return total;
 }
 
 void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[])
