@@ -1,7 +1,7 @@
 #define NAME_SIZE 30
 #define ID_LENGTH 10
 #define MONTHS 12
-#define SLEEP_TIME 2
+#define SLEEP_TIME 1
 #define DATE_LENGTH 30
 #define MONTH_NAME_LEN 15
 
@@ -50,7 +50,6 @@ struct ProfitPerMonth
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: main.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[]);
 void viewInventory(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -68,6 +67,7 @@ void sellItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);
 void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
 struct Node *getItemById(struct Node **list, char itemId[]);
+void addItemFromStorage(struct Node **head, struct Item newItem);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -87,6 +87,7 @@ void freeLinkedList(struct Node **head);
 //      FILE: sales.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void viewReports(struct ProfitPerMonth monthlyProfits[]);
+void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[]);
 double getTotalProfit(struct ProfitPerMonth monthlyProfits[]);
 double getTotalCosts(struct ProfitPerMonth monthlyProfits[]);
 double getTotalRevenue(struct ProfitPerMonth monthlyProfits[]);
@@ -116,4 +117,12 @@ void bannerBlankBorderTextLeft (char *text);
 void bannerBlankBorder ();
 void bannerUserInput();
 void bannerFullBorderSection ();
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      FILE: storage.c
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+void addItemToStorage(struct Item item);
+void getItemsFromStorage(struct Node **head);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

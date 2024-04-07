@@ -14,15 +14,16 @@ int main()
     struct Node *head = NULL;
     struct ProfitPerMonth monthlyProfits[MONTHS];
     initMonthlyProfits(monthlyProfits);             // fill the monthly values with zero and sets monthly names
+    getItemsFromStorage(&head);
     char action;
-
+    
     // Adding test items for development purposes only
-    addItemToList(&head, monthlyProfits, "pencil", 25, 10, 5, 15);
-    addItemToList(&head, monthlyProfits, "paper", 10, 55, 44, 15);
-    addItemToList(&head, monthlyProfits, "scissors", 15, 56, 47, 15);
-    addItemToList(&head, monthlyProfits, "ballpen", 18, 12, 10, 15);
-    addItemToList(&head, monthlyProfits, "scraper", 5, 200, 150, 15);
-    addItemToList(&head, monthlyProfits, "comb", 4, 46, 40, 15);
+    // addItemToList(&head, monthlyProfits, "pencil", 25, 10, 5, 15);
+    // addItemToList(&head, monthlyProfits, "paper", 10, 55, 44, 15);
+    // addItemToList(&head, monthlyProfits, "scissors", 15, 56, 47, 15);
+    // addItemToList(&head, monthlyProfits, "ballpen", 18, 12, 10, 15);
+    // addItemToList(&head, monthlyProfits, "scraper", 5, 200, 150, 15);
+    // addItemToList(&head, monthlyProfits, "comb", 4, 46, 40, 15);
 
     while (true) {
         system("cls");

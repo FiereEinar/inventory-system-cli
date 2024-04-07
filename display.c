@@ -7,6 +7,7 @@
 void askUserToFullScreen()
 {
     char x;
+    system("cls");
     printf("\n\n\n\n");
     printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
     printf("::                                                                          ::\n");

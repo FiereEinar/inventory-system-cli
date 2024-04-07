@@ -99,8 +99,7 @@ struct Node *getItemById(struct Node **list, char itemId[])
 
     while (current != NULL)
     {
-        if (strcmp(current->data.id, itemId) == 0)
-            return current;
+        if (strcmp(current->data.id, itemId) == 0) return current;
         
         current = current->next;
     }
@@ -181,8 +180,7 @@ void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     fflush(stdin);
     fgets(newItem.name, NAME_SIZE, stdin);
     size_t len = strlen(newItem.name);                  // clear the newline character from fgets()
-    if (len > 0 && newItem.name[len - 1] == '\n')
-        newItem.name[len - 1] = '\0';
+    if (len > 0 && newItem.name[len - 1] == '\n') newItem.name[len - 1] = '\0';
 
     if (strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "b") == 0) return;
 
@@ -291,18 +289,18 @@ void editItemHandler(struct Node **head)
 
     if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "b") == 0 || *head == NULL) return;
 
-    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. original price | 3. selling price ]", "What do you want to edit?: ", "", "", "");
-    scanf("%d", &toUpdate);
-
     struct Node *current = getItemById(head, idToDelete);
 
     // if we didn't find the item, give them an error
-    if (strcmp(current->data.id, idToDelete) != 0)
+    if (current == NULL)
     {
         newUserMessagePage("Editing an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
+
+    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. original price | 3. selling price ]", "What do you want to edit?: ", "", "", "");
+    scanf("%d", &toUpdate);
 
     char headerWithName[100];
     // after that, we simply determine what the user wants to update and prompt the user for new data
@@ -376,8 +374,27 @@ void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], c
         *head = newNode;
     } else {
         struct Node *current = *head;
-        while(current->next != NULL)
-            current = current->next;
+        while(current->next != NULL) current = current->next;
+        
+        current->next = newNode;
+    }
+    
+    addItemToStorage(newItem);
+}
+
+void addItemFromStorage(struct Node **head, struct Item item)
+{
+    struct Item newItem = item;
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    newNode->data = newItem;
+    newNode->next = NULL;
+
+    // the logic for adding it to the list
+    if (*head == NULL) {
+        *head = newNode;
+    } else {
+        struct Node *current = *head;
+        while(current->next != NULL) current = current->next;
         
         current->next = newNode;
     }
