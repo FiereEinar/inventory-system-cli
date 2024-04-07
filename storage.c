@@ -62,7 +62,7 @@ void getItemsFromStorage(struct Node **head)
             return;
         }
 
-        addItemFromStorage(head, newItem);
+        addItemToLinkedList(head, newItem);
     } while (!feof(file));
 
     fclose(file);

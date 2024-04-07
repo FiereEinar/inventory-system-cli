@@ -67,7 +67,7 @@ void sellItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);
 void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
 struct Node *getItemById(struct Node **list, char itemId[]);
-void addItemFromStorage(struct Node **head, struct Item newItem);
+void addItemToLinkedList(struct Node **head, struct Item newItem);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -81,6 +81,7 @@ int getCurrentDateInt();
 int getListSize(struct Node **head);
 void freeLinkedList(struct Node **head);
 void clearNewline(char *string);
+void updateDate(char *placeholder);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

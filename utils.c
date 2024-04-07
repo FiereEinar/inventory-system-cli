@@ -127,3 +127,8 @@ void clearNewline(char *string)
     size_t len = strlen(string);                                                
     if (len > 0 && string[len - 1] == '\n') string[len - 1] = '\0';
 }
+
+void updateDate(char *placeholder)
+{
+    sprintf(placeholder, "%s / %s", getCurrentDate(), getCurrentTime());
+}

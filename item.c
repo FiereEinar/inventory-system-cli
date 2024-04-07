@@ -41,6 +41,8 @@ void sellItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     current->data.stocks -= (int)quantity;
     monthlyProfits[getCurrentDateInt()].revenue += quantity * current->data.price;
 
+    editItemFromStorageById(current->data.id, current->data);
+
     newUserMessagePage("Point of Sale", "", "Item purchased successfully", "", "", "", "");
     sleep(SLEEP_TIME);
 }
@@ -60,7 +62,7 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     // prompt the user for some details
     scanf("%s", idToDelete);
 
-    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "b") == 0 || *head == NULL) return;
+    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0 || *head == NULL) return;
     // we create a current variable so that we don't manipulate the pointer of the head
     struct Node *current = getItemById(head, idToDelete);
     // traverse to the Node/item that the user wants to update
@@ -87,8 +89,10 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 
     // tally the costs
     monthlyProfits[getCurrentDateInt()].costs += (addedStocks * current->data.originalPrice) + additionalCosts;
-    // update the lastUpdated data
-    sprintf(current->data.lastUpdated, "%s / %s", getCurrentDate(), getCurrentTime());
+
+    updateDate(current->data.lastUpdated);
+    editItemFromStorageById(current->data.id, current->data);
+
     newUserMessagePage("Restocking an Item", "", "Item restocked successfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
@@ -118,46 +122,25 @@ void searchItem(struct Node **list)
     struct Node *current = *list;
     // another linked list to store the results
     struct Node *results = NULL;
-    // tracker for the tail
-    struct Node *last = NULL;
 
     fflush(stdin);
     fgets(searchTerm, 20, stdin);
 
-    if (strcmp(searchTerm, "b") == 0 || strcmp(searchTerm, "b") == 0 || *list == NULL) return;
+    if (strcmp(searchTerm, "b") == 0 || strcmp(searchTerm, "B") == 0 || *list == NULL) return;
 
     size_t len = strlen(searchTerm);                                                // clear the newline character from fgets()
     if (len > 0 && searchTerm[len - 1] == '\n') searchTerm[len - 1] = '\0';
 
-    printf("\nSearching for: %s\n", searchTerm);
-
     // we traverse the list and on each iteration, check if searchTerm is a substring of the current data name
     while(current != NULL) {
         // strstr() is a function in <string.h> that will check if a string is a substring of another string. in simple term, if it fits the searchTerm
-        if(strstr(current->data.name, searchTerm) != NULL) {
-            // if true we create a new instance of Node with the same data
-            struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-            newNode->data = current->data;
-            newNode->next = NULL;
-
-            // then store it in the results
-            // this checks if this is the first element being stored
-            if(results == NULL) {
-                results = newNode;
-                // we keep track of the tail of the list so that we don't have to loop our way there
-                last = results;
-            } else {
-                // if its not the first Node, go to the tail (last) and add it there
-                last->next = newNode;
-                // keep track of tail
-                last = newNode;
-            }
-        }
+        if(strstr(current->data.name, searchTerm) != NULL) 
+            addItemToLinkedList(&results, current->data);
         // go to next node (iterator)
         current = current->next;
     }
+
     system("cls");
-    // print all the result
     inventoryPage(&results);
     // free the memory of results
     freeLinkedList(&results);
@@ -168,7 +151,8 @@ void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     // using item struct to store values, less variable declaration needed
     struct Item newItem;
     double additionalCosts;
-    char message[][60] = {
+    char message[][60] = 
+    {
         "Enter the name of new item: ",
         "Enter the the initial stocks of item: ",
         "Enter the selling price of item: ",
@@ -179,10 +163,12 @@ void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     newUserMessagePage("Adding an Item", "Enter 'b' to go back", message[0], "", "", "", "");
     fflush(stdin);
     fgets(newItem.name, NAME_SIZE, stdin);
+    
+    if (strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "B") == 0) return;
+
     size_t len = strlen(newItem.name);                  // clear the newline character from fgets()
     if (len > 0 && newItem.name[len - 1] == '\n') newItem.name[len - 1] = '\0';
 
-    if (strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "b") == 0) return;
 
     newUserMessagePage("Adding an Item", "", message[1], "", "", "", "");
     scanf("%d", &newItem.stocks);
@@ -214,7 +200,7 @@ void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[
     char idToDelete[ID_LENGTH];
     scanf("%s", idToDelete);
 
-    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "b") == 0 || *head == NULL) return;
+    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0 || *head == NULL) return;
 
     // we create a current variable so that we don't manipulate the pointer of the head
     struct Node *current = *head;
@@ -262,7 +248,6 @@ void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[
     sleep(SLEEP_TIME);
 }
 
-// crazy long function
 void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], double deduction)
 {
     char action;
@@ -285,11 +270,9 @@ void editItemHandler(struct Node **head)
     int toUpdate;
     // this will hold the index of item to be deleted
     char idToDelete[ID_LENGTH];
-
-    // prompt the user for some details
     scanf("%s", idToDelete);
 
-    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "b") == 0 || *head == NULL) return;
+    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0 || *head == NULL) return;
 
     struct Node *current = getItemById(head, idToDelete);
 
@@ -341,10 +324,10 @@ void editItemHandler(struct Node **head)
     }
 
     editItemFromStorageById(idToDelete, current->data);
+    updateDate(current->data.lastUpdated);
+
     newUserMessagePage("Editing an Item", "", "Item edited succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
-    // update the lastUpdated data
-    sprintf(current->data.lastUpdated, "%s / %s", getCurrentDate(), getCurrentTime());
 }
 
 void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost)
@@ -360,32 +343,18 @@ void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], c
     newItem.originalPrice = originalPrice;
     newItem.profit = newItem.price - newItem.originalPrice;
 
-    sprintf(newItem.dateAdded, "%s / %s", getCurrentDate(), getCurrentTime());
-    sprintf(newItem.lastUpdated, "%s / %s", getCurrentDate(), getCurrentTime());
+    updateDate(newItem.dateAdded);
+    updateDate(newItem.lastUpdated);
 
     generateId(newItem.id);
     // tally the costs
     monthlyProfits[getCurrentDateInt()].costs += (newItem.stocks * newItem.originalPrice) + additionalCost;
 
-    // create a dynamically allocated node 
-    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
-    newNode->data = newItem;
-    newNode->next = NULL;
-
-    // the logic for adding it to the list
-    if (*head == NULL) {
-        *head = newNode;
-    } else {
-        struct Node *current = *head;
-        while(current->next != NULL) current = current->next;
-        
-        current->next = newNode;
-    }
-    
+    addItemToLinkedList(head, newItem);
     addItemToStorage(newItem);
 }
 
-void addItemFromStorage(struct Node **head, struct Item item)
+void addItemToLinkedList(struct Node **head, struct Item item)
 {
     struct Item newItem = item;
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
@@ -393,9 +362,11 @@ void addItemFromStorage(struct Node **head, struct Item item)
     newNode->next = NULL;
 
     // the logic for adding it to the list
+    // if this is the first item, add it in the head
     if (*head == NULL) {
         *head = newNode;
     } else {
+        // if not, go to the end and add it there
         struct Node *current = *head;
         while(current->next != NULL) current = current->next;
         
@@ -410,7 +381,7 @@ void viewItemDetails(struct Node **head)
     newUserMessagePage("Viewing an Item", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
     scanf("%s", itemId);
 
-    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "b") == 0 || *head == NULL) {
+    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) {
         system("cls");
         inventoryPage(head);
         return;
