@@ -7,63 +7,48 @@
 
 #include "main.h"
 
-void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
+void sellItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
-    system("cls");
-    struct Node *current = *head;
+    newUserMessagePage("Point of Sale", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
+
     char itemId[ID_LENGTH];
     double quantity;
-    int updated = 0;
 
-    printf("\nType [x] to exit.");
-    printf("\n\nEnter the item ID: \n>>> ");
     scanf("%s", itemId);
 
-    if (strcmp(itemId, "x") == 0 || strcmp(itemId, "X") == 0)
-    {
-        printActions();
-        return;
-    }
-    printf("Enter the quantity purchased: \n>>> ");
-    scanf("%lf", &quantity);
+    struct Node *current = getItemById(head, itemId);
 
-    // find the item in the list
-    while (current != NULL) {
-        if (strcmp(current->data.id, itemId) == 0) {
-            // if there's not enough stocks, don't proceed
-            if (current->data.stocks < quantity)
-            {
-                printf("\nNot enough stocks to fulfill the purchase.");
-                sleep(SLEEP_TIME);
-                return;
-            }
+    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0) return;
 
-            // once the item is found, update the stocks and tally the profit and revenue
-            current->data.stocks -= (int)quantity;
-            monthlyProfits[getCurrentDateInt()].profit += quantity * (current->data.price - current->data.originalPrice);
-            monthlyProfits[getCurrentDateInt()].revenue += quantity * current->data.price;
-            updated = 1;
-            break; // exit the loop once item is found and updated
-        }
-        current = current->next;
-    }
-
-    if (updated == 0)
-    {
-        printf("\nItem not found");
+    if (current == NULL) {
+        newUserMessagePage("Point of Sale", "", "Item not found, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
-    printLinkedlist(*head);
-    printf("\n\nPurchase deducted to stocks successfully!");
-    printf("\n\nEnter 'b' to go back.");
+    newUserMessagePage("Point of Sale", "", "Enter the quantity purchased: ", "", "", "", "");
+    scanf("%lf", &quantity);
+
+    // if there's not enough stocks, don't proceed
+    if (current->data.stocks < quantity)
+    {
+        newUserMessagePage("Point of Sale", "", "Not enough stocks to fulfill the purchase.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    // once the item is found, update the stocks and tally the revenue
+    current->data.stocks -= (int)quantity;
+    monthlyProfits[getCurrentDateInt()].revenue += quantity * current->data.price;
+
+    newUserMessagePage("Point of Sale", "", "Item purchased successfully", "", "", "", "");
+    sleep(SLEEP_TIME);
 }
 
 void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
     if (*head == NULL){
-        newUserMessagePage("Restocking an Item", "Enter 'b' to go back", "No item to restock.", "", "", "", "");
+        newUserMessagePage("Restocking an Item", "Enter any key to go back", "No item to restock.", "", "", "", "");
     } else {
         newUserMessagePage("Restocking an Item", "Enter 'b' to go back", "Enter the ID of the item: ", "", "", "", "");
     }
@@ -97,7 +82,7 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     current->data.stocks += addedStocks;
     current->data.baseStocks = current->data.stocks;
 
-    newUserMessagePage("Restocking an Item", "", messageWithName, "Any additional costs? (gas, transportation, etc.)", "", "", "");
+    newUserMessagePage("Restocking an Item", "", "Enter additional costs (gas, transportation, etc.)", "", "", "", "");
     scanf("%lf", &additionalCosts);
 
     // tally the costs
@@ -125,7 +110,7 @@ struct Node *getItemById(struct Node **list, char itemId[])
 void searchItem(struct Node **list)
 {
     if (*list == NULL) {
-        newUserMessagePage("Searching an Item", "Enter 'b' to go back.", "No item to search.", "", "", "", "");
+        newUserMessagePage("Searching an Item", "Enter any key to go back", "No item to search.", "", "", "", "");
     } else {
         newUserMessagePage("Searching an Item", "Enter 'b' to go back.", "Enter a keyword to search: ", "", "", "", "");
     }
@@ -184,12 +169,12 @@ void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     // using item struct to store values, less variable declaration needed
     struct Item newItem;
     double additionalCosts;
-    char message[][50] = {
+    char message[][60] = {
         "Enter the name of new item: ",
-        "Enter the stocks of item: ",
+        "Enter the the initial stocks of item: ",
         "Enter the selling price of item: ",
         "Enter the original price of item: ",
-        "Any additional costs? (gas, transportation, etc.)"
+        "Enter additional costs (gas, transportation, etc.)"
     };
 
     newUserMessagePage("Adding an Item", "Enter 'b' to go back", message[0], "", "", "", "");
@@ -201,29 +186,29 @@ void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 
     if (strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "b") == 0) return;
 
-    newUserMessagePage("Adding an Item", "", message[0], message[1], "", "", "");
+    newUserMessagePage("Adding an Item", "", message[1], "", "", "", "");
     scanf("%d", &newItem.stocks);
     newItem.baseStocks = newItem.stocks;
 
-    newUserMessagePage("Adding an Item", "", message[0], message[1], message[2], "", "");
+    newUserMessagePage("Adding an Item", "", message[2], "", "", "", "");
     scanf("%lf", &newItem.price);
 
-    newUserMessagePage("Adding an Item", "", message[0], message[1], message[2], message[3], "");
+    newUserMessagePage("Adding an Item", "", message[3], "", "", "", "");
     scanf("%lf", &newItem.originalPrice);
 
-    newUserMessagePage("Adding an Item", "", message[0], message[1], message[2], message[3], message[4]);
+    newUserMessagePage("Adding an Item", "", message[4], "", "", "", "");
     scanf("%lf", &additionalCosts);
     
     // after getting all the necessary data from user, add it to the list
     addItemToList(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, additionalCosts);
-    newUserMessagePage("Adding an Item", "Item added succesfully!", message[0], message[1], message[2], message[3], message[4]);
+    newUserMessagePage("Adding an Item", "", "Item added succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
 void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 {
     if (*head == NULL) {
-        newUserMessagePage("Deleting an Item", "Enter 'b' to go back", "No item to delete.", "", "", "", "");
+        newUserMessagePage("Deleting an Item", "Enter any key to go back", "No item to delete.", "", "", "", "");
     } else {
         newUserMessagePage("Deleting an Item", "Enter 'b' to go back", "Enter the ID of the item you want to delete: ", "", "", "", "");
     }
@@ -250,7 +235,6 @@ void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[
         // to delete a Node, we traverse to the Node right before the Node TO BE DELETED
         while(current->next != NULL)
         {
-            printf("Are you here? 2");
             // if the next item is the item to be deleted, then break
             if (strcmp(current->next->data.id, idToDelete) == 0) break;
             current = current->next;
@@ -258,7 +242,7 @@ void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[
         // if we didn't find the item, give them an error
         if (current->next == NULL || strcmp(current->next->data.id, idToDelete) != 0)
         {
-            newUserMessagePage("Deleting an Item", "Error: Item does not exist. Please try again", "Enter the ID of the item you want to delete: ", "", "", "", "");
+            newUserMessagePage("Deleting an Item", "", "Error: Item does not exist. Please try again.", "", "", "", "");
             sleep(SLEEP_TIME);
             return;
         }
@@ -272,7 +256,7 @@ void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[
         if (current->next->next == NULL) current->next = NULL;
         else current->next = current->next->next;
     }
-    newUserMessagePage("Deleting an Item", "Item deleted succesfully!", "Enter the ID of the item you want to delete: ", "Do you want to deduct the total costs of deleted item to your monthly costs report?[y/n]", "", "", "");
+    newUserMessagePage("Deleting an Item", "", "Item deleted succesfully!", "", "", "", "");
     // free the memory
     free(deleted);
     sleep(SLEEP_TIME);
@@ -283,7 +267,7 @@ void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], dou
 {
     char action;
 
-    newUserMessagePage("Deleting an Item", "", "Enter the ID of the item you want to delete: ", "Do you want to deduct the total costs of deleted item to your monthly costs report?[y/n]", "", "", "");
+    newUserMessagePage("Deleting an Item", "", "Do you want to deduct the total costs of deleted item to your monthly costs report?[y/n]", "", "", "", "");
     fflush(stdin);
     scanf("%c", &action);
 
@@ -293,7 +277,7 @@ void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], dou
 void editItemHandler(struct Node **head)
 {
     if (*head == NULL) {
-        newUserMessagePage("Editing an Item", "Enter 'b' to go back", "No item to edit.", "", "", "", "");
+        newUserMessagePage("Editing an Item", "Enter any key to go back", "No item to edit.", "", "", "", "");
     } else {
         newUserMessagePage("Editing an Item", "Enter 'b' to go back", "Enter the ID of the item: ", "", "", "", "");
     }
@@ -307,7 +291,7 @@ void editItemHandler(struct Node **head)
 
     if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "b") == 0 || *head == NULL) return;
 
-    newUserMessagePage("Editing an Item", "", "Enter the ID of the item: ", "Options: [ 1. name | 2. original price | 3. selling price ]", "What do you want to edit?: ", "", "");
+    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. original price | 3. selling price ]", "What do you want to edit?: ", "", "", "");
     scanf("%d", &toUpdate);
 
     struct Node *current = getItemById(head, idToDelete);
@@ -324,7 +308,7 @@ void editItemHandler(struct Node **head)
     // after that, we simply determine what the user wants to update and prompt the user for new data
     switch(toUpdate) {
         case 1:
-            strcpy(headerWithName, "Enter a new name of ");
+            strcpy(headerWithName, "Enter a new name for ");
             strcat(headerWithName, current->data.name);
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
 
@@ -352,7 +336,7 @@ void editItemHandler(struct Node **head)
             current->data.profit = current->data.price - current->data.originalPrice;
             break;
         default:
-            newUserMessagePage("Editing an Item", "Incorrect number entered", "", "", "", "", "");
+            newUserMessagePage("Editing an Item", "", "Incorrect number entered", "", "", "", "");
             return;
     }
 
@@ -397,4 +381,31 @@ void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], c
         
         current->next = newNode;
     }
+}
+
+void viewItemDetails(struct Node **head)
+{
+    char itemId[ID_LENGTH];
+
+    newUserMessagePage("Viewing an Item", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
+    scanf("%s", itemId);
+
+    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "b") == 0 || *head == NULL) {
+        system("cls");
+        inventoryPage(head);
+        return;
+    }
+
+    struct Node *itemData = getItemById(head, itemId);
+
+    if (itemData == NULL) {
+        newUserMessagePage("Viewing an Item", "", "Item not found, please try again.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        system("cls");
+        inventoryPage(head);
+        return;
+    }
+
+    system("cls");
+    itemDataPage(itemData->data);
 }

@@ -3,19 +3,38 @@
 #include <string.h>
 #include "main.h"
 
+// the layout breaks if the terminal is not full screen
+void askUserToFullScreen()
+{
+    char x;
+    printf("\n\n\n\n");
+    printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+    printf("::                                                                          ::\n");
+    printf("::                                                                          ::\n");
+    printf("::              Please ensure that the window is at full screen             ::\n");
+    printf("::                                                                          ::\n");
+    printf("::                        Enter any key to continue                         ::\n");
+    printf("::                                                                          ::\n");
+    printf("::                                                                          ::\n");
+    printf("::                                                                          ::\n");
+    printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
+    bannerUserInput();
+    scanf("%c", &x);
+}
+
 void itemDataPage(struct Item item)
 {
     topBar("Details of an item");
     bannerBlankBorder();
 
-    printf("::  Item Name:\t\t\t\t\t\t\t%s\t\t\t\t\t\t\t\t\t  ::\n", item.name);
-    printf("::  Stocks:\t\t\t\t\t\t\t%d/%d\t\t\t\t\t\t\t\t\t  ::\n", item.stocks, item.baseStocks);
-    printf("::  Price:\t\t\t\t\t\t\t%.2lf\t\t\t\t\t\t\t\t\t  ::\n", item.price);
-    printf("::  Original Price:\t\t\t\t\t\t%.2lf\t\t\t\t\t\t\t\t\t  ::\n", item.originalPrice);
-    printf("::  Profit per item:\t\t\t\t\t\t%.2lf\t\t\t\t\t\t\t\t\t  ::\n", item.profit);
-    printf("::  Date Added:\t\t\t\t\t\t\t%s\t\t\t\t\t\t\t  ::\n", item.dateAdded);
-    printf("::  Last Updated:\t\t\t\t\t\t%s\t\t\t\t\t\t\t  ::\n", item.lastUpdated);
-    printf("::  Item ID:\t\t\t\t\t\t\t%s\t\t\t\t\t\t\t\t  ::\n", item.id);
+    printf("::  Item Name:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", item.name);
+    printf("::  Stocks:\t\t\t\t\t\t\t%d/%-20d\t\t\t\t\t\t\t  ::\n", item.stocks, item.baseStocks);
+    printf("::  Selling Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.price);
+    printf("::  Original Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.originalPrice);
+    printf("::  Profit per item:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.profit);
+    printf("::  Date Added:\t\t\t\t\t\t\t%-15s\t\t\t\t\t\t\t  ::\n", item.dateAdded);
+    printf("::  Last Updated:\t\t\t\t\t\t%-15s\t\t\t\t\t\t\t  ::\n", item.lastUpdated);
+    printf("::  Item ID:\t\t\t\t\t\t\t%-15s\t\t\t\t\t\t\t\t  ::\n", item.id);
 
     printMinimumScreenHeight(3);
     bannerBlankBorderTextCen("Enter 'b' to go back Home Page.");
@@ -81,6 +100,7 @@ void printMonthlyReports(struct ProfitPerMonth monthlyProfits[])
 {
     for (int i = 0; i < MONTHS; i++)
     {
+        monthlyProfits[i].profit = monthlyProfits[i].revenue - monthlyProfits[i].costs;
         printf
         (
             "::  %d. %-15s\t\t\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 

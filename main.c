@@ -9,6 +9,7 @@
 
 int main()
 {
+    askUserToFullScreen();
     srand(time(NULL));
     struct Node *head = NULL;
     struct ProfitPerMonth monthlyProfits[MONTHS];
@@ -36,7 +37,7 @@ int main()
             viewInventory(&head, monthlyProfits);
             break;
         case '2':
-            sellItem(&head, monthlyProfits);
+            sellItemHandler(&head, monthlyProfits);
             break;
         case '3':
             system("cls");
@@ -92,175 +93,5 @@ void viewInventory(struct Node **head, struct ProfitPerMonth monthlyProfits[])
         case 'b':
             return;
         }
-    }
-}
-
-void viewItemDetails(struct Node **head)
-{
-    char itemId[ID_LENGTH];
-
-    newUserMessagePage("Viewing an Item", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
-    scanf("%s", itemId);
-
-    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "b") == 0 || *head == NULL) {
-        system("cls");
-        inventoryPage(head);
-        return;
-    }
-
-    struct Node *itemData = getItemById(head, itemId);
-
-    if (itemData == NULL) {
-        newUserMessagePage("Restocking an Item", "", "Item not found, please try again.", "", "", "", "");
-        sleep(SLEEP_TIME);
-        system("cls");
-        inventoryPage(head);
-        return;
-    }
-
-    system("cls");
-    itemDataPage(itemData->data);
-}
-
-// void printItemData(struct Item item)
-// {
-//     system("cls");
-//     printf("\nMore details about the item: \n");
-//     printf("\nItem Name:\t\t\t\t%s", item.name);
-//     printf("\nStocks:\t\t\t\t\t%d / %d", item.stocks, item.baseStocks);
-//     printf("\nPrice:\t\t\t\t\t%.2lf", item.price);
-//     printf("\nOriginal Price:\t\t\t\t%.2lf", item.originalPrice);
-//     printf("\nProfit per item:\t\t\t%.2lf", item.profit);
-//     printf("\nDate Added:\t\t\t\t%s", item.dateAdded);
-//     printf("\nLast Updated:\t\t\t\t%s", item.lastUpdated);
-//     printf("\nItem ID:\t\t\t\t%s", item.id);
-
-//     printf("\n\nEnter 'b' to go back.");
-// }
-
-void viewReports(struct ProfitPerMonth monthlyProfits[])
-{
-    salesReportPage(monthlyProfits);
-
-    char back;
-    bannerUserInput();
-    fflush(stdin);
-    scanf("%c", &back);
-}
-
-double getTotalProfit(struct ProfitPerMonth monthlyProfits[])
-{
-    double total = 0;
-
-    for (int i = 0; i < MONTHS; i++)
-        total += monthlyProfits[i].profit;
-
-    return total;
-}
-
-double getTotalCosts(struct ProfitPerMonth monthlyProfits[])
-{
-    double total = 0;
-
-    for (int i = 0; i < MONTHS; i++)
-        total += monthlyProfits[i].costs;
-
-    return total;
-}
-
-double getTotalRevenue(struct ProfitPerMonth monthlyProfits[])
-{
-    double total = 0;
-
-    for (int i = 0; i < MONTHS; i++)
-        total += monthlyProfits[i].revenue;
-
-    return total;
-}
-
-void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[])
-{
-    char months[MONTHS][15] = 
-    {
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    };
-
-    // initialize the monthly data
-    for (int i = 0; i < MONTHS; ++i) 
-    {
-        strcpy(monthlyProfits[i].month, months[i]);
-        monthlyProfits[i].costs = 0.0;
-        monthlyProfits[i].revenue = 0.0;
-        monthlyProfits[i].profit = 0.0;
-    }
-}
-
-void printActions()
-{
-    system("cls");
-    topBar("Inventory Management System");
-    printf("\nEnter the action you want to take:\n");
-
-    printf("\n1. view all items in the inventory.");
-
-    printf("\n2. add an item in the inventory.");
-    printf("\n3. delete an item in the inventory.");
-    printf("\n4. edit an item in the inventory.");
-    printf("\n5. restock an item in the inventory.");
-    printf("\n6. search an item in the inventory.");
-    
-    printf("\n7. sell an item.");
-    printf("\n8. view sales report.");
-
-    printf("\n\nEnter 'q' to exit.");
-}
-
-int getListSize(struct Node **head)
-{
-    struct Node *current = *head;
-    int size = 0;
-    // traverse the list and increment size on each iteration, then return it
-    while (current != NULL)
-    {
-        current = current->next;
-        size++;
-    }
-    return size;
-}
-
-// print the linked list values
-void printLinkedlist(const struct Node *head)
-{
-    int i = 1;
-    printf("\nItem:\t\t\tStocks:\t Selling Price:\t Profit/item:\t Id:");
-    // loop over the entire list and print the data on each iteration
-    while (head != NULL)
-    {
-        // TODO: truncate the name if it's too long
-        // if (strlen(head->data.name) >= 8) { / ... / }
-        printf
-        (
-            "\n%d. %-20s\t%d/%d\t P%-14.2lf %.2lf\t\t %s",
-            i, head->data.name, head->data.stocks, head->data.baseStocks, head->data.price, head->data.profit, head->data.id
-        );
-        // iterator
-        head = head->next;
-        i++;
-    }
-}
-
-void freeLinkedList(struct Node **head)
-{
-    struct Node *current = *head;
-    struct Node *next;
-
-    while (current != NULL) {
-        // store the next node before freeing the current one
-        next = current->next;
-        // free the memory allocated for the current node
-        free(current);
-        // move to the next node
-        current = next;
     }
 }

@@ -93,3 +93,31 @@ int getCurrentDateInt()
 
     return info->tm_mon;
 }
+
+int getListSize(struct Node **head)
+{
+    struct Node *current = *head;
+    int size = 0;
+    // traverse the list and increment size on each iteration, then return it
+    while (current != NULL)
+    {
+        current = current->next;
+        size++;
+    }
+    return size;
+}
+
+void freeLinkedList(struct Node **head)
+{
+    struct Node *current = *head;
+    struct Node *next;
+
+    while (current != NULL) {
+        // store the next node before freeing the current one
+        next = current->next;
+        // free the memory allocated for the current node
+        free(current);
+        // move to the next node
+        current = next;
+    }
+}
