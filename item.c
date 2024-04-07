@@ -254,7 +254,7 @@ void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[
         if (current->next->next == NULL) current->next = NULL;
         else current->next = current->next->next;
     }
-    
+
     deleteItemFromStorageById(idToDelete);
     newUserMessagePage("Deleting an Item", "", "Item deleted succesfully!", "", "", "", "");
     // free the memory
@@ -340,6 +340,7 @@ void editItemHandler(struct Node **head)
             return;
     }
 
+    editItemFromStorageById(idToDelete, current->data);
     newUserMessagePage("Editing an Item", "", "Item edited succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
     // update the lastUpdated data

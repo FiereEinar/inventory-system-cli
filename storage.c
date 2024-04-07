@@ -53,9 +53,7 @@ void getItemsFromStorage(struct Node **head)
             newItem.id
         );
 
-        // clear the newline character from ID
-        size_t len = strlen(newItem.id);                                                
-        if (len > 0 && newItem.id[len - 1] == '\n') newItem.id[len - 1] = '\0';         
+        clearNewline(newItem.id);      
         
         // if it didn't read all 9 properties
         if (read != 9) {
@@ -83,7 +81,7 @@ void deleteItemFromStorageById(char *id)
     char placeholder[maxLine];                      // placeholder for data inside the file
 
     file = fopen(filename, "r");
-    temp = fopen(tempFile, "w");
+    temp = fopen(tempFile, "a");
 
     if (file == NULL || temp == NULL) {
         printf("Error opening the files.");
@@ -91,13 +89,10 @@ void deleteItemFromStorageById(char *id)
         return;
     }
 
-    do {
-        fgets(placeholder, maxLine, file);
-
-        // all i need is the ID property
-        fscanf(
-            file,
-            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,]\n",
+    while (fgets(placeholder, maxLine, file) != NULL) {
+        sscanf(
+            placeholder,
+            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,]",
             newItem.name,
             &newItem.baseStocks,
             &newItem.stocks,
@@ -109,9 +104,75 @@ void deleteItemFromStorageById(char *id)
             newItem.id
         );
 
-        // if it matches the ID, don't include it
+        // clear the newline character from ID
+        //  I AM SO MAD AT THIS, TOOK ME LONG TO FIGURE OUT AN ISSUE, IT WAS JUST A NEWLINE THE ENTIRE TIME
+        clearNewline(newItem.id);
+
+        // if it match the ID, don't include it
         if (strcmp(newItem.id, id) != 0) fputs(placeholder, temp);
-    } while (!feof(file));
+    }
+
+    fclose(file);
+    fclose(temp);
+
+    remove(filename);
+    rename(tempFile, filename);
+}
+
+void editItemFromStorageById(char *id, struct Item editedItem)
+{
+    FILE *file;
+    FILE *temp;
+    struct Item currentItem;
+    int maxLine = 2000;                             // max line inside a file
+
+    char filename[20] = "items.csv";
+    char tempFile[20] = "temp__items.csv";
+
+    char placeholder[maxLine];                      // placeholder for data inside the file
+
+    file = fopen(filename, "r");
+    temp = fopen(tempFile, "a");
+
+    if (file == NULL || temp == NULL) {
+        printf("Error opening the files.");
+        sleep(SLEEP_TIME);                          // gives us time to read
+        return;
+    }
+
+    while (fgets(placeholder, maxLine, file) != NULL) {
+        sscanf(
+            placeholder,
+            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,]",
+            currentItem.name,
+            &currentItem.baseStocks,
+            &currentItem.stocks,
+            &currentItem.price,
+            &currentItem.originalPrice,
+            &currentItem.profit,
+            currentItem.dateAdded,
+            currentItem.lastUpdated,
+            currentItem.id
+        );
+
+        clearNewline(currentItem.id);
+
+        // if it matches the ID, don't include it, but instead put the new item
+        if (strcmp(currentItem.id, id) != 0) fputs(placeholder, temp);
+        else fprintf(
+            temp, 
+            "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s\n",
+            editedItem.name,
+            editedItem.baseStocks,
+            editedItem.stocks,
+            editedItem.price,
+            editedItem.originalPrice,
+            editedItem.profit,
+            editedItem.dateAdded,
+            editedItem.lastUpdated,
+            editedItem.id        
+        );
+    }
 
     fclose(file);
     fclose(temp);

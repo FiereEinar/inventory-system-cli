@@ -80,6 +80,7 @@ void generateId(char placeholder[]);
 int getCurrentDateInt();
 int getListSize(struct Node **head);
 void freeLinkedList(struct Node **head);
+void clearNewline(char *string);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -126,4 +127,5 @@ void bannerFullBorderSection ();
 void addItemToStorage(struct Item item);
 void getItemsFromStorage(struct Node **head);
 void deleteItemFromStorageById(char *id);
+void editItemFromStorageById(char *id, struct Item item);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
