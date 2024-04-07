@@ -45,16 +45,6 @@ int main()
         case 'q':
             return 0;
         }
-        // if (strcmp(action, "1") == 0) viewInventory(&head, monthlyProfits);
-        // if (strcmp(action, "1") == 0) viewInventory(head);
-        // if (strcmp(action, "2") == 0) addItem(&head, monthlyProfits);
-        // if (strcmp(action, "3") == 0) deleteItem(&head, monthlyProfits);
-        // if (strcmp(action, "4") == 0) editItem(&head);
-        // if (strcmp(action, "5") == 0) restockItem(&head, monthlyProfits);
-        // if (strcmp(action, "6") == 0) searchItem(&head);
-        // if (strcmp(action, "7") == 0) sellItem(&head, monthlyProfits);
-        // if (strcmp(action, "8") == 0) viewReports(monthlyProfits);
-        // if (strcmp(action, "b") == 0) printActions();
     }
     // TODO: maybe clear the memory of head? there's an available function for that
 }
@@ -74,17 +64,17 @@ void viewInventory(struct Node **head, struct ProfitPerMonth monthlyProfits[])
         switch (action)
         {
         case '1':
-            addItem(head, monthlyProfits);
+            addItemHandler(head, monthlyProfits);
             system("cls");
             inventoryPage(head);
             break;
         case '2':
-            deleteItem(head, monthlyProfits);
+            deleteItemHandler(head, monthlyProfits);
             system("cls");
             inventoryPage(head);
             break;
         case '3':
-            editItem(head);
+            editItemHandler(head);
             system("cls");
             inventoryPage(head);
             break;
@@ -109,56 +99,50 @@ void viewItemDetails(struct Node **head)
 {
     char itemId[ID_LENGTH];
 
-    printf("Enter the item ID:");
-    bannerUserInput();
+    newUserMessagePage("Viewing an Item", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
     scanf("%s", itemId);
+
+    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "b") == 0 || *head == NULL) {
+        system("cls");
+        inventoryPage(head);
+        return;
+    }
 
     struct Node *itemData = getItemById(head, itemId);
 
     if (itemData == NULL) {
-        printf("\nItem not found, please try again.");
+        newUserMessagePage("Restocking an Item", "", "Item not found, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
         system("cls");
         inventoryPage(head);
         return;
     }
-    
-    printItemData(itemData->data);
-}
 
-void printItemData(struct Item item)
-{
     system("cls");
-    printf("\nMore details about the item: \n");
-    printf("\nItem Name:\t\t\t\t%s", item.name);
-    printf("\nStocks:\t\t\t\t\t%d / %d", item.stocks, item.baseStocks);
-    printf("\nPrice:\t\t\t\t\t%.2lf", item.price);
-    printf("\nOriginal Price:\t\t\t\t%.2lf", item.originalPrice);
-    printf("\nProfit per item:\t\t\t%.2lf", item.profit);
-    printf("\nDate Added:\t\t\t\t%s", item.dateAdded);
-    printf("\nLast Updated:\t\t\t\t%s", item.lastUpdated);
-    printf("\nItem ID:\t\t\t\t%s", item.id);
-
-    printf("\n\nEnter 'b' to go back.");
+    itemDataPage(itemData->data);
 }
+
+// void printItemData(struct Item item)
+// {
+//     system("cls");
+//     printf("\nMore details about the item: \n");
+//     printf("\nItem Name:\t\t\t\t%s", item.name);
+//     printf("\nStocks:\t\t\t\t\t%d / %d", item.stocks, item.baseStocks);
+//     printf("\nPrice:\t\t\t\t\t%.2lf", item.price);
+//     printf("\nOriginal Price:\t\t\t\t%.2lf", item.originalPrice);
+//     printf("\nProfit per item:\t\t\t%.2lf", item.profit);
+//     printf("\nDate Added:\t\t\t\t%s", item.dateAdded);
+//     printf("\nLast Updated:\t\t\t\t%s", item.lastUpdated);
+//     printf("\nItem ID:\t\t\t\t%s", item.id);
+
+//     printf("\n\nEnter 'b' to go back.");
+// }
 
 void viewReports(struct ProfitPerMonth monthlyProfits[])
 {
-    printf("Month:\t\t\t\tCosts:\t\tRevenue:\t\tProfit:\n");
-    for (int i = 0; i < MONTHS; i++)
-    {
-        printf
-        (
-            "%d. %-15s\t\tP%-10.2lf\tP%-10.2lf\t\tP%-10.2lf\n", 
-            i + 1, monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].revenue, monthlyProfits[i].profit
-        );
-    }
-    printf("\nTotal Costs:\t\t\t\t\t\t\t\tP%.2lf", getTotalCosts(monthlyProfits));
-    printf("\nTotal Revenue:\t\t\t\t\t\t\t\tP%.2lf", getTotalRevenue(monthlyProfits));
-    printf("\nTotal Profit:\t\t\t\t\t\t\t\tP%.2lf", getTotalProfit(monthlyProfits));
+    salesReportPage(monthlyProfits);
 
     char back;
-    printf("\n\nEnter 'b' to go back.");
     bannerUserInput();
     fflush(stdin);
     scanf("%c", &back);
@@ -232,13 +216,14 @@ void printActions()
     printf("\n\nEnter 'q' to exit.");
 }
 
-int getListSize(const struct Node *head)
+int getListSize(struct Node **head)
 {
+    struct Node *current = *head;
     int size = 0;
     // traverse the list and increment size on each iteration, then return it
-    while (head != NULL)
+    while (current != NULL)
     {
-        head = head->next;
+        current = current->next;
         size++;
     }
     return size;

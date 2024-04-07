@@ -1,7 +1,7 @@
 #define NAME_SIZE 20
 #define ID_LENGTH 10
 #define MONTHS 12
-#define SLEEP_TIME 3
+#define SLEEP_TIME 2
 
 // structure of an individual item
 struct Item
@@ -36,9 +36,9 @@ struct ProfitPerMonth
 // function prototypes
 
 // item
-void addItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
-void deleteItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
-void editItem(struct Node **head);
+void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
+void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
+void editItemHandler(struct Node **head);
 void searchItem(struct Node **head);
 void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], double deduction);
 void sellItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
@@ -55,7 +55,7 @@ int getCurrentDateInt();
 // main
 void printLinkedlist(const struct Node *head);
 void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[]);
-int getListSize(const struct Node *head);
+int getListSize(struct Node **head);
 void viewInventory(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
 void viewItemDetails(struct Node **head);
 double getTotalProfit(struct ProfitPerMonth monthlyProfits[]);
@@ -64,9 +64,16 @@ double getTotalRevenue(struct ProfitPerMonth monthlyProfits[]);
 void printActions();
 void freeLinkedList(struct Node **head);
 void viewReports(struct ProfitPerMonth monthlyProfits[]);
-void printItemData(struct Item item);
+// void printItemData(struct Item item);
 
 // display
+void itemDataPage(struct Item item);
+void newUserMessagePage(char *header, char *bottomMessage, char *message1, char *message2, char *message3, char *message4, char *message5);
+void userMessagePage(char *header, char *bottomMessage, char *message1, char *message2, char *message3, char *message4, char *message5);
+void printMinimumScreenHeight(int itemsLength);
+void salesReportPage(struct ProfitPerMonth monthlyProfits[]);
+void printMonthlyReports(struct ProfitPerMonth monthlyProfits[]);
+void printReportHeader();
 void inventoryPage(struct Node **head);
 void printItemList(struct Node **head);
 void printItemHeader();
