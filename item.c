@@ -254,6 +254,8 @@ void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[
         if (current->next->next == NULL) current->next = NULL;
         else current->next = current->next->next;
     }
+    
+    deleteItemFromStorageById(idToDelete);
     newUserMessagePage("Deleting an Item", "", "Item deleted succesfully!", "", "", "", "");
     // free the memory
     free(deleted);
