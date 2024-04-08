@@ -12,7 +12,7 @@ int main()
     askUserToFullScreen();
     srand(time(NULL));
     struct Node *head = NULL;
-    struct ProfitPerMonth monthlyProfits[MONTHS];
+    struct ReportPerMonth monthlyProfits[MONTHS];
     initMonthlyProfits(monthlyProfits);             // fill the monthly values with zero and sets monthly names
     getItemsFromStorage(&head);
     char action;
@@ -51,7 +51,7 @@ int main()
     // TODO: maybe clear the memory of head? there's an available function for that
 }
 
-void viewInventory(struct Node **head, struct ProfitPerMonth monthlyProfits[])
+void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     char action;
     system("cls");

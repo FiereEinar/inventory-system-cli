@@ -94,6 +94,16 @@ int getCurrentDateInt()
     return info->tm_mon;
 }
 
+int getCurrentDayInt()
+{
+    time_t rawtime;
+    struct tm *info;
+    time(&rawtime);
+    info = localtime(&rawtime);
+
+    return info->tm_mday - 1;
+}
+
 int getListSize(struct Node **head)
 {
     struct Node *current = *head;

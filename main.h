@@ -4,6 +4,7 @@
 #define SLEEP_TIME 1
 #define DATE_LENGTH 30
 #define MONTH_NAME_LEN 15
+#define DAYS_IN_MONTH 31
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      STRUCTS
@@ -29,11 +30,21 @@ struct Node
     struct Node *next;      // a pointer that points to the next item
 };
 
+struct ReportPerDay
+{
+    double costs;
+    double additionalCosts;
+    double revenue;
+    double profit;
+};
+
 // structure of sales report on each month, will be stored in array of 12(months)
-struct ProfitPerMonth
+struct ReportPerMonth
 {
     char month[MONTH_NAME_LEN];         // name of the month
+    struct ReportPerDay day[DAYS_IN_MONTH];
     double costs;
+    double additionalCosts;
     double revenue;
     double profit;
 };
@@ -50,22 +61,22 @@ struct ProfitPerMonth
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: main.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-void viewInventory(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
+void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: item.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
-void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
+void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void editItemHandler(struct Node **head);
 void viewItemDetails(struct Node **head);
 void searchItem(struct Node **head);
-void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], double deduction);
-void sellItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
-void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);
-void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[]);
+void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
+void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);
+void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 struct Node *getItemById(struct Node **list, char itemId[]);
 void addItemToLinkedList(struct Node **head, struct Item newItem);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -78,6 +89,7 @@ char* getCurrentTime();
 char* getCurrentDate();
 void generateId(char placeholder[]);
 int getCurrentDateInt();
+int getCurrentDayInt();
 int getListSize(struct Node **head);
 void freeLinkedList(struct Node **head);
 void clearNewline(char *string);
@@ -88,11 +100,14 @@ void updateDate(char *placeholder);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: sales.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-void viewReports(struct ProfitPerMonth monthlyProfits[]);
-void initMonthlyProfits(struct ProfitPerMonth monthlyProfits[]);
-double getTotalProfit(struct ProfitPerMonth monthlyProfits[]);
-double getTotalCosts(struct ProfitPerMonth monthlyProfits[]);
-double getTotalRevenue(struct ProfitPerMonth monthlyProfits[]);
+void viewReports(struct ReportPerMonth monthlyProfits[]);
+void initMonthlyProfits(struct ReportPerMonth monthlyProfits[]);
+double getTotalProfit(struct ReportPerMonth monthlyProfits[]);
+double getTotalCosts(struct ReportPerMonth monthlyProfits[]);
+double getTotalRevenue(struct ReportPerMonth monthlyProfits[]);
+double getTotalExtraCosts(struct ReportPerMonth monthlyProfits[]);
+double getProfitForMonth(struct ReportPerMonth monthlyProfits);
+double getProfitForDay(struct ReportPerDay day);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -104,9 +119,12 @@ void itemDataPage(struct Item item);
 void newUserMessagePage(char *header, char *bottomMessage, char *message1, char *message2, char *message3, char *message4, char *message5);
 void userMessagePage(char *header, char *bottomMessage, char *message1, char *message2, char *message3, char *message4, char *message5);
 void printMinimumScreenHeight(int itemsLength);
-void salesReportPage(struct ProfitPerMonth monthlyProfits[]);
-void printMonthlyReports(struct ProfitPerMonth monthlyProfits[]);
+void salesReportPage(struct ReportPerMonth monthlyProfits[]);
+void salesPerDayReportPage(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month);
+void printPerDayReports(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month);
+void printMonthlyReports(struct ReportPerMonth monthlyProfits[]);
 void printReportHeader();
+void printMonthlyReportHeader(char *month);
 void inventoryPage(struct Node **head);
 void printItemList(struct Node **head);
 void printItemHeader();

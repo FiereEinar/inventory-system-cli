@@ -78,7 +78,7 @@ void printMinimumScreenHeight(int itemsLength)
     }
 }
 
-void salesReportPage(struct ProfitPerMonth monthlyProfits[])
+void salesReportPage(struct ReportPerMonth monthlyProfits[])
 {
     bannerFullBorder();
     bannerBlankBorder();
@@ -86,33 +86,74 @@ void salesReportPage(struct ProfitPerMonth monthlyProfits[])
     bannerFullBorderSection();
 
     printMonthlyReports(monthlyProfits);
-    printMinimumScreenHeight(MONTHS - 1);
+    printMinimumScreenHeight(MONTHS - 2);
 
+    bannerBlankBorderTextCen("Enter the number of month to see more details.");
     bannerBlankBorderTextCen("'b' to go back to Menu Page");
     bannerFullBorder();
 }
 
-void printReportHeader()
+void salesPerDayReportPage(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month)
 {
-    printf("::  Month\t\t\t\t\t\t\t\tCosts\t\t\tRevenue\t\t\tProfit\t\t  ::\n");
+    bannerFullBorder();
+    bannerBlankBorder();
+    printMonthlyReportHeader(monthlyProfits[month].month);
+    bannerFullBorderSection();
+
+    printPerDayReports(day, monthlyProfits, month);
+    printMinimumScreenHeight(DAYS_IN_MONTH - 1);
+
+    bannerBlankBorder();
+    bannerBlankBorderTextCen("'b' to go back");
+    bannerFullBorder();
 }
 
-void printMonthlyReports(struct ProfitPerMonth monthlyProfits[])
+void printPerDayReports(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month)
 {
-    for (int i = 0; i < MONTHS; i++)
+    for (int i = 0; i < DAYS_IN_MONTH; i++)
     {
-        monthlyProfits[i].profit = monthlyProfits[i].revenue - monthlyProfits[i].costs;
+        // day[i].profit = getProfitForDay(day[i]);
         printf
         (
-            "::  %d. %-15s\t\t\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
-            i + 1, monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].revenue, monthlyProfits[i].profit
+            "::  %-4d  \t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
+            i + 1, day[i].costs, day[i].additionalCosts, day[i].revenue, getProfitForDay(day[i])
         );
     }
     bannerFullBorderSection();
     printf
     (
-        "::  Total\t\t\t\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
-        getTotalCosts(monthlyProfits), getTotalRevenue(monthlyProfits), getTotalProfit(monthlyProfits)
+        "::  Total\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
+        monthlyProfits[month].costs, monthlyProfits[month].additionalCosts, monthlyProfits[month].revenue, getProfitForMonth(monthlyProfits[month])
+    );
+}
+
+void printMonthlyReportHeader(char *month)
+{
+    printf("::  %s\t\t\t\t\tCosts\t\t\tExtra Costs\t\tRevenue\t\t\tProfit\t\t  ::\n", month);
+}
+
+void printReportHeader()
+{
+    printf("::  Month\t\t\t\t\tCosts\t\t\tExtra Costs\t\tRevenue\t\t\tProfit\t\t  ::\n");
+}
+
+void printMonthlyReports(struct ReportPerMonth monthlyProfits[])
+{
+    for (int i = 0; i < MONTHS; i++)
+    {
+        // monthlyProfits[i].profit = getProfitForMonth(monthlyProfits[i]);
+        // monthlyProfits[i].profit = monthlyProfits[i].revenue - monthlyProfits[i].costs - monthlyProfits[i].additionalCosts;
+        printf
+        (
+            "::  %d. %-15s\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
+            i + 1, monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].additionalCosts, monthlyProfits[i].revenue, getProfitForMonth(monthlyProfits[i])
+        );
+    }
+    bannerFullBorderSection();
+    printf
+    (
+        "::  Total\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
+        getTotalCosts(monthlyProfits), getTotalExtraCosts(monthlyProfits), getTotalRevenue(monthlyProfits), getTotalProfit(monthlyProfits)
     );
 }
 
@@ -121,7 +162,8 @@ void inventoryPage(struct Node **head)
     bannerFullBorder();
     bannerBlankBorder();
     printItemHeader();
-    bannerFullBorderSection();
+    bannerFullBorder();
+    // bannerFullBorderSection();
     bannerBlankBorder();
     printItemList(head);
 
@@ -136,7 +178,7 @@ void inventoryPage(struct Node **head)
 
 void printItemHeader()
 {
-    printf("::  Item\t\t\t\t\t\t\tStocks\t\tSelling Price\t\tProfit/item\t\tId\t  ::\n");
+    printf("::\tItem\t\t\t\t\t\tStocks\t\tSelling Price\t\tProfit/item\t\tId\t\t  ::\n");
 }
 
 void printItemList(struct Node **head)
@@ -150,7 +192,7 @@ void printItemList(struct Node **head)
         // if (strlen(current->data.name) >= 8) { / ... / }
         printf
         (
-            "::  %d. %-57s%d/%-12d\tP%-14.2lf\t\t%.2lf\t\t\t%s  ::\n",
+            "::  %3d. %-45s\t%d/%-12d\tP%-14.2lf\t\t%.2lf\t\t\t%s\t  ::\n",
             i, current->data.name, current->data.stocks, current->data.baseStocks, current->data.price, current->data.profit, current->data.id
         );
         // iterator

@@ -7,7 +7,7 @@
 
 #include "main.h"
 
-void sellItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
+void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     newUserMessagePage("Point of Sale", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
 
@@ -40,6 +40,10 @@ void sellItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     // once the item is found, update the stocks and tally the revenue
     current->data.stocks -= (int)quantity;
     monthlyProfits[getCurrentDateInt()].revenue += quantity * current->data.price;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].revenue += quantity * current->data.price;
+
+    monthlyProfits[getCurrentDateInt()].profit += quantity * current->data.profit;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].profit += quantity * current->data.profit;
 
     editItemFromStorageById(current->data.id, current->data);
 
@@ -47,7 +51,7 @@ void sellItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     sleep(SLEEP_TIME);
 }
 
-void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
+void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     if (*head == NULL){
         newUserMessagePage("Restocking an Item", "Enter any key to go back", "No item to restock.", "", "", "", "");
@@ -89,6 +93,10 @@ void restockItem(struct Node **head, struct ProfitPerMonth monthlyProfits[])
 
     // tally the costs
     monthlyProfits[getCurrentDateInt()].costs += (addedStocks * current->data.originalPrice) + additionalCosts;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs += (addedStocks * current->data.originalPrice) + additionalCosts;
+
+    monthlyProfits[getCurrentDateInt()].additionalCosts += additionalCosts;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].additionalCosts += additionalCosts;
 
     updateDate(current->data.lastUpdated);
     editItemFromStorageById(current->data.id, current->data);
@@ -146,7 +154,7 @@ void searchItem(struct Node **list)
     freeLinkedList(&results);
 }
 
-void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
+void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     // using item struct to store values, less variable declaration needed
     struct Item newItem;
@@ -169,6 +177,11 @@ void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     size_t len = strlen(newItem.name);                  // clear the newline character from fgets()
     if (len > 0 && newItem.name[len - 1] == '\n') newItem.name[len - 1] = '\0';
 
+    if (len <= 1) {
+        newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Items with no name are not allowed.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
 
     newUserMessagePage("Adding an Item", "", message[1], "", "", "", "");
     scanf("%d", &newItem.stocks);
@@ -189,7 +202,7 @@ void addItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
     sleep(SLEEP_TIME);
 }
 
-void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[])
+void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     if (*head == NULL) {
         newUserMessagePage("Deleting an Item", "Enter any key to go back", "No item to delete.", "", "", "", "");
@@ -248,7 +261,7 @@ void deleteItemHandler(struct Node **head, struct ProfitPerMonth monthlyProfits[
     sleep(SLEEP_TIME);
 }
 
-void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], double deduction)
+void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction)
 {
     char action;
 
@@ -256,7 +269,10 @@ void reflectToMonthlyCostsOnDeletion(struct ProfitPerMonth monthlyProfits[], dou
     fflush(stdin);
     scanf("%c", &action);
 
-    if (action == 'y' || action == 'Y') monthlyProfits[getCurrentDateInt()].costs -= deduction;
+    if (action == 'y' || action == 'Y') {
+        monthlyProfits[getCurrentDateInt()].costs -= deduction;
+        monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs -= deduction;
+    }
 }
 
 void editItemHandler(struct Node **head)
@@ -284,10 +300,11 @@ void editItemHandler(struct Node **head)
         return;
     }
 
-    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. original price | 3. selling price ]", "What do you want to edit?: ", "", "", "");
+    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. stocks | 3. selling price | 4. original price ]", "What do you want to edit?: ", "", "", "");
     scanf("%d", &toUpdate);
 
     char headerWithName[100];
+    char x;
     // after that, we simply determine what the user wants to update and prompt the user for new data
     switch(toUpdate) {
         case 1:
@@ -303,12 +320,14 @@ void editItemHandler(struct Node **head)
             if (len > 0 && current->data.name[len - 1] == '\n') current->data.name[len - 1] = '\0';
             break;
         case 2:
-            strcpy(headerWithName, "Enter an updated original price of ");
+            strcpy(headerWithName, "Enter an updated stocks price of ");
             strcat(headerWithName, current->data.name);
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
-            
-            scanf("%lf", &current->data.originalPrice);
-            current->data.profit = current->data.price - current->data.originalPrice;
+
+            scanf("%d", &current->data.stocks);
+            newUserMessagePage("Editing an Item", "", "Do you want to update the base stocks as well? [y/n]", "", "", "", "");
+            scanf("%c", &x);
+            if (x == 'y') current->data.baseStocks = current->data.stocks;
             break;
         case 3:
             strcpy(headerWithName, "Enter an updated selling price of ");
@@ -316,6 +335,14 @@ void editItemHandler(struct Node **head)
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
 
             scanf("%lf", &current->data.price);
+            current->data.profit = current->data.price - current->data.originalPrice;
+            break;
+        case 4:
+            strcpy(headerWithName, "Enter an updated original price of ");
+            strcat(headerWithName, current->data.name);
+            newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
+            
+            scanf("%lf", &current->data.originalPrice);
             current->data.profit = current->data.price - current->data.originalPrice;
             break;
         default:
@@ -330,7 +357,7 @@ void editItemHandler(struct Node **head)
     sleep(SLEEP_TIME);
 }
 
-void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost)
+void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost)
 {
     // tbh, i could've just passed the entire Item struct, but im using this function for generating test items as well so...
     struct Item newItem;
@@ -349,6 +376,10 @@ void addItemToList(struct Node **head, struct ProfitPerMonth monthlyProfits[], c
     generateId(newItem.id);
     // tally the costs
     monthlyProfits[getCurrentDateInt()].costs += (newItem.stocks * newItem.originalPrice) + additionalCost;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs += (newItem.stocks * newItem.originalPrice) + additionalCost;
+
+    monthlyProfits[getCurrentDateInt()].additionalCosts += additionalCost;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].additionalCosts += additionalCost;
 
     addItemToLinkedList(head, newItem);
     addItemToStorage(newItem);
