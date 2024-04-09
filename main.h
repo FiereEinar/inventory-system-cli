@@ -1,7 +1,7 @@
 #define NAME_SIZE 30
 #define ID_LENGTH 10
 #define MONTHS 12
-#define SLEEP_TIME 1
+#define SLEEP_TIME 1                                    // the pause when showing information or errors before returning to previous page
 #define DATE_LENGTH 30
 #define MONTH_NAME_LEN 15
 #define DAYS_IN_MONTH 31
@@ -26,8 +26,8 @@ struct Item
 // structure of an individual node in a linked list
 struct Node
 {
-    struct Item data;       // contains the Item
-    struct Node *next;      // a pointer that points to the next item
+    struct Item data;                                   // contains the Item
+    struct Node *next;                                  // a pointer that points to the next item
 };
 
 struct ReportPerDay
@@ -41,8 +41,8 @@ struct ReportPerDay
 // structure of sales report on each month, will be stored in array of 12(months)
 struct ReportPerMonth
 {
-    char month[MONTH_NAME_LEN];         // name of the month
-    struct ReportPerDay day[DAYS_IN_MONTH];
+    char month[MONTH_NAME_LEN];                         // name of the month
+    struct ReportPerDay day[DAYS_IN_MONTH];             // per day report stored in array[31]
     double costs;
     double additionalCosts;
     double revenue;
@@ -72,7 +72,7 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void editItemHandler(struct Node **head);
 void viewItemDetails(struct Node **head);
-void searchItem(struct Node **head);
+void searchItemHandler(struct Node **head);
 void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
 void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);

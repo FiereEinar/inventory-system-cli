@@ -29,7 +29,6 @@ int main()
     while (true) {
         system("cls");
         menuPage();
-
         bannerUserInput();
         scanf("%c", &action);
 
@@ -49,7 +48,6 @@ int main()
             return 0;
         }
     }
-    // TODO: maybe clear the memory of head? there's an available function for that
 }
 
 void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[])
@@ -60,6 +58,8 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[])
     inventoryPage(head);
 
     while (true) {
+        system("cls");
+        inventoryPage(head);
         bannerUserInput();
         fflush(stdin);
         scanf("%c", &action);
@@ -68,26 +68,18 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[])
         {
         case '1':
             addItemHandler(head, monthlyProfits);
-            system("cls");
-            inventoryPage(head);
             break;
         case '2':
             deleteItemHandler(head, monthlyProfits);
-            system("cls");
-            inventoryPage(head);
             break;
         case '3':
             editItemHandler(head);
-            system("cls");
-            inventoryPage(head);
             break;
         case '4':
             restockItem(head, monthlyProfits);
-            system("cls");
-            inventoryPage(head);
             break;
         case '5':
-            searchItem(head);
+            searchItemHandler(head);
             break;
         case '6':
             viewItemDetails(head);

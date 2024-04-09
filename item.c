@@ -16,6 +16,7 @@ void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 
     scanf("%s", itemId);
 
+    // get the item with that ID
     struct Node *current = getItemById(head, itemId);
 
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0) return;
@@ -37,11 +38,12 @@ void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
         return;
     }
 
-    // once the item is found, update the stocks and tally the revenue
+    // once we get the item, update the stocks and tally the revenue
     current->data.stocks -= (int)quantity;
     updateRevenue(monthlyProfits, current->data.price, quantity);
     updateProfit(monthlyProfits, current->data.profit, quantity);
     
+    // update the data from storage as well
     editItemFromStorageById(itemId, current->data);
     updateReportsFromStorage(monthlyProfits);
 
@@ -59,14 +61,13 @@ void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
     
     int addedStocks;
     double additionalCosts;
-    char idToDelete[ID_LENGTH];
 
-    // prompt the user for some details
-    scanf("%s", idToDelete);
+    char itemId[ID_LENGTH];
+    scanf("%s", itemId);
 
-    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0 || *head == NULL) return;
+    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
 
-    struct Node *current = getItemById(head, idToDelete);
+    struct Node *current = getItemById(head, itemId);
 
     // if we didn't find the item, give them an error
     if (current == NULL)
@@ -80,8 +81,9 @@ void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
     strcpy(messageWithName, "Enter the amount of stocks added in ");
     strcat(messageWithName, current->data.name);
     newUserMessagePage("Restocking an Item", "", messageWithName, "", "", "", "");
-
     scanf("%d", &addedStocks);
+
+    // update the stocks and base stocks
     current->data.stocks += addedStocks;
     current->data.baseStocks = current->data.stocks;
 
@@ -91,15 +93,17 @@ void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
     // tally the costs
     updateCosts(monthlyProfits, addedStocks, current->data.originalPrice);
     updateAdditionalCosts(monthlyProfits, additionalCosts);
+    
+    // update the data from storage
     updateReportsFromStorage(monthlyProfits);
-
-    updateDate(current->data.lastUpdated);
     editItemFromStorageById(current->data.id, current->data);
 
+    updateDate(current->data.lastUpdated);
     newUserMessagePage("Restocking an Item", "", "Item restocked successfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
+// gives you the item based on ID, returns NULL if not found
 struct Node *getItemById(struct Node **list, char itemId[])
 {
     struct Node *current = *list;
@@ -113,7 +117,7 @@ struct Node *getItemById(struct Node **list, char itemId[])
     return NULL;
 }
 
-void searchItem(struct Node **list)
+void searchItemHandler(struct Node **list)
 {
     if (*list == NULL) {
         newUserMessagePage("Searching an Item", "Enter any key to go back", "No item to search.", "", "", "", "");
@@ -121,18 +125,18 @@ void searchItem(struct Node **list)
         newUserMessagePage("Searching an Item", "Enter 'b' to go back.", "Enter a keyword to search: ", "", "", "", "");
     }
 
-    char searchTerm[20];
+    char searchTerm[NAME_SIZE];
+    // create a current variable to prevent the head pointer from being manipulated
     struct Node *current = *list;
     // another linked list to store the results
     struct Node *results = NULL;
 
     fflush(stdin);
-    fgets(searchTerm, 20, stdin);
+    fgets(searchTerm, NAME_SIZE, stdin);
 
     if (strcmp(searchTerm, "b") == 0 || strcmp(searchTerm, "B") == 0 || *list == NULL) return;
 
-    size_t len = strlen(searchTerm);                                                // clear the newline character from fgets()
-    if (len > 0 && searchTerm[len - 1] == '\n') searchTerm[len - 1] = '\0';
+    clearNewline(searchTerm);
 
     // we traverse the list and on each iteration, check if searchTerm is a substring of the current data name
     while(current != NULL) {
@@ -143,10 +147,15 @@ void searchItem(struct Node **list)
         current = current->next;
     }
 
+    // render the results
     system("cls");
     inventoryPage(&results);
     // free the memory of results
     freeLinkedList(&results);
+
+    // to be able to go back to inventory page
+    char x;
+    scanf("%c", &x);
 }
 
 void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
@@ -170,10 +179,8 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 
     if (strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "B") == 0) return;
 
-    size_t len = strlen(newItem.name);                  // clear the newline character from fgets()
-    if (len > 0 && newItem.name[len - 1] == '\n') newItem.name[len - 1] = '\0';
-
-    if (len <= 1) {
+    // if the name is too short or none at all, don't proceed
+    if (strlen(newItem.name) <= 1) {
         newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Items with no name are not allowed.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
@@ -205,7 +212,8 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
     } else {
         newUserMessagePage("Deleting an Item", "Enter 'b' to go back", "Enter the ID of the item you want to delete: ", "", "", "", "");
     }
-    // this will hold the index of item to be deleted
+
+    // get the ID to be deleted
     char idToDelete[ID_LENGTH];
     scanf("%s", idToDelete);
 
@@ -218,6 +226,7 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
 
     // if the user is trying to delete the first item, we simply set the head to point to the next node
     if (strcmp(current->data.id, idToDelete) == 0) {
+        // ask the user if he/she wants to deduct the total costs of the deleted item
         double deduction = current->data.originalPrice * current->data.stocks;
         reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
 
@@ -225,7 +234,7 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
         if (current->next == NULL) *head = NULL;
         else *head = current->next;
     } else {
-        // to delete a Node, we traverse to the Node right before the Node TO BE DELETED
+        // to delete a Node, we traverse to the Node right before it
         while(current->next != NULL)
         {
             // if the next item is the item to be deleted, then break
@@ -239,6 +248,8 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
             sleep(SLEEP_TIME);
             return;
         }
+
+        // ask the user if he/she wants to deduct the total costs of the deleted item
         double deduction = current->data.originalPrice * current->data.stocks;
         reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
 
@@ -248,6 +259,7 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
         else current->next = current->next->next;
     }
 
+    // delete it from the storage as well
     deleteItemFromStorageById(idToDelete);
     newUserMessagePage("Deleting an Item", "", "Item deleted succesfully!", "", "", "", "");
     // free the memory
@@ -255,6 +267,7 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
     sleep(SLEEP_TIME);
 }
 
+// asks the user if he/she wants to deduct the total costs of the deleted item
 void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction)
 {
     char action;
@@ -278,14 +291,16 @@ void editItemHandler(struct Node **head)
         newUserMessagePage("Editing an Item", "Enter 'b' to go back", "Enter the ID of the item: ", "", "", "", "");
     }
 
+    // the options to edit
     int toUpdate;
     // this will hold the index of item to be deleted
-    char idToDelete[ID_LENGTH];
-    scanf("%s", idToDelete);
+    char itemId[ID_LENGTH];
+    scanf("%s", itemId);
 
-    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0 || *head == NULL) return;
+    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
 
-    struct Node *current = getItemById(head, idToDelete);
+    // get the item
+    struct Node *current = getItemById(head, itemId);
 
     // if we didn't find the item, give them an error
     if (current == NULL)
@@ -298,9 +313,11 @@ void editItemHandler(struct Node **head)
     newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. selling price | 3. original price ]", "What do you want to edit?: ", "", "", "");
     scanf("%d", &toUpdate);
 
+    // this is just to dynamically show a message with the name of item
     char headerWithName[100];
     // after that, we simply determine what the user wants to update and prompt the user for new data
     switch(toUpdate) {
+        // EDITED: NAME
         case 1:
             strcpy(headerWithName, "Enter a new name for ");
             strcat(headerWithName, current->data.name);
@@ -308,10 +325,7 @@ void editItemHandler(struct Node **head)
 
             fflush(stdin);
             fgets(current->data.name, NAME_SIZE, stdin);
-
-            // clear the newline character from fgets()
-            size_t len = strlen(current->data.name);
-            if (len > 0 && current->data.name[len - 1] == '\n') current->data.name[len - 1] = '\0';
+            clearNewline(current->data.name);
             break;
         // case 2:
         //     strcpy(headerWithName, "Enter an updated stocks price of ");
@@ -323,6 +337,7 @@ void editItemHandler(struct Node **head)
         //     scanf("%c", &x);
         //     if (x == 'y') current->data.baseStocks = current->data.stocks;
         //     break;
+        // EDITED: selling price
         case 2:
             strcpy(headerWithName, "Enter an updated selling price of ");
             strcat(headerWithName, current->data.name);
@@ -331,6 +346,7 @@ void editItemHandler(struct Node **head)
             scanf("%lf", &current->data.price);
             current->data.profit = current->data.price - current->data.originalPrice;
             break;
+        // EDITED: original price
         case 3:
             strcpy(headerWithName, "Enter an updated original price of ");
             strcat(headerWithName, current->data.name);
@@ -344,8 +360,9 @@ void editItemHandler(struct Node **head)
             return;
     }
 
-    editItemFromStorageById(idToDelete, current->data);
     updateDate(current->data.lastUpdated);
+    // update the item in the storage
+    editItemFromStorageById(itemId, current->data);
 
     newUserMessagePage("Editing an Item", "", "Item edited succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
@@ -372,6 +389,7 @@ void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], c
     // tally the costs
     updateCosts(monthlyProfits, newItem.stocks, newItem.originalPrice);
     updateAdditionalCosts(monthlyProfits, additionalCost);
+    // update the storage
     updateReportsFromStorage(monthlyProfits);
 
     addItemToLinkedList(head, newItem);
@@ -411,16 +429,21 @@ void viewItemDetails(struct Node **head)
         return;
     }
 
+    // get the item
     struct Node *itemData = getItemById(head, itemId);
 
     if (itemData == NULL) {
         newUserMessagePage("Viewing an Item", "", "Item not found, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
-        system("cls");
-        inventoryPage(head);
         return;
     }
 
+    // render it if it's found
     system("cls");
     itemDataPage(itemData->data);
+
+    // to be able to go back to inventory page
+    char x;
+    fflush(stdin);
+    scanf("%c", &x);
 }

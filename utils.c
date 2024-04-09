@@ -143,6 +143,7 @@ void updateDate(char *placeholder)
     sprintf(placeholder, "%s / %s", getCurrentDate(), getCurrentTime());
 }
 
+// the stocks column in inventory page (10/10)
 void joinStocks(char *output, int stock, int base)
 {
     char stockStr[5];
@@ -154,10 +155,4 @@ void joinStocks(char *output, int stock, int base)
     strcpy(output, stockStr);
     strcat(output, "/");
     strcat(output, baseStr);
-    // itoa(stock, stockStr, 10);
-    // itoa(base, baseStr, 10);
-
-    // strcpy(output, stockStr);
-    // strcpy(output, "/");
-    // strcpy(output, baseStr);
 }

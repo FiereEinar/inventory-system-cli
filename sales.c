@@ -16,16 +16,22 @@ void viewReports(struct ReportPerMonth monthlyProfits[])
 
     if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) return;
 
+    // if the user enters the number of month, it will be a string. so convert it to int
     int month = atoi(action) - 1;
 
+    // render the report per day by passing the record using the month entered
     system("cls");
     salesPerDayReportPage(monthlyProfits[month].day, monthlyProfits, month);
+
+    // allows the user to go back to monthly report
     bannerUserInput();
     fflush(stdin);
     scanf("%s", action);
     viewReports(monthlyProfits);
 }
 
+// we don't subtract the additional costs on every purchased because it will cause some miscalculation
+// we instead just calculate it based on month or day not by items
 double getTotalProfit(struct ReportPerMonth monthlyProfits[])
 {
     double total = 0;
@@ -66,6 +72,7 @@ double getTotalExtraCosts(struct ReportPerMonth monthlyProfits[])
     return total;
 }
 
+// fills the record with zero and sets the names of month
 void initMonthlyProfits(struct ReportPerMonth monthlyProfits[])
 {
     char months[MONTHS][15] = 
@@ -93,18 +100,21 @@ void initMonthlyProfits(struct ReportPerMonth monthlyProfits[])
     }
 }
 
+// same here, per month subtraction of additional costs instead of per item
 double getProfitForMonth(struct ReportPerMonth monthlyProfits)
 {
     double profit = monthlyProfits.revenue - monthlyProfits.costs - monthlyProfits.additionalCosts;
     return profit;
 }
 
+// same here, per day subtraction of additional costs instead of per item
 double getProfitForDay(struct ReportPerDay day)
 {
     double profit = day.revenue - day.costs - day.additionalCosts;
     return profit;
 }
 
+// updater functions for the records
 void updateRevenue(struct ReportPerMonth monthlyProfits[], double price, double quantity)
 {
     monthlyProfits[getCurrentDateInt()].revenue += quantity * price;
@@ -134,7 +144,9 @@ void reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction)
     monthlyProfits[getCurrentDateInt()].costs -= deduction;
     monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs -= deduction;
 }
+// end
 
+// the updater function for the storage
 void updateReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 {
     updateReportDataFromStorage(getCurrentDateInt(), getCurrentDayInt(), monthlyProfits[getCurrentDateInt()], monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()] );

@@ -67,17 +67,16 @@ void userMessagePage(char *header, char *bottomMessage, char *message1, char *me
     bannerFullBorder();
 }
 
+// prints the necessary amount of spaces to keep the same height of different pages
 void printMinimumScreenHeight(int itemsLength)
 {
     int min = 20;
 
     if (itemsLength >= min) return;
-    for (int i = 0; i < min - itemsLength; i++)
-    {
-        bannerBlankBorder();
-    }
+    for (int i = 0; i < min - itemsLength; i++) bannerBlankBorder();
 }
 
+// per month report
 void salesReportPage(struct ReportPerMonth monthlyProfits[])
 {
     bannerFullBorder();
@@ -93,6 +92,7 @@ void salesReportPage(struct ReportPerMonth monthlyProfits[])
     bannerFullBorder();
 }
 
+// per day report
 void salesPerDayReportPage(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month)
 {
     bannerFullBorder();
@@ -108,11 +108,32 @@ void salesPerDayReportPage(struct ReportPerDay day[], struct ReportPerMonth mont
     bannerFullBorder();
 }
 
+// each individual month report
+void printMonthlyReports(struct ReportPerMonth monthlyProfits[])
+{
+    for (int i = 0; i < MONTHS; i++)
+    {
+        printf
+        (
+            "::  %d. %-15s\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
+            i + 1, monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].additionalCosts, monthlyProfits[i].revenue, getProfitForMonth(monthlyProfits[i])
+        );
+    }
+    bannerFullBorderSection();
+
+    // the total at the bottom
+    printf
+    (
+        "::  Total\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
+        getTotalCosts(monthlyProfits), getTotalExtraCosts(monthlyProfits), getTotalRevenue(monthlyProfits), getTotalProfit(monthlyProfits)
+    );
+}
+
+// each individual day report
 void printPerDayReports(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month)
 {
     for (int i = 0; i < DAYS_IN_MONTH; i++)
     {
-        // day[i].profit = getProfitForDay(day[i]);
         printf
         (
             "::  %-4d  \t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
@@ -120,6 +141,8 @@ void printPerDayReports(struct ReportPerDay day[], struct ReportPerMonth monthly
         );
     }
     bannerFullBorderSection();
+
+    // the total at the bottom
     printf
     (
         "::  Total\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
@@ -135,26 +158,6 @@ void printMonthlyReportHeader(char *month)
 void printReportHeader()
 {
     printf("::  Month\t\t\t\t\tCosts\t\t\tExtra Costs\t\tRevenue\t\t\tProfit\t\t  ::\n");
-}
-
-void printMonthlyReports(struct ReportPerMonth monthlyProfits[])
-{
-    for (int i = 0; i < MONTHS; i++)
-    {
-        // monthlyProfits[i].profit = getProfitForMonth(monthlyProfits[i]);
-        // monthlyProfits[i].profit = monthlyProfits[i].revenue - monthlyProfits[i].costs - monthlyProfits[i].additionalCosts;
-        printf
-        (
-            "::  %d. %-15s\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
-            i + 1, monthlyProfits[i].month, monthlyProfits[i].costs, monthlyProfits[i].additionalCosts, monthlyProfits[i].revenue, getProfitForMonth(monthlyProfits[i])
-        );
-    }
-    bannerFullBorderSection();
-    printf
-    (
-        "::  Total\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
-        getTotalCosts(monthlyProfits), getTotalExtraCosts(monthlyProfits), getTotalRevenue(monthlyProfits), getTotalProfit(monthlyProfits)
-    );
 }
 
 void inventoryPage(struct Node **head)
@@ -182,6 +185,7 @@ void printItemHeader()
     printf("::\tItem\t\t\t\t\t\tStocks\t\tSelling Price\t\tProfit/item\t\tId\t\t  ::\n");
 }
 
+// each individual item in the inventory
 void printItemList(struct Node **head)
 {
     struct Node *current = *head;
