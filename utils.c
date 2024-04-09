@@ -142,3 +142,22 @@ void updateDate(char *placeholder)
 {
     sprintf(placeholder, "%s / %s", getCurrentDate(), getCurrentTime());
 }
+
+void joinStocks(char *output, int stock, int base)
+{
+    char stockStr[5];
+    char baseStr[5];
+
+    sprintf(stockStr, "%d", stock);
+    sprintf(baseStr, "%d", base);
+
+    strcpy(output, stockStr);
+    strcat(output, "/");
+    strcat(output, baseStr);
+    // itoa(stock, stockStr, 10);
+    // itoa(base, baseStr, 10);
+
+    // strcpy(output, stockStr);
+    // strcpy(output, "/");
+    // strcpy(output, baseStr);
+}

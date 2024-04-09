@@ -94,6 +94,7 @@ int getListSize(struct Node **head);
 void freeLinkedList(struct Node **head);
 void clearNewline(char *string);
 void updateDate(char *placeholder);
+void joinStocks(char *output, int stock, int base);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -112,7 +113,8 @@ void updateRevenue(struct ReportPerMonth monthlyProfits[], double price, double 
 void updateProfit(struct ReportPerMonth monthlyProfits[], double profit, double quantity);
 void updateCosts(struct ReportPerMonth monthlyProfits[], int addedStocks, double originalPrice);
 void updateAdditionalCosts(struct ReportPerMonth monthlyProfits[], double additionalCosts);
-void reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction); 
+void reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction);
+void updateReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -152,4 +154,7 @@ void addItemToStorage(struct Item item);
 void getItemsFromStorage(struct Node **head);
 void deleteItemFromStorageById(char *id);
 void editItemFromStorageById(char *id, struct Item item);
+void initReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
+void updateReportDataFromStorage(int month, int day, struct ReportPerMonth monthData, struct ReportPerDay dayData);
+void updatePerDayData(char *month, int day, struct ReportPerDay dayData);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

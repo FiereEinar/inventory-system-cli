@@ -43,6 +43,7 @@ void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
     updateProfit(monthlyProfits, current->data.profit, quantity);
     
     editItemFromStorageById(itemId, current->data);
+    updateReportsFromStorage(monthlyProfits);
 
     newUserMessagePage("Point of Sale", "", "Item purchased successfully", "", "", "", "");
     sleep(SLEEP_TIME);
@@ -90,7 +91,8 @@ void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
     // tally the costs
     updateCosts(monthlyProfits, addedStocks, current->data.originalPrice);
     updateAdditionalCosts(monthlyProfits, additionalCosts);
-    
+    updateReportsFromStorage(monthlyProfits);
+
     updateDate(current->data.lastUpdated);
     editItemFromStorageById(current->data.id, current->data);
 
@@ -164,7 +166,8 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
     newUserMessagePage("Adding an Item", "Enter 'b' to go back", message[0], "", "", "", "");
     fflush(stdin);
     fgets(newItem.name, NAME_SIZE, stdin);
-    
+    clearNewline(newItem.name);
+
     if (strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "B") == 0) return;
 
     size_t len = strlen(newItem.name);                  // clear the newline character from fgets()
@@ -261,7 +264,10 @@ void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], dou
     scanf("%c", &action);
 
     // TODO: account for additional costs
-    if (action == 'y' || action == 'Y') reduceCosts(monthlyProfits, deduction);
+    if (action == 'y' || action == 'Y') {
+        reduceCosts(monthlyProfits, deduction);
+        updateReportsFromStorage(monthlyProfits);
+    }
 }
 
 void editItemHandler(struct Node **head)
@@ -289,11 +295,10 @@ void editItemHandler(struct Node **head)
         return;
     }
 
-    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. stocks | 3. selling price | 4. original price ]", "What do you want to edit?: ", "", "", "");
+    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. selling price | 3. original price ]", "What do you want to edit?: ", "", "", "");
     scanf("%d", &toUpdate);
 
     char headerWithName[100];
-    char x;
     // after that, we simply determine what the user wants to update and prompt the user for new data
     switch(toUpdate) {
         case 1:
@@ -308,17 +313,17 @@ void editItemHandler(struct Node **head)
             size_t len = strlen(current->data.name);
             if (len > 0 && current->data.name[len - 1] == '\n') current->data.name[len - 1] = '\0';
             break;
-        case 2:
-            strcpy(headerWithName, "Enter an updated stocks price of ");
-            strcat(headerWithName, current->data.name);
-            newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
+        // case 2:
+        //     strcpy(headerWithName, "Enter an updated stocks price of ");
+        //     strcat(headerWithName, current->data.name);
+        //     newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
 
-            scanf("%d", &current->data.stocks);
-            newUserMessagePage("Editing an Item", "", "Do you want to update the base stocks as well? [y/n]", "", "", "", "");
-            scanf("%c", &x);
-            if (x == 'y') current->data.baseStocks = current->data.stocks;
-            break;
-        case 3:
+        //     scanf("%d", &current->data.stocks);
+        //     newUserMessagePage("Editing an Item", "", "Do you want to update the base stocks as well? [y/n]", "", "", "", "");
+        //     scanf("%c", &x);
+        //     if (x == 'y') current->data.baseStocks = current->data.stocks;
+        //     break;
+        case 2:
             strcpy(headerWithName, "Enter an updated selling price of ");
             strcat(headerWithName, current->data.name);
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
@@ -326,7 +331,7 @@ void editItemHandler(struct Node **head)
             scanf("%lf", &current->data.price);
             current->data.profit = current->data.price - current->data.originalPrice;
             break;
-        case 4:
+        case 3:
             strcpy(headerWithName, "Enter an updated original price of ");
             strcat(headerWithName, current->data.name);
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
@@ -367,7 +372,8 @@ void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], c
     // tally the costs
     updateCosts(monthlyProfits, newItem.stocks, newItem.originalPrice);
     updateAdditionalCosts(monthlyProfits, additionalCost);
-    
+    updateReportsFromStorage(monthlyProfits);
+
     addItemToLinkedList(head, newItem);
     addItemToStorage(newItem);
 }

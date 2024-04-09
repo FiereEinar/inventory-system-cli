@@ -134,3 +134,8 @@ void reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction)
     monthlyProfits[getCurrentDateInt()].costs -= deduction;
     monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs -= deduction;
 }
+
+void updateReportsFromStorage(struct ReportPerMonth monthlyProfits[])
+{
+    updateReportDataFromStorage(getCurrentDateInt(), getCurrentDayInt(), monthlyProfits[getCurrentDateInt()], monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()] );
+}

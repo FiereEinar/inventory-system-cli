@@ -15,6 +15,7 @@ int main()
     struct ReportPerMonth monthlyProfits[MONTHS];
     initMonthlyProfits(monthlyProfits);             // fill the monthly values with zero and sets monthly names
     getItemsFromStorage(&head);
+    initReportsFromStorage(monthlyProfits);
     char action;
     
     // Adding test items for development purposes only

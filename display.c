@@ -53,7 +53,7 @@ void userMessagePage(char *header, char *bottomMessage, char *message1, char *me
 {
     topBar(header);
 
-    for (int i = 0; i < 9; i++) bannerBlankBorder();
+    for (int i = 0; i < 11; i++) bannerBlankBorder();
 
     bannerBlankBorderTextCen(message1);
     bannerBlankBorderTextCen(message2);
@@ -61,7 +61,7 @@ void userMessagePage(char *header, char *bottomMessage, char *message1, char *me
     bannerBlankBorderTextCen(message4);
     bannerBlankBorderTextCen(message5);
 
-    for (int i = 0; i < 9; i++) bannerBlankBorder();
+    for (int i = 0; i < 12; i++) bannerBlankBorder();
 
     bannerBlankBorderTextCen(bottomMessage);
     bannerFullBorder();
@@ -86,7 +86,7 @@ void salesReportPage(struct ReportPerMonth monthlyProfits[])
     bannerFullBorderSection();
 
     printMonthlyReports(monthlyProfits);
-    printMinimumScreenHeight(MONTHS - 2);
+    printMinimumScreenHeight(MONTHS - 6);
 
     bannerBlankBorderTextCen("Enter the number of month to see more details.");
     bannerBlankBorderTextCen("'b' to go back to Menu Page");
@@ -162,12 +162,13 @@ void inventoryPage(struct Node **head)
     bannerFullBorder();
     bannerBlankBorder();
     printItemHeader();
+    bannerBlankBorder();
     bannerFullBorder();
     // bannerFullBorderSection();
     bannerBlankBorder();
     printItemList(head);
 
-    printMinimumScreenHeight(getListSize(head) - 3);
+    printMinimumScreenHeight(getListSize(head) - 5);
     bannerBlankBorder();
 
     bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Edit | 4. Restock | 5. Search | 6. Item Details");
@@ -188,12 +189,14 @@ void printItemList(struct Node **head)
     // loop over the entire list and print the data on each iteration
     while (current != NULL)
     {
+        char stocksStr[12];
+        joinStocks(stocksStr, current->data.stocks, current->data.baseStocks);
         // TODO: truncate the name if it's too long
         // if (strlen(current->data.name) >= 8) { / ... / }
         printf
         (
-            "::  %3d. %-45s\t%d/%-12d\tP%-14.2lf\t\t%.2lf\t\t\t%s\t  ::\n",
-            i, current->data.name, current->data.stocks, current->data.baseStocks, current->data.price, current->data.profit, current->data.id
+            "::  %3d. %-45s\t%-12s\tP%-14.2lf\t\t%.2lf\t\t\t%s\t  ::\n",
+            i, current->data.name, stocksStr, current->data.price, current->data.profit, current->data.id
         );
         // iterator
         current = current->next;
@@ -205,13 +208,7 @@ void menuPage()
 {
     topBar("Inventory Management System");
 
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
+    for (int i = 0; i < 10; i++) bannerBlankBorder();
 
     bannerBlankBorderTextCen("Select a page by number");
 
@@ -221,16 +218,7 @@ void menuPage()
     bannerBlankBorderTextCen("2. Point of Sale Page");
     bannerBlankBorderTextCen("3. Sales Reports");
 
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
-    bannerBlankBorder();
+    for (int i = 0; i < 13; i++) bannerBlankBorder();
 
     bannerBlankBorderTextCen("Type 'q' to quit.");
     bannerFullBorder();
