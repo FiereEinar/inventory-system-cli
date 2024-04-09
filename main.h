@@ -108,6 +108,11 @@ double getTotalRevenue(struct ReportPerMonth monthlyProfits[]);
 double getTotalExtraCosts(struct ReportPerMonth monthlyProfits[]);
 double getProfitForMonth(struct ReportPerMonth monthlyProfits);
 double getProfitForDay(struct ReportPerDay day);
+void updateRevenue(struct ReportPerMonth monthlyProfits[], double price, double quantity);
+void updateProfit(struct ReportPerMonth monthlyProfits[], double profit, double quantity);
+void updateCosts(struct ReportPerMonth monthlyProfits[], int addedStocks, double originalPrice);
+void updateAdditionalCosts(struct ReportPerMonth monthlyProfits[], double additionalCosts);
+void reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction); 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

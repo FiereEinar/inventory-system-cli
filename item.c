@@ -39,13 +39,10 @@ void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 
     // once the item is found, update the stocks and tally the revenue
     current->data.stocks -= (int)quantity;
-    monthlyProfits[getCurrentDateInt()].revenue += quantity * current->data.price;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].revenue += quantity * current->data.price;
-
-    monthlyProfits[getCurrentDateInt()].profit += quantity * current->data.profit;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].profit += quantity * current->data.profit;
-
-    editItemFromStorageById(current->data.id, current->data);
+    updateRevenue(monthlyProfits, current->data.price, quantity);
+    updateProfit(monthlyProfits, current->data.profit, quantity);
+    
+    editItemFromStorageById(itemId, current->data);
 
     newUserMessagePage("Point of Sale", "", "Item purchased successfully", "", "", "", "");
     sleep(SLEEP_TIME);
@@ -67,9 +64,8 @@ void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
     scanf("%s", idToDelete);
 
     if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0 || *head == NULL) return;
-    // we create a current variable so that we don't manipulate the pointer of the head
+
     struct Node *current = getItemById(head, idToDelete);
-    // traverse to the Node/item that the user wants to update
 
     // if we didn't find the item, give them an error
     if (current == NULL)
@@ -92,12 +88,9 @@ void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
     scanf("%lf", &additionalCosts);
 
     // tally the costs
-    monthlyProfits[getCurrentDateInt()].costs += (addedStocks * current->data.originalPrice) + additionalCosts;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs += (addedStocks * current->data.originalPrice) + additionalCosts;
-
-    monthlyProfits[getCurrentDateInt()].additionalCosts += additionalCosts;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].additionalCosts += additionalCosts;
-
+    updateCosts(monthlyProfits, addedStocks, current->data.originalPrice);
+    updateAdditionalCosts(monthlyProfits, additionalCosts);
+    
     updateDate(current->data.lastUpdated);
     editItemFromStorageById(current->data.id, current->data);
 
@@ -245,11 +238,9 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
         }
         double deduction = current->data.originalPrice * current->data.stocks;
         reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
-        // if we did find it and break out the loop, proceed here
+
         deleted = current->next;
-        // now that were at the Node right before the Node TO BE DELETED,
-        // the (current->next) is the TO BE DELETED so we simply overwrite it
-        // by setting it to point to the next Node of the Node TO BE DELETED
+        // delete it by overwritting it
         if (current->next->next == NULL) current->next = NULL;
         else current->next = current->next->next;
     }
@@ -269,10 +260,8 @@ void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], dou
     fflush(stdin);
     scanf("%c", &action);
 
-    if (action == 'y' || action == 'Y') {
-        monthlyProfits[getCurrentDateInt()].costs -= deduction;
-        monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs -= deduction;
-    }
+    // TODO: account for additional costs
+    if (action == 'y' || action == 'Y') reduceCosts(monthlyProfits, deduction);
 }
 
 void editItemHandler(struct Node **head)
@@ -374,13 +363,11 @@ void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], c
     updateDate(newItem.lastUpdated);
 
     generateId(newItem.id);
+
     // tally the costs
-    monthlyProfits[getCurrentDateInt()].costs += (newItem.stocks * newItem.originalPrice) + additionalCost;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs += (newItem.stocks * newItem.originalPrice) + additionalCost;
-
-    monthlyProfits[getCurrentDateInt()].additionalCosts += additionalCost;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].additionalCosts += additionalCost;
-
+    updateCosts(monthlyProfits, newItem.stocks, newItem.originalPrice);
+    updateAdditionalCosts(monthlyProfits, additionalCost);
+    
     addItemToLinkedList(head, newItem);
     addItemToStorage(newItem);
 }

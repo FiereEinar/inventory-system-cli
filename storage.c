@@ -132,7 +132,7 @@ void editItemFromStorageById(char *id, struct Item editedItem)
     char placeholder[maxLine];                      // placeholder for data inside the file
 
     file = fopen(filename, "r");
-    temp = fopen(tempFile, "a");
+    temp = fopen(tempFile, "w");
 
     if (file == NULL || temp == NULL) {
         printf("Error opening the files.");

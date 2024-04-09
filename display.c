@@ -104,7 +104,7 @@ void salesPerDayReportPage(struct ReportPerDay day[], struct ReportPerMonth mont
     printMinimumScreenHeight(DAYS_IN_MONTH - 1);
 
     bannerBlankBorder();
-    bannerBlankBorderTextCen("'b' to go back");
+    bannerBlankBorderTextCen("Enter 'b' to go back");
     bannerFullBorder();
 }
 

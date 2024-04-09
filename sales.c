@@ -31,7 +31,7 @@ double getTotalProfit(struct ReportPerMonth monthlyProfits[])
     double total = 0;
 
     for (int i = 0; i < MONTHS; i++)
-        total += monthlyProfits[i].profit - monthlyProfits[i].additionalCosts;
+        total += monthlyProfits[i].revenue - monthlyProfits[i].costs - monthlyProfits[i].additionalCosts;
 
     return total;
 }
@@ -95,12 +95,42 @@ void initMonthlyProfits(struct ReportPerMonth monthlyProfits[])
 
 double getProfitForMonth(struct ReportPerMonth monthlyProfits)
 {
-    double profit = monthlyProfits.profit - monthlyProfits.additionalCosts;
+    double profit = monthlyProfits.revenue - monthlyProfits.costs - monthlyProfits.additionalCosts;
     return profit;
 }
 
 double getProfitForDay(struct ReportPerDay day)
 {
-    double profit = day.revenue - day.additionalCosts;
+    double profit = day.revenue - day.costs - day.additionalCosts;
     return profit;
+}
+
+void updateRevenue(struct ReportPerMonth monthlyProfits[], double price, double quantity)
+{
+    monthlyProfits[getCurrentDateInt()].revenue += quantity * price;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].revenue += quantity * price;
+}
+
+void updateProfit(struct ReportPerMonth monthlyProfits[], double profit, double quantity)
+{
+    monthlyProfits[getCurrentDateInt()].profit += quantity * profit;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].profit += quantity * profit;
+}
+
+void updateCosts(struct ReportPerMonth monthlyProfits[], int addedStocks, double originalPrice)
+{
+    monthlyProfits[getCurrentDateInt()].costs += addedStocks * originalPrice;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs += addedStocks * originalPrice;
+}
+
+void updateAdditionalCosts(struct ReportPerMonth monthlyProfits[], double additionalCosts)
+{
+    monthlyProfits[getCurrentDateInt()].additionalCosts += additionalCosts;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].additionalCosts += additionalCosts;
+}
+
+void reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction)
+{
+    monthlyProfits[getCurrentDateInt()].costs -= deduction;
+    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs -= deduction;
 }
