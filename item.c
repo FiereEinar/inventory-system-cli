@@ -139,9 +139,9 @@ void searchItemHandler(struct Node **list)
     fflush(stdin);
     fgets(searchTerm, NAME_SIZE, stdin);
 
-    if (strcmp(searchTerm, "b") == 0 || strcmp(searchTerm, "B") == 0 || *list == NULL) return;
-
     clearNewline(searchTerm);
+
+    if (strcmp(searchTerm, "b") == 0 || strcmp(searchTerm, "B") == 0 || *list == NULL) return;
 
     // we traverse the list and on each iteration, check if searchTerm is a substring of the current data name
     while(current != NULL) {
@@ -188,6 +188,13 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
     // if the name is too short or none at all, don't proceed
     if (strlen(newItem.name) <= 1) {
         newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Items with no name are not allowed.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    // if the name is too long, don't proceed
+    if (strlen(newItem.name) > NAME_SIZE - 1) {
+        newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Item name is too long, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }

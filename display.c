@@ -28,9 +28,10 @@ void itemDataPage(struct Item item)
 {
     topBar("Details of an item");
     bannerBlankBorder();
-
-    printf("::  Item Name:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", item.name);
-    printf("::  Stocks:\t\t\t\t\t\t\t%d/%-20d\t\t\t\t\t\t\t  ::\n", item.stocks, item.baseStocks);
+    char stocksStr[20];
+    joinStocks(stocksStr, item.stocks, item.baseStocks);
+    printf("::  Item Name:\t\t\t\t\t\t\t%-30s\t\t\t\t\t\t  ::\n", item.name);
+    printf("::  Stocks:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", stocksStr);
     printf("::  Selling Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.price);
     printf("::  Original Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.originalPrice);
     printf("::  Profit per item:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.profit);
@@ -39,7 +40,7 @@ void itemDataPage(struct Item item)
     printf("::  Item ID:\t\t\t\t\t\t\t%-15s\t\t\t\t\t\t\t\t  ::\n", item.id);
 
     printMinimumScreenHeight(3);
-    bannerBlankBorderTextCen("Enter 'b' to go back Home Page.");
+    bannerBlankBorderTextCen("Enter 'b' to go back.");
     bannerFullBorder();
 }
 
