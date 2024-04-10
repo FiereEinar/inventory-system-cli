@@ -62,6 +62,7 @@ char* getCurrentDate()
     return dateString;
 }
 
+// generates an id of 4 random character and 4 random numbers
 void generateId(char placeholder[])
 {
     char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -104,6 +105,7 @@ int getCurrentDayInt()
     return info->tm_mday - 1;
 }
 
+// gives the size of a linked list
 int getListSize(struct Node **head)
 {
     struct Node *current = *head;
@@ -117,6 +119,7 @@ int getListSize(struct Node **head)
     return size;
 }
 
+// frees the memory of a nodes in a linked list
 void freeLinkedList(struct Node **head)
 {
     struct Node *current = *head;

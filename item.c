@@ -7,6 +7,7 @@
 
 #include "main.h"
 
+// handles the process of selling an item
 void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     newUserMessagePage("Point of Sale", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
@@ -27,6 +28,7 @@ void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
         return;
     }
 
+    // ask the user for quantity purchased
     newUserMessagePage("Point of Sale", "", "Enter the quantity purchased: ", "", "", "", "");
     scanf("%lf", &quantity);
 
@@ -51,7 +53,8 @@ void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
     sleep(SLEEP_TIME);
 }
 
-void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
+// handles the process of restocking an item
+void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     if (*head == NULL){
         newUserMessagePage("Restocking an Item", "Enter any key to go back", "No item to restock.", "", "", "", "");
@@ -62,6 +65,7 @@ void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[])
     int addedStocks;
     double additionalCosts;
 
+    // ask for id
     char itemId[ID_LENGTH];
     scanf("%s", itemId);
 
@@ -117,6 +121,7 @@ struct Node *getItemById(struct Node **list, char itemId[])
     return NULL;
 }
 
+// handles the searching of an item
 void searchItemHandler(struct Node **list)
 {
     if (*list == NULL) {
@@ -158,6 +163,7 @@ void searchItemHandler(struct Node **list)
     scanf("%c", &x);
 }
 
+// handles the process of prompting the user for an item to be added
 void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     // using item struct to store values, less variable declaration needed
@@ -205,6 +211,7 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
     sleep(SLEEP_TIME);
 }
 
+// handles the process of deleting an item on the inventory based on ID
 void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     if (*head == NULL) {
@@ -283,6 +290,9 @@ void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], dou
     }
 }
 
+
+// TODO: allow editing for base stocks
+// handles the editing of an item
 void editItemHandler(struct Node **head)
 {
     if (*head == NULL) {
@@ -368,6 +378,7 @@ void editItemHandler(struct Node **head)
     sleep(SLEEP_TIME);
 }
 
+// handles the process of setting the data and tallying the costs, records of an item being added
 void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost)
 {
     // tbh, i could've just passed the entire Item struct, but im using this function for generating test items as well so...
@@ -396,6 +407,7 @@ void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], c
     addItemToStorage(newItem);
 }
 
+// handles the actual addition to the list
 void addItemToLinkedList(struct Node **head, struct Item item)
 {
     struct Item newItem = item;
@@ -416,6 +428,7 @@ void addItemToLinkedList(struct Node **head, struct Item item)
     }
 }
 
+// handles the process of viewing more details of an item by asking for ID
 void viewItemDetails(struct Node **head)
 {
     char itemId[ID_LENGTH];

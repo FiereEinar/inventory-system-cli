@@ -23,6 +23,7 @@ void askUserToFullScreen()
     scanf("%c", &x);
 }
 
+// the option 6. in inventory page to view the details of an item
 void itemDataPage(struct Item item)
 {
     topBar("Details of an item");
@@ -42,6 +43,7 @@ void itemDataPage(struct Item item)
     bannerFullBorder();
 }
 
+// this page is mostly used in prompting the user for action or showing messages to users
 void newUserMessagePage(char *header, char *bottomMessage, char *message1, char *message2, char *message3, char *message4, char *message5)
 {
     system("cls");
@@ -160,6 +162,7 @@ void printReportHeader()
     printf("::  Month\t\t\t\t\tCosts\t\t\tExtra Costs\t\tRevenue\t\t\tProfit\t\t  ::\n");
 }
 
+// renders the items in the inventory
 void inventoryPage(struct Node **head)
 {
     bannerFullBorder();
@@ -208,6 +211,7 @@ void printItemList(struct Node **head)
     }
 }
 
+// renders the main menu
 void menuPage()
 {
     topBar("Inventory Management System");
@@ -228,6 +232,7 @@ void menuPage()
     bannerFullBorder();
 }
 
+// the top bars of each pages
 void topBar(char *text) {
     bannerFullBorder();
 
@@ -238,12 +243,14 @@ void topBar(char *text) {
     bannerFullBorder();
 }
 
+// prints a full line
 void bannerFullBorder () {
     for ( int i = 0; i < 14; i++ )
         printf ("::::::::::");
     printf ("\n");
 }
 
+// prints a text at the center with borders
 void bannerBlankBorderTextCen (char *text) {
     // calculate the padding needed to center
     int length = strlen (text) - 1;  // Remove the terminal '\0'
@@ -252,22 +259,27 @@ void bannerBlankBorderTextCen (char *text) {
     printf (":: %*s%s%*s ::\n", pad, " ", text, 133 - pad - length, " ");
 }
 
+// prints a text at the center with borders
 void bannerBlankBorderText (char *text) {
     printf (":: %134s ::\n", text);
 }
 
+// prints a text at the left with borders
 void bannerBlankBorderTextLeft (char *text) {
     printf (":: %-134s ::\n", text);
 }
 
+// prints a blank line with borders
 void bannerBlankBorder () {
     printf (":: %134s ::\n", "");
 }
 
+// prints the (>>>) for accepting user input
 void bannerUserInput () {
     printf ("\n>>> ");
 }
 
+// prints a full line
 void bannerFullBorderSection () {
     printf (":: ______________________________________________________________________________________________________________________________________ ::\n");
 }

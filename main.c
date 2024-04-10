@@ -50,6 +50,7 @@ int main()
     }
 }
 
+// handles event cycle of the inventory page
 void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     char action;
@@ -76,7 +77,7 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[])
             editItemHandler(head);
             break;
         case '4':
-            restockItem(head, monthlyProfits);
+            restockItemHandler(head, monthlyProfits);
             break;
         case '5':
             searchItemHandler(head);

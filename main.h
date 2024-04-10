@@ -1,3 +1,7 @@
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      CONSTANTS
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 #define NAME_SIZE 30
 #define ID_LENGTH 10
 #define MONTHS 12
@@ -76,7 +80,7 @@ void searchItemHandler(struct Node **head);
 void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
 void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);
-void restockItem(struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 struct Node *getItemById(struct Node **list, char itemId[]);
 void addItemToLinkedList(struct Node **head, struct Item newItem);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

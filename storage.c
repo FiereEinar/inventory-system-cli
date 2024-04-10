@@ -6,6 +6,7 @@
 
 // TODO: add error checking
 
+// adds an item to the file
 void addItemToStorage(struct Item item)
 {
     FILE *file;
@@ -37,6 +38,7 @@ void addItemToStorage(struct Item item)
     fclose(file);
 }
 
+// gets all the items in the file and store it in the head
 void getItemsFromStorage(struct Node **head)
 {
     FILE *file;
@@ -82,6 +84,7 @@ void getItemsFromStorage(struct Node **head)
     fclose(file);
 }
 
+// deletes and item in the file
 // to delete an item, we rewrite everything in a temporary file EXEPT for the item being deleted
 // after that the temporary file will contain the new list without the item that was deleted
 // then we simply rename that temporary file to storage file and deleted the old storage file, kinda like swapping them
@@ -141,6 +144,7 @@ void deleteItemFromStorageById(char *id)
     rename(tempFile, filename);
 }
 
+// replaces an item in the file
 // when it comes to editing a certain data in a file, it is the same in deleting an item
 // but instead of NOT writing the data, we write the NEW data, effectively replacing it
 void editItemFromStorageById(char *id, struct Item editedItem)
@@ -327,6 +331,7 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
     }
 }
 
+// updates the records per month in the file
 // the same logic for editing an item, except we're using index(month) instead of ID
 void updateReportDataFromStorage(int month, int day, struct ReportPerMonth monthData, struct ReportPerDay dayData)
 {
@@ -369,6 +374,7 @@ void updateReportDataFromStorage(int month, int day, struct ReportPerMonth month
     updatePerDayData(monthData.month, day, dayData);
 }
 
+// updates the per day records in the file
 // same also here, except we need to get the month name and concatenate it with filename to get the correct filename
 void updatePerDayData(char *month, int day, struct ReportPerDay dayData)
 {

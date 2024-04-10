@@ -3,6 +3,7 @@
 #include <string.h>
 #include "main.h"
 
+// the sales report page
 void viewReports(struct ReportPerMonth monthlyProfits[])
 {
     system("cls");
@@ -121,24 +122,28 @@ void updateRevenue(struct ReportPerMonth monthlyProfits[], double price, double 
     monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].revenue += quantity * price;
 }
 
+// updater functions for the records
 void updateProfit(struct ReportPerMonth monthlyProfits[], double profit, double quantity)
 {
     monthlyProfits[getCurrentDateInt()].profit += quantity * profit;
     monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].profit += quantity * profit;
 }
 
+// updater functions for the records
 void updateCosts(struct ReportPerMonth monthlyProfits[], int addedStocks, double originalPrice)
 {
     monthlyProfits[getCurrentDateInt()].costs += addedStocks * originalPrice;
     monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs += addedStocks * originalPrice;
 }
 
+// updater functions for the records
 void updateAdditionalCosts(struct ReportPerMonth monthlyProfits[], double additionalCosts)
 {
     monthlyProfits[getCurrentDateInt()].additionalCosts += additionalCosts;
     monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].additionalCosts += additionalCosts;
 }
 
+// updater functions for the records
 void reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction)
 {
     monthlyProfits[getCurrentDateInt()].costs -= deduction;
