@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <stdbool.h>
 
 #include "main.h"
@@ -158,4 +159,21 @@ void joinStocks(char *output, int stock, int base)
     strcpy(output, stockStr);
     strcat(output, "/");
     strcat(output, baseStr);
+}
+
+// turns a string into all lowercase
+void toLowercase(char *str) 
+{
+    while (*str) {
+        *str = tolower((unsigned char)*str);
+        str++;
+    }
+}
+
+// capitalizes the first letter of a string
+void capitalizeFirst(char *str) 
+{
+    if (str[0] != '\0') { // Check if string is not empty
+        str[0] = toupper((unsigned char)str[0]);
+    }
 }

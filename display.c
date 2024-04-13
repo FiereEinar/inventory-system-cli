@@ -1,7 +1,59 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include "main.h"
+
+void categoryPreview(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    topBar("Categories available");
+
+    bannerBlankBorder();
+    printCategoryList(categories, categoriesLen);
+
+    printMinimumScreenHeight(*categoriesLen - 5);
+    bannerBlankBorder();
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen("Enter the index for this item, enter 'n' to set it to none");
+
+    bannerFullBorder();
+}
+
+void categoryPage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    bannerFullBorder();
+    bannerBlankBorder();
+
+    printCategoryHeader();
+
+    bannerBlankBorder();
+    bannerFullBorder();
+
+    bannerBlankBorder();
+    printCategoryList(categories, categoriesLen);
+
+    printMinimumScreenHeight(*categoriesLen - 5);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Edit");
+    bannerBlankBorderTextCen("'b' to go back to Items Page");
+
+    bannerFullBorder();
+}
+
+void printCategoryHeader()
+{
+    printf("::\tIndex\t\t\tCategory Name\t\t\t\t\t\t\t\t\t\t\t\t  ::\n");
+}
+
+void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    for (int i = 0; i < *categoriesLen; i++)
+    {
+        printf("::  \t%-2d\t\t\t%-30s\t\t\t\t\t\t\t\t\t\t  ::\n", i + 1, categories[i]);
+    }
+}
 
 // the layout breaks if the terminal is not full screen
 void askUserToFullScreen()
@@ -28,9 +80,12 @@ void itemDataPage(struct Item item)
 {
     topBar("Details of an item");
     bannerBlankBorder();
+
     char stocksStr[20];
     joinStocks(stocksStr, item.stocks, item.baseStocks);
+    
     printf("::  Item Name:\t\t\t\t\t\t\t%-30s\t\t\t\t\t\t  ::\n", item.name);
+    printf("::  Category:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", item.category);
     printf("::  Stocks:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", stocksStr);
     printf("::  Selling Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.price);
     printf("::  Original Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.originalPrice);
@@ -171,7 +226,6 @@ void inventoryPage(struct Node **head)
     printItemHeader();
     bannerBlankBorder();
     bannerFullBorder();
-    // bannerFullBorderSection();
     bannerBlankBorder();
     printItemList(head);
 
@@ -179,14 +233,14 @@ void inventoryPage(struct Node **head)
     bannerBlankBorder();
 
     bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Edit | 4. Restock | 5. Search | 6. Item Details");
-    bannerBlankBorderTextCen("'b' to go back to Menu Page");
+    bannerBlankBorderTextCen("'b' to go back to Menu Page | 'c' to go to Categories Page");
 
     bannerFullBorder();
 }
 
 void printItemHeader()
 {
-    printf("::\tItem\t\t\t\t\t\tStocks\t\tSelling Price\t\tProfit/item\t\tId\t\t  ::\n");
+    printf("::\tItem\t\t\t\tCategory\t\t\tStocks\t\tSelling Price\tProfit/item\tId\t\t  ::\n");
 }
 
 // each individual item in the inventory
@@ -203,8 +257,8 @@ void printItemList(struct Node **head)
         // if (strlen(current->data.name) >= 8) { / ... / }
         printf
         (
-            "::  %3d. %-45s\t%-12s\tP%-14.2lf\t\t%.2lf\t\t\t%s\t  ::\n",
-            i, current->data.name, stocksStr, current->data.price, current->data.profit, current->data.id
+            "::  %3d. %-30s\t%-32s%-12s\tP%-14.2lf\t%.2lf\t\t%s\t  ::\n",
+            i, current->data.name, current->data.category, stocksStr, current->data.price, current->data.profit, current->data.id
         );
         // iterator
         current = current->next;

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> 
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -164,18 +164,19 @@ void searchItemHandler(struct Node **list)
 }
 
 // handles the process of prompting the user for an item to be added
-void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
+void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     // using item struct to store values, less variable declaration needed
     struct Item newItem;
     double additionalCosts;
-    char message[][60] = 
+    char message[][100] = 
     {
         "Enter the name of new item: ",
         "Enter the the initial stocks of item: ",
         "Enter the selling price of item: ",
         "Enter the original price of item: ",
-        "Enter additional costs (gas, transportation, etc.)"
+        "Enter additional costs (gas, transportation, etc.)",
+        "Enter the index of category for the new item. Press enter to skip"
     };
 
     newUserMessagePage("Adding an Item", "Enter 'b' to go back", message[0], "", "", "", "");
@@ -199,6 +200,9 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
         return;
     }
 
+    // ask the user for the category
+    itemCategoryPrompter(newItem.category, categories, categoriesLen);
+
     newUserMessagePage("Adding an Item", "", message[1], "", "", "", "");
     scanf("%d", &newItem.stocks);
     newItem.baseStocks = newItem.stocks;
@@ -213,7 +217,7 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
     scanf("%lf", &additionalCosts);
     
     // after getting all the necessary data from user, add it to the list
-    addItemToList(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, additionalCosts);
+    addItemToList(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, newItem.category, additionalCosts);
     newUserMessagePage("Adding an Item", "", "Item added succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
@@ -300,7 +304,7 @@ void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], dou
 
 // TODO: allow editing for base stocks
 // handles the editing of an item
-void editItemHandler(struct Node **head)
+void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     if (*head == NULL) {
         newUserMessagePage("Editing an Item", "Enter any key to go back", "No item to edit.", "", "", "", "");
@@ -327,7 +331,7 @@ void editItemHandler(struct Node **head)
         return;
     }
 
-    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. selling price | 3. original price ]", "What do you want to edit?: ", "", "", "");
+    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. category | 3. selling price | 4. original price ]", "What do you want to edit?: ", "", "", "");
     scanf("%d", &toUpdate);
 
     // this is just to dynamically show a message with the name of item
@@ -344,18 +348,12 @@ void editItemHandler(struct Node **head)
             fgets(current->data.name, NAME_SIZE, stdin);
             clearNewline(current->data.name);
             break;
-        // case 2:
-        //     strcpy(headerWithName, "Enter an updated stocks price of ");
-        //     strcat(headerWithName, current->data.name);
-        //     newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
-
-        //     scanf("%d", &current->data.stocks);
-        //     newUserMessagePage("Editing an Item", "", "Do you want to update the base stocks as well? [y/n]", "", "", "", "");
-        //     scanf("%c", &x);
-        //     if (x == 'y') current->data.baseStocks = current->data.stocks;
-        //     break;
-        // EDITED: selling price
+        // EDITED: category
         case 2:
+            itemCategoryPrompter(current->data.category, categories, categoriesLen);
+            break;
+        // EDITED: selling price
+        case 3:
             strcpy(headerWithName, "Enter an updated selling price of ");
             strcat(headerWithName, current->data.name);
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
@@ -364,7 +362,7 @@ void editItemHandler(struct Node **head)
             current->data.profit = current->data.price - current->data.originalPrice;
             break;
         // EDITED: original price
-        case 3:
+        case 4:
             strcpy(headerWithName, "Enter an updated original price of ");
             strcat(headerWithName, current->data.name);
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
@@ -386,13 +384,14 @@ void editItemHandler(struct Node **head)
 }
 
 // handles the process of setting the data and tallying the costs, records of an item being added
-void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost)
+void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost)
 {
     // tbh, i could've just passed the entire Item struct, but im using this function for generating test items as well so...
     struct Item newItem;
 
     // append all the data
     strcpy(newItem.name, name);
+    strcpy(newItem.category, category);
     newItem.stocks = stocks;
     newItem.baseStocks = stocks;
     newItem.price = price;
@@ -466,4 +465,21 @@ void viewItemDetails(struct Node **head)
     char x;
     fflush(stdin);
     scanf("%c", &x);
+}
+
+// updates the category of the affected items in both the list and file storage. could be optimized but im not willing to write any more code
+void updateItemsWithCategory(struct Node **head, char *oldCategory, char *newCategory)
+{
+    struct Node *current = *head;
+
+    while (current != NULL)
+    {
+        // if it matches the old category, replace it with the new one
+        if (strcmp(current->data.category, oldCategory) == 0) {
+            strcpy(current->data.category, newCategory);
+            editItemFromStorageById(current->data.id, current->data);
+        }
+        
+        current = current->next;
+    }
 }
