@@ -20,6 +20,7 @@ int main()
 
     initMonthlyProfits(monthlyProfits);             // fill the monthly values with zero and sets monthly names
     getItemsFromStorage(&head);
+    getCategoriesFromStorage(categories, &categoriesLen);
     initReportsFromStorage(monthlyProfits);
 
     while (true) {
@@ -61,13 +62,13 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
         switch (action)
         {
         case '1':
-            addItemHandler(head, monthlyProfits);
+            addItemHandler(head, monthlyProfits, categories, categoriesLen);
             break;
         case '2':
             deleteItemHandler(head, monthlyProfits);
             break;
         case '3':
-            editItemHandler(head);
+            editItemHandler(head, categories, categoriesLen);
             break;
         case '4':
             restockItemHandler(head, monthlyProfits);
@@ -79,7 +80,7 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
             viewItemDetails(head);
             break;
         case 'c':
-            viewCategories(categories, categoriesLen);
+            viewCategories(head, categories, categoriesLen);
             break;
         case 'b':
             return;
@@ -87,7 +88,7 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
     }
 }
 
-void viewCategories(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char action;
 
@@ -105,6 +106,9 @@ void viewCategories(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
             break;
         case '2':
             deleteCategoryHandler(categories, categoriesLen);
+            break;
+        case '3':
+            editCategoryHandler(head, categories, categoriesLen);
             break;
         case 'b':
             return;

@@ -19,7 +19,7 @@ void addItemToStorage(struct Item item)
     // write the data
     fprintf(
         file, 
-        "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s\n",        // format of how they are written (csv)
+        "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s,%s\n",        // format of how they are written (csv)
         item.name,
         item.baseStocks,
         item.stocks,
@@ -28,7 +28,8 @@ void addItemToStorage(struct Item item)
         item.profit,
         item.dateAdded,
         item.lastUpdated,
-        item.id        
+        item.id,
+        item.category
     );
 
     if (ferror(file))
@@ -51,34 +52,33 @@ void getItemsFromStorage(struct Node **head)
     // if there's no current records the go back
     if (file == NULL) return;
 
-    // if there is a record,
-    do {
-        // get the items on each line
-        read = fscanf(
-            file,
-            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,]\n",
-            newItem.name,
-            &newItem.baseStocks,
-            &newItem.stocks,
-            &newItem.price,
-            &newItem.originalPrice,
-            &newItem.profit,
-            newItem.dateAdded,
-            newItem.lastUpdated,
-            newItem.id
-        );
-
-        clearNewline(newItem.id);      
-        
-        // if it didn't read all 9 properties
-        if (read != 9) {
-            printf("There was a problem that occured when trying to read data from the items.csv file\n");
-            printf("It is likely that someone touched the file.\n");
-            return;
-        }
-        // after getting the data, add it to the head
+    // while there is a record to read
+    while ((read = fscanf(
+        file, 
+        " %29[^,],%d,%d,%lf,%lf,%lf, %29[^,],%29[^,],%9[^,],%29[^,\n]", 
+        newItem.name, 
+        &newItem.baseStocks, 
+        &newItem.stocks,
+        &newItem.price, 
+        &newItem.originalPrice, 
+        &newItem.profit,
+        newItem.dateAdded, 
+        newItem.lastUpdated, 
+        newItem.id,
+        newItem.category
+    )) == 10) 
+    // get it, clear the newlines, and add it to the head(list)
+    {
+        clearNewline(newItem.id);
+        clearNewline(newItem.category);
         addItemToLinkedList(head, newItem);
-    } while (!feof(file));
+    }
+
+    if (read != EOF) {
+        printf("Error: Failed to read data from file\n");
+        printf("It is likely that the file format is incorrect or corrupted or touched by someone.\n");
+        sleep(SLEEP_TIME);
+    }
 
     // close the file
     fclose(file);
@@ -115,7 +115,7 @@ void deleteItemFromStorageById(char *id)
         // sscanf() to extract the data and store it in newItem, all we need here is the ID
         sscanf(
             placeholder,
-            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,]",
+            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,],%29[^,]",
             newItem.name,
             &newItem.baseStocks,
             &newItem.stocks,
@@ -124,12 +124,14 @@ void deleteItemFromStorageById(char *id)
             &newItem.profit,
             newItem.dateAdded,
             newItem.lastUpdated,
-            newItem.id
+            newItem.id,
+            newItem.category
         );
 
         // clear the newline character from ID
         //  I AM SO MAD AT THIS, TOOK ME LONG TO FIGURE OUT AN ISSUE, IT WAS JUST A NEWLINE THE ENTIRE TIME
         clearNewline(newItem.id);
+        clearNewline(newItem.category);
 
         // if it match the ID, don't include it, which basically deletes it
         if (strcmp(newItem.id, id) != 0) fputs(placeholder, temp);
@@ -171,7 +173,7 @@ void editItemFromStorageById(char *id, struct Item editedItem)
     while (fgets(placeholder, maxLine, file) != NULL) {
         sscanf(
             placeholder,
-            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,]",
+            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,],%29[^,]",
             currentItem.name,
             &currentItem.baseStocks,
             &currentItem.stocks,
@@ -180,17 +182,19 @@ void editItemFromStorageById(char *id, struct Item editedItem)
             &currentItem.profit,
             currentItem.dateAdded,
             currentItem.lastUpdated,
-            currentItem.id
+            currentItem.id,
+            currentItem.category
         );
 
         clearNewline(currentItem.id);
+        clearNewline(currentItem.category);
 
         // if it matches the ID, don't include it, 
         if (strcmp(currentItem.id, id) != 0) fputs(placeholder, temp);
         // but instead put the new item
         else fprintf(
             temp, 
-            "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s\n",
+            "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s,%s\n",
             editedItem.name,
             editedItem.baseStocks,
             editedItem.stocks,
@@ -199,7 +203,8 @@ void editItemFromStorageById(char *id, struct Item editedItem)
             editedItem.profit,
             editedItem.dateAdded,
             editedItem.lastUpdated,
-            editedItem.id        
+            editedItem.id,
+            editedItem.category
         );
     }
 
@@ -415,6 +420,110 @@ void updatePerDayData(char *month, int day, struct ReportPerDay dayData)
     fclose(file);
     fclose(temp);
 
+    remove(filename);
+    rename(tempFilename, filename);
+}
+
+void addCategoryToStorage(char *category)
+{
+    FILE *file;
+    // make the folder
+    mkdir("storedata");
+
+    // open the file inside that folder
+    file = fopen("storedata/categories.csv", "a");
+
+    // write the data
+    fprintf(file, "%s,\n", category);
+
+    if (ferror(file))
+        printf("There was a problem that occured when trying to add category in the categories.csv file\n");
+    
+    // close the file after writing it
+    fclose(file);
+}
+
+// gets the categories currently stored in users device if there are any 
+void getCategoriesFromStorage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    FILE *file;
+    char placeholder[CATEGORY_NAME_LEN];
+
+    // open the file
+    file = fopen("storedata/categories.csv", "r");
+
+    // if there's no current records the go back
+    if (file == NULL) return;
+
+    // while there is a record to read, continue reading... duhh
+    // %*[,] instructs fscanf to read and discard a comma if present, and %*[\n] does the same for a newline character
+    while (fscanf(file, "%29[^,\n]%*[,]%*[\n]", placeholder) == 1) {
+        addCategory(categories, categoriesLen, placeholder);
+    }
+
+    fclose(file);
+}
+
+// creates a temp file and rewrites all the content EXCEPT for the one being deleted. which kinda deletes it
+// after rewriting the contents, swap the files
+void deleteCategoryFromStorage(char *category)
+{
+    FILE *file;
+    FILE *temp;
+    char placeholder[CATEGORY_NAME_LEN];
+    char filename[] = "storedata/categories.csv";
+    char tempFilename[] = "storedata/temp__categories.csv";
+
+    // open the files
+    file = fopen(filename, "r");
+    temp = fopen(tempFilename, "w");
+
+    // if there's no current records the go back
+    if (file == NULL || temp == NULL) return;
+
+    // %*[,] instructs fscanf to read and discard a comma if present, and %*[\n] does the same for a newline character
+    while (fscanf(file, "%29[^,\n]%*[,]%*[\n]", placeholder) == 1) {
+        // if the current item is EQUAL to the item deleted, don't include it in the temp file
+        if (strcmp(placeholder, category) != 0) fprintf(temp, "%s,\n", placeholder);
+    }
+
+    fclose(file);
+    fclose(temp);
+
+    // swap the files
+    remove(filename);
+    rename(tempFilename, filename);
+}
+
+void editCategoryFromStorage(char *oldCategory, char *newCategory)
+{
+    FILE *file;
+    FILE *temp;
+    char placeholder[CATEGORY_NAME_LEN];
+    char filename[] = "storedata/categories.csv";
+    char tempFilename[] = "storedata/temp__categories.csv";
+
+    // open the files
+    file = fopen(filename, "r");
+    temp = fopen(tempFilename, "w");
+
+    // if there's no current records the go back
+    if (file == NULL || temp == NULL) return;
+
+    // %*[,] instructs fscanf to read and discard a comma if present, and %*[\n] does the same for a newline character
+    while (fscanf(file, "%29[^,\n]%*[,]%*[\n]", placeholder) == 1) {
+        // if the current item is EQUAL to the item deleted, don't include it in the temp file but put the new category instead
+        if (strcmp(placeholder, oldCategory) != 0) {
+            fprintf(temp, "%s,\n", placeholder);
+        } else {
+            fprintf(temp, "%s,\n", newCategory);                                // the new version
+        }
+    }
+
+    fclose(file);
+    fclose(temp);
+
+    // swap the files
     remove(filename);
     rename(tempFilename, filename);
 }

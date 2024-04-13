@@ -69,24 +69,25 @@ struct ReportPerMonth
 //      FILE: main.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
-void viewCategories(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
+void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: item.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
-void editItemHandler(struct Node **head);
+void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void viewItemDetails(struct Node **head);
 void searchItemHandler(struct Node **head);
 void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
 void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
-void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, double additionalCost);
+void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost);
 void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 struct Node *getItemById(struct Node **list, char itemId[]);
 void addItemToLinkedList(struct Node **head, struct Item newItem);
+void updateItemsWithCategory(struct Node **head, char *oldCategory, char *newCategory);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -170,12 +171,21 @@ void editItemFromStorageById(char *id, struct Item item);
 void initReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
 void updateReportDataFromStorage(int month, int day, struct ReportPerMonth monthData, struct ReportPerDay dayData);
 void updatePerDayData(char *month, int day, struct ReportPerDay dayData);
+void addCategoryToStorage(char *category);
+void getCategoriesFromStorage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
+void deleteCategoryFromStorage(char *category);
+void editCategoryFromStorage(char *oldCategory, char *newCategory);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//      FILE: storage.c
+//      FILE: category.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void addCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
+void addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *categoryToAdd);
+void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
+int isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *category);
+void categoryPreview(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
+void itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

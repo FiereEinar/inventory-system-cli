@@ -4,6 +4,22 @@
 #include <string.h>
 #include "main.h"
 
+void categoryPreview(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    topBar("Categories available");
+
+    bannerBlankBorder();
+    printCategoryList(categories, categoriesLen);
+
+    printMinimumScreenHeight(*categoriesLen - 5);
+    bannerBlankBorder();
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen("Enter the index for this item, enter 'n' to set it to none");
+
+    bannerFullBorder();
+}
+
 void categoryPage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     bannerFullBorder();
@@ -33,13 +49,9 @@ void printCategoryHeader()
 
 void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
-    char categoryName[CATEGORY_NAME_LEN];
-
     for (int i = 0; i < *categoriesLen; i++)
     {
-        strcpy(categoryName, categories[i]);
-        capitalizeFirst(categoryName);
-        printf("::  \t%-2d\t\t\t%-30s\t\t\t\t\t\t\t\t\t\t  ::\n", i + 1, categoryName);
+        printf("::  \t%-2d\t\t\t%-30s\t\t\t\t\t\t\t\t\t\t  ::\n", i + 1, categories[i]);
     }
 }
 
@@ -214,7 +226,6 @@ void inventoryPage(struct Node **head)
     printItemHeader();
     bannerBlankBorder();
     bannerFullBorder();
-    // bannerFullBorderSection();
     bannerBlankBorder();
     printItemList(head);
 
@@ -229,7 +240,7 @@ void inventoryPage(struct Node **head)
 
 void printItemHeader()
 {
-    printf("::\tItem\t\t\t\t\t\tStocks\t\tSelling Price\t\tProfit/item\t\tId\t\t  ::\n");
+    printf("::\tItem\t\t\t\tCategory\t\t\tStocks\t\tSelling Price\tProfit/item\tId\t\t  ::\n");
 }
 
 // each individual item in the inventory
@@ -246,8 +257,8 @@ void printItemList(struct Node **head)
         // if (strlen(current->data.name) >= 8) { / ... / }
         printf
         (
-            "::  %3d. %-45s\t%-12s\tP%-14.2lf\t\t%.2lf\t\t\t%s\t  ::\n",
-            i, current->data.name, stocksStr, current->data.price, current->data.profit, current->data.id
+            "::  %3d. %-30s\t%-32s%-12s\tP%-14.2lf\t%.2lf\t\t%s\t  ::\n",
+            i, current->data.name, current->data.category, stocksStr, current->data.price, current->data.profit, current->data.id
         );
         // iterator
         current = current->next;
