@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> 
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -327,7 +327,7 @@ void editItemHandler(struct Node **head)
         return;
     }
 
-    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. selling price | 3. original price ]", "What do you want to edit?: ", "", "", "");
+    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. category | 3. selling price | 4. original price ]", "What do you want to edit?: ", "", "", "");
     scanf("%d", &toUpdate);
 
     // this is just to dynamically show a message with the name of item
@@ -344,18 +344,17 @@ void editItemHandler(struct Node **head)
             fgets(current->data.name, NAME_SIZE, stdin);
             clearNewline(current->data.name);
             break;
-        // case 2:
-        //     strcpy(headerWithName, "Enter an updated stocks price of ");
-        //     strcat(headerWithName, current->data.name);
-        //     newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
-
-        //     scanf("%d", &current->data.stocks);
-        //     newUserMessagePage("Editing an Item", "", "Do you want to update the base stocks as well? [y/n]", "", "", "", "");
-        //     scanf("%c", &x);
-        //     if (x == 'y') current->data.baseStocks = current->data.stocks;
-        //     break;
-        // EDITED: selling price
         case 2:
+            strcpy(headerWithName, "Enter a new category of ");
+            strcat(headerWithName, current->data.name);
+
+            newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
+            fflush(stdin);
+            fgets(current->data.category, CATEGORY_NAME_LEN, stdin);
+            clearNewline(current->data.category);
+            break;
+        // EDITED: selling price
+        case 3:
             strcpy(headerWithName, "Enter an updated selling price of ");
             strcat(headerWithName, current->data.name);
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
@@ -364,7 +363,7 @@ void editItemHandler(struct Node **head)
             current->data.profit = current->data.price - current->data.originalPrice;
             break;
         // EDITED: original price
-        case 3:
+        case 4:
             strcpy(headerWithName, "Enter an updated original price of ");
             strcat(headerWithName, current->data.name);
             newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");

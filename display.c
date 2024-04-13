@@ -1,7 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include "main.h"
+
+void categoryPage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    bannerFullBorder();
+    bannerBlankBorder();
+
+    printCategoryHeader();
+
+    bannerBlankBorder();
+    bannerFullBorder();
+
+    bannerBlankBorder();
+    printCategoryList(categories, categoriesLen);
+
+    printMinimumScreenHeight(*categoriesLen - 5);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Edit");
+    bannerBlankBorderTextCen("'b' to go back to Items Page");
+
+    bannerFullBorder();
+}
+
+void printCategoryHeader()
+{
+    printf("::\tIndex\t\t\tCategory Name\t\t\t\t\t\t\t\t\t\t\t\t  ::\n");
+}
+
+void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    char categoryName[CATEGORY_NAME_LEN];
+
+    for (int i = 0; i < *categoriesLen; i++)
+    {
+        strcpy(categoryName, categories[i]);
+        capitalizeFirst(categoryName);
+        printf("::  \t%-2d\t\t\t%-30s\t\t\t\t\t\t\t\t\t\t  ::\n", i + 1, categoryName);
+    }
+}
 
 // the layout breaks if the terminal is not full screen
 void askUserToFullScreen()
@@ -28,9 +68,12 @@ void itemDataPage(struct Item item)
 {
     topBar("Details of an item");
     bannerBlankBorder();
+
     char stocksStr[20];
     joinStocks(stocksStr, item.stocks, item.baseStocks);
+    
     printf("::  Item Name:\t\t\t\t\t\t\t%-30s\t\t\t\t\t\t  ::\n", item.name);
+    printf("::  Category:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", item.category);
     printf("::  Stocks:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", stocksStr);
     printf("::  Selling Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.price);
     printf("::  Original Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.originalPrice);
@@ -179,7 +222,7 @@ void inventoryPage(struct Node **head)
     bannerBlankBorder();
 
     bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Edit | 4. Restock | 5. Search | 6. Item Details");
-    bannerBlankBorderTextCen("'b' to go back to Menu Page");
+    bannerBlankBorderTextCen("'b' to go back to Menu Page | 'c' to go to Categories Page");
 
     bannerFullBorder();
 }
