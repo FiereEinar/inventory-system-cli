@@ -117,7 +117,7 @@ void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN
     char oldVer[CATEGORY_NAME_LEN];
     strcpy(oldVer, categories[index]);
 
-    char message[50] = "Enter an edited version of ";
+    char message[50] = "Enter a new name for ";
     strcat(message, categories[index]);
 
     newUserMessagePage(header, "Enter 'b' to go back", message, "", "", "", "");
@@ -170,4 +170,45 @@ void itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN
             break;
         }
     }
+}
+
+void viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    char header[] = "Viewing items of a category";
+    char userInput[2];
+
+    if (*categoriesLen == 0) {
+        newUserMessagePage(header, "Enter any key to go back", "No category to be viewed", "", "", "", "");
+    } else {
+        newUserMessagePage(header, "Enter 'b' to go back", "Enter the index of the item you want to view:", "", "", "", "");
+    }
+
+    fflush(stdin);
+    scanf("%s", userInput);
+
+    if (strcmp(userInput, "b") == 0 || strcmp(userInput, "B") == 0 || *categoriesLen == 0) return;
+
+    // convert user input(string) to int
+    int index = atoi(userInput) - 1;
+
+    if (index < 0 || index >= *categoriesLen) {
+        newUserMessagePage(header, "", "Invalid index.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    // get the items based on category input
+    struct Node *categoryItems = NULL;
+    getItemsByCategory(head, categories[index], &categoryItems);
+
+    // render the result
+    system("cls");
+    itemCategoryPage(&categoryItems);
+
+    // free the memory
+    freeLinkedList(&categoryItems);
+
+    bannerUserInput();
+    fflush(stdin);
+    fgets(userInput, 2, stdin);
 }

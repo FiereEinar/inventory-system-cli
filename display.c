@@ -4,6 +4,29 @@
 #include <string.h>
 #include "main.h"
 
+// renders the items in a given the category
+void itemCategoryPage(struct Node **head)
+{
+    bannerFullBorder();
+    bannerBlankBorder();
+
+    printItemHeader();
+
+    bannerBlankBorder();
+    bannerFullBorder();
+
+    bannerBlankBorder();
+    printItemList(head);
+
+    printMinimumScreenHeight(getListSize(head) - 5);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen("");
+    bannerBlankBorderTextCen("Enter any key to go back");
+
+    bannerFullBorder();
+}
+
 void categoryPreview(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     topBar("Categories available");
@@ -36,7 +59,7 @@ void categoryPage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
     printMinimumScreenHeight(*categoriesLen - 5);
     bannerBlankBorder();
 
-    bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Edit");
+    bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Edit | 4. View");
     bannerBlankBorderTextCen("'b' to go back to Items Page");
 
     bannerFullBorder();

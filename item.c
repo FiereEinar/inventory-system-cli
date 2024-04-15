@@ -160,6 +160,7 @@ void searchItemHandler(struct Node **list)
 
     // to be able to go back to inventory page
     char x;
+    bannerUserInput();
     scanf("%c", &x);
 }
 
@@ -422,6 +423,7 @@ void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], c
 }
 
 // handles the actual addition to the list
+// REMINDER: use the function freeLinkedList() after using this funciton because it dynamically allocates memory
 void addItemToLinkedList(struct Node **head, struct Item item)
 {
     struct Item newItem = item;
@@ -489,6 +491,20 @@ void updateItemsWithCategory(struct Node **head, char *oldCategory, char *newCat
             editItemFromStorageById(current->data.id, current->data);
         }
         
+        current = current->next;
+    }
+}
+
+// gets the items with the given category and appends it in your desired placeholder
+void getItemsByCategory(struct Node **head, char *category, struct Node **placeholder)
+{
+    struct Node *current = *head;
+
+    while (current->next != NULL) {
+        // if the current item has the matching category, add it to the placeholder
+        if (strcmp(current->data.category, category) == 0) {
+            addItemToLinkedList(placeholder, current->data);
+        }
         current = current->next;
     }
 }

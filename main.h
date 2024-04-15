@@ -88,6 +88,7 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
 struct Node *getItemById(struct Node **list, char itemId[]);
 void addItemToLinkedList(struct Node **head, struct Item newItem);
 void updateItemsWithCategory(struct Node **head, char *oldCategory, char *newCategory);
+void getItemsByCategory(struct Node **head, char *category, struct Node **placeholder);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -158,7 +159,8 @@ void bannerBlankBorderText (char *text);
 void bannerBlankBorderTextLeft (char *text);
 void bannerBlankBorder ();
 void bannerUserInput();
-void bannerFullBorderSection ();
+void bannerFullBorderSection();
+void itemCategoryPage(struct Node **head);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -189,4 +191,5 @@ void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN
 int isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *category);
 void categoryPreview(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
+void viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

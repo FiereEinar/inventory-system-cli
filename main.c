@@ -110,6 +110,9 @@ void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], in
         case '3':
             editCategoryHandler(head, categories, categoriesLen);
             break;
+        case '4':
+            viewCategoryItems(head, categories, categoriesLen);
+            break;
         case 'b':
             return;
         }
