@@ -52,7 +52,7 @@ void addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char 
 
 void deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
-    char header[] = "Adding a Category";
+    char header[] = "Deleting a Category";
     char userInput[2];
 
     if (*categoriesLen == 0) {
@@ -127,7 +127,7 @@ void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN
 
     // update the list with the old category
     updateItemsWithCategory(head, oldVer, categories[index]);
-    
+
     // update the data from storage
     editCategoryFromStorage(oldVer, categories[index]);
 }

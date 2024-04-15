@@ -106,6 +106,7 @@ void updateDate(char *placeholder);
 void joinStocks(char *output, int stock, int base);
 void toLowercase(char *str);
 void capitalizeFirst(char *str);
+void getPercentage(char *output, int number, int base);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

@@ -15,7 +15,7 @@ void categoryPreview(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
     bannerBlankBorder();
     bannerBlankBorder();
 
-    bannerBlankBorderTextCen("Enter the index for this item, enter 'n' to set it to none");
+    bannerBlankBorderTextCen("Enter the index of category for this item, enter 'n' to set it to none");
 
     bannerFullBorder();
 }
@@ -251,14 +251,16 @@ void printItemList(struct Node **head)
     // loop over the entire list and print the data on each iteration
     while (current != NULL)
     {
-        char stocksStr[12];
-        joinStocks(stocksStr, current->data.stocks, current->data.baseStocks);
+        char stocksPercentage[12];
+        getPercentage(stocksPercentage, current->data.stocks, current->data.baseStocks);
+        // joinStocks(stocksStr, current->data.stocks, current->data.baseStocks);
+        
         // TODO: truncate the name if it's too long
         // if (strlen(current->data.name) >= 8) { / ... / }
         printf
         (
             "::  %3d. %-30s\t%-32s%-12s\tP%-14.2lf\t%.2lf\t\t%s\t  ::\n",
-            i, current->data.name, current->data.category, stocksStr, current->data.price, current->data.profit, current->data.id
+            i, current->data.name, current->data.category, stocksPercentage, current->data.price, current->data.profit, current->data.id
         );
         // iterator
         current = current->next;

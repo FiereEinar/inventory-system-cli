@@ -89,7 +89,7 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
 
     // update the stocks and base stocks
     current->data.stocks += addedStocks;
-    current->data.baseStocks = current->data.stocks;
+    if (current->data.stocks > current->data.baseStocks) current->data.baseStocks = current->data.stocks;
 
     newUserMessagePage("Restocking an Item", "", "Enter additional costs (gas, transportation, etc.)", "", "", "", "");
     scanf("%lf", &additionalCosts);
@@ -331,7 +331,7 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         return;
     }
 
-    newUserMessagePage("Editing an Item", "", "Options: [ 1. name | 2. category | 3. selling price | 4. original price ]", "What do you want to edit?: ", "", "", "");
+    newUserMessagePage("Editing an Item", "", "Options:", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?: ", "", "");
     scanf("%d", &toUpdate);
 
     // this is just to dynamically show a message with the name of item
@@ -369,6 +369,14 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
             
             scanf("%lf", &current->data.originalPrice);
             current->data.profit = current->data.price - current->data.originalPrice;
+            break;
+        // EDITED: base stocks
+        case 5:
+            strcpy(headerWithName, "Enter an updated base stocks of ");
+            strcat(headerWithName, current->data.name);
+            newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
+
+            scanf("%d", &current->data.baseStocks);
             break;
         default:
             newUserMessagePage("Editing an Item", "", "Incorrect number entered", "", "", "", "");
@@ -457,12 +465,13 @@ void viewItemDetails(struct Node **head)
         return;
     }
 
-    // render it if it's found
+    // render it if it is found
     system("cls");
     itemDataPage(itemData->data);
 
     // to be able to go back to inventory page
     char x;
+    bannerUserInput();
     fflush(stdin);
     scanf("%c", &x);
 }
