@@ -33,8 +33,7 @@ void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
     scanf("%lf", &quantity);
 
     // if there's not enough stocks, don't proceed
-    if (current->data.stocks < quantity)
-    {
+    if (current->data.stocks < quantity) {
         newUserMessagePage("Point of Sale", "", "Not enough stocks to fulfill the purchase.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
@@ -71,11 +70,11 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
 
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
 
+    // get the item based on id
     struct Node *current = getItemById(head, itemId);
 
     // if we didn't find the item, give them an error
-    if (current == NULL)
-    {
+    if (current == NULL) {
         newUserMessagePage("Restocking an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
@@ -112,8 +111,7 @@ struct Node *getItemById(struct Node **list, char itemId[])
 {
     struct Node *current = *list;
 
-    while (current != NULL)
-    {
+    while (current != NULL) {
         if (strcmp(current->data.id, itemId) == 0) return current;
         
         current = current->next;
@@ -254,15 +252,13 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
         else *head = current->next;
     } else {
         // to delete a Node, we traverse to the Node right before it
-        while(current->next != NULL)
-        {
+        while(current->next != NULL) {
             // if the next item is the item to be deleted, then break
             if (strcmp(current->next->data.id, idToDelete) == 0) break;
             current = current->next;
         }
         // if we didn't find the item, give them an error
-        if (current->next == NULL || strcmp(current->next->data.id, idToDelete) != 0)
-        {
+        if (current->next == NULL || strcmp(current->next->data.id, idToDelete) != 0) {
             newUserMessagePage("Deleting an Item", "", "Error: Item does not exist. Please try again.", "", "", "", "");
             sleep(SLEEP_TIME);
             return;
@@ -325,8 +321,7 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
     struct Node *current = getItemById(head, itemId);
 
     // if we didn't find the item, give them an error
-    if (current == NULL)
-    {
+    if (current == NULL) {
         newUserMessagePage("Editing an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
@@ -426,7 +421,7 @@ void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], c
 // REMINDER: use the function freeLinkedList() after using this funciton because it dynamically allocates memory
 void addItemToLinkedList(struct Node **head, struct Item item)
 {
-    struct Item newItem = item;
+    struct Item newItem = item;                 // TODO: remove this
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->data = newItem;
     newNode->next = NULL;
@@ -479,12 +474,11 @@ void viewItemDetails(struct Node **head)
 }
 
 // updates the category of the affected items in both the list and file storage. could be optimized but im not willing to write any more code
-void updateItemsWithCategory(struct Node **head, char *oldCategory, char *newCategory)
+void updateItemsCategory(struct Node **head, char *oldCategory, char *newCategory)
 {
     struct Node *current = *head;
 
-    while (current != NULL)
-    {
+    while (current != NULL) {
         // if it matches the old category, replace it with the new one
         if (strcmp(current->data.category, oldCategory) == 0) {
             strcpy(current->data.category, newCategory);

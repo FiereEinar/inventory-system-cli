@@ -72,15 +72,13 @@ void generateId(char placeholder[])
     placeholder[0] = '\0';
 
     // get 4 random characters
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; i++) {
         char temp[2] = {chars[rand() % strlen(chars)], '\0'};
         strcat(placeholder, temp);
     }
 
     // get 4 random numbers
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; i++) {
         char temp[2] = {nums[rand() % strlen(nums)], '\0'};
         strcat(placeholder, temp);
     }
@@ -112,8 +110,7 @@ int getListSize(struct Node **head)
     struct Node *current = *head;
     int size = 0;
     // traverse the list and increment size on each iteration, then return it
-    while (current != NULL)
-    {
+    while (current != NULL) {
         current = current->next;
         size++;
     }

@@ -7,6 +7,38 @@
 
 #include "main.h"
 
+void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    char action;
+
+    while (true) {
+        system("cls");
+        categoryPage(categories, categoriesLen);
+        
+        bannerUserInput();
+        fflush(stdin);
+        scanf("%c", &action);
+
+        switch (action)
+        {
+        case '1':
+            addCategoryHandler(categories, categoriesLen);
+            break;
+        case '2':
+            deleteCategoryHandler(categories, categoriesLen);
+            break;
+        case '3':
+            editCategoryHandler(head, categories, categoriesLen);
+            break;
+        case '4':
+            viewCategoryItems(head, categories, categoriesLen);
+            break;
+        case 'b':
+            return;
+        }
+    }
+}
+
 // handles the addition of category, like user inputs, user input validations, etc.
 void addCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
@@ -126,7 +158,7 @@ void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN
     clearNewline(categories[index]);
 
     // update the list with the old category
-    updateItemsWithCategory(head, oldVer, categories[index]);
+    updateItemsCategory(head, oldVer, categories[index]);
 
     // update the data from storage
     editCategoryFromStorage(oldVer, categories[index]);
@@ -145,11 +177,6 @@ int isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, ch
 void itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     while (true) {
-        if (categoriesLen == 0) {
-            strcpy(placeholder, "none");
-            break;
-        }
-
         char index[2];
         system("cls");
         categoryPreview(categories, categoriesLen);
@@ -180,7 +207,7 @@ void viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN],
     if (*categoriesLen == 0) {
         newUserMessagePage(header, "Enter any key to go back", "No category to be viewed", "", "", "", "");
     } else {
-        newUserMessagePage(header, "Enter 'b' to go back", "Enter the index of the item you want to view:", "", "", "", "");
+        newUserMessagePage(header, "Enter 'b' to go back", "Enter the index of the category you want to view:", "", "", "", "");
     }
 
     fflush(stdin);

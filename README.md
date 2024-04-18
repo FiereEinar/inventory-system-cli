@@ -9,8 +9,10 @@
 
 ## Installation
 
-Here's how you can install the application to your computer.
+installation guide coming soon
+
+<!-- Here's how you can install the application to your computer.
 
 1. Download the bin.exe file
 2. Put the file inside a folder to contain the files it will generate
-3. Open the bin.exe application
+3. Open the bin.exe application -->

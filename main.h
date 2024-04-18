@@ -69,7 +69,6 @@ struct ReportPerMonth
 //      FILE: main.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
-void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -79,15 +78,15 @@ void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], in
 void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
-void viewItemDetails(struct Node **head);
-void searchItemHandler(struct Node **head);
-void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
 void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void searchItemHandler(struct Node **head);
+void viewItemDetails(struct Node **head);
+void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
 void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost);
 void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 struct Node *getItemById(struct Node **list, char itemId[]);
 void addItemToLinkedList(struct Node **head, struct Item newItem);
-void updateItemsWithCategory(struct Node **head, char *oldCategory, char *newCategory);
+void updateItemsCategory(struct Node **head, char *oldCategory, char *newCategory);
 void getItemsByCategory(struct Node **head, char *category, struct Node **placeholder);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -184,6 +183,7 @@ void editCategoryFromStorage(char *oldCategory, char *newCategory);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: category.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void addCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *categoryToAdd);

@@ -190,22 +190,26 @@ void editItemFromStorageById(char *id, struct Item editedItem)
         clearNewline(currentItem.category);
 
         // if it matches the ID, don't include it, 
-        if (strcmp(currentItem.id, id) != 0) fputs(placeholder, temp);
-        // but instead put the new item
-        else fprintf(
-            temp, 
-            "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s,%s\n",
-            editedItem.name,
-            editedItem.baseStocks,
-            editedItem.stocks,
-            editedItem.price,
-            editedItem.originalPrice,
-            editedItem.profit,
-            editedItem.dateAdded,
-            editedItem.lastUpdated,
-            editedItem.id,
-            editedItem.category
-        );
+        if (strcmp(currentItem.id, id) != 0) {
+            fputs(placeholder, temp);
+
+        } else {
+            // but instead put the new item
+            fprintf(
+                temp, 
+                "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s,%s\n",
+                editedItem.name,
+                editedItem.baseStocks,
+                editedItem.stocks,
+                editedItem.price,
+                editedItem.originalPrice,
+                editedItem.profit,
+                editedItem.dateAdded,
+                editedItem.lastUpdated,
+                editedItem.id,
+                editedItem.category
+            );
+        }
     }
 
     fclose(file);
@@ -219,8 +223,8 @@ void editItemFromStorageById(char *id, struct Item editedItem)
 // TODO: break this function into multiple chunks
 void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 {
-    FILE *file;
-    FILE *tempFile;
+    FILE *monthsFile;
+    FILE *daysFile;
 
     // make the folders
     mkdir("storedata");
@@ -242,12 +246,12 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
     struct stat st;                                         // i don't know what this is, all I know is that it checks if the file exists
     if (stat(monthFilename, &st) != 0) {
         // if there's no current record, initialize it with our own record, which is just full of zeros at this point 
-        file = fopen(monthFilename, "w+");
+        monthsFile = fopen(monthFilename, "w+");
 
         for (int i = 0; i < MONTHS; i++) {
             // write the per month record
             fprintf(
-                file, 
+                monthsFile, 
                 "%lf,%lf,%lf,%lf\n",                        // format of how they are written (csv)
                 monthlyProfits[i].costs,     
                 monthlyProfits[i].additionalCosts,     
@@ -262,12 +266,12 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
             strcat(currentFilename, extension);
             // example: storedata/reports/days/January.csv
 
-            tempFile = fopen(currentFilename, "w+");
+            daysFile = fopen(currentFilename, "w+");
 
             // write the per day record of that month
             for (int j = 0; j < DAYS_IN_MONTH; j++) {
                 fprintf(
-                    tempFile, 
+                    daysFile, 
                     "%lf,%lf,%lf,%lf\n", 
                     monthlyProfits[i].day[j].costs,     
                     monthlyProfits[i].day[j].additionalCosts,     
@@ -276,18 +280,18 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
                 );
             }
 
-            fclose(tempFile);
+            fclose(daysFile);
         }
 
-        fclose(file);
+        fclose(monthsFile);
     } else {
         // if there is a record, then we get it
-        file = fopen(monthFilename, "r");
+        monthsFile = fopen(monthFilename, "r");
 
         for (int i = 0; i < MONTHS; i++) {
             // copy the per month record
             read = fscanf(
-                file, 
+                monthsFile, 
                 "%lf,%lf,%lf,%lf\n",
                 &monthlyProfits[i].costs,     
                 &monthlyProfits[i].additionalCosts,     
@@ -299,7 +303,7 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
                 printf("There was a problem that occured when trying to read data from the monthlyReports.csv file\n");
                 printf("It is likely that someone touched the file.\n");
                 sleep(SLEEP_TIME);
-                // return;
+                return;
             }
             
             // same here, dynamic month name
@@ -308,12 +312,12 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
             strcat(currentFilename, monthlyProfits[i].month);
             strcat(currentFilename, extension);
 
-            tempFile = fopen(currentFilename, "r");
+            daysFile = fopen(currentFilename, "r");
 
             for (int j = 0; j < DAYS_IN_MONTH; j++) {
                 // copy the per day record of that month
                 read = fscanf(
-                    tempFile, 
+                    daysFile, 
                     "%lf,%lf,%lf,%lf\n", 
                     &monthlyProfits[i].day[j].costs,     
                     &monthlyProfits[i].day[j].additionalCosts,     
@@ -322,17 +326,17 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
                 );
 
                 if (read != 4) {
-                    printf("There was a problem that occured when trying to read data from the [monthName].csv file\n");
+                    printf("There was a problem that occured when trying to read data from the [monthName].csv d\n");
                     printf("It is likely that someone touched the file.\n");
                     sleep(SLEEP_TIME);
-                    // return;
+                    return;
                 }
             }
 
-            fclose(tempFile);
+            fclose(daysFile);
         }
 
-        fclose(file);
+        fclose(monthsFile);
     }
 }
 
@@ -512,7 +516,7 @@ void editCategoryFromStorage(char *oldCategory, char *newCategory)
 
     // %*[,] instructs fscanf to read and discard a comma if present, and %*[\n] does the same for a newline character
     while (fscanf(file, "%29[^,\n]%*[,]%*[\n]", placeholder) == 1) {
-        // if the current item is EQUAL to the item deleted, don't include it in the temp file but put the new category instead
+        // if the current item is EQUAL to the item deleted, don't include it in the temp file, instead put the new category
         if (strcmp(placeholder, oldCategory) != 0) {
             fprintf(temp, "%s,\n", placeholder);
         } else {

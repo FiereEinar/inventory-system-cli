@@ -18,14 +18,16 @@ int main()
     int categoriesLen = 0;
     char action;
 
-    initMonthlyProfits(monthlyProfits);             // fill the monthly values with zero and sets monthly names
+    // initializations
+    initMonthlyProfits(monthlyProfits);                             // fill all the values with zero and sets monthly names
     getItemsFromStorage(&head);
     getCategoriesFromStorage(categories, &categoriesLen);
-    initReportsFromStorage(monthlyProfits);
+    initReportsFromStorage(monthlyProfits);                         // check the storage if there is any record, if yes then read it, if no then make one and initialize it with zeros
 
     while (true) {
         system("cls");
         menuPage();
+
         bannerUserInput();
         scanf("%c", &action);
 
@@ -55,6 +57,7 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
     while (true) {
         system("cls");
         inventoryPage(head);
+
         bannerUserInput();
         fflush(stdin);
         scanf("%c", &action);
@@ -81,37 +84,6 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
             break;
         case 'c':
             viewCategories(head, categories, categoriesLen);
-            break;
-        case 'b':
-            return;
-        }
-    }
-}
-
-void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
-{
-    char action;
-
-    while (true) {
-        system("cls");
-        categoryPage(categories, categoriesLen);
-        bannerUserInput();
-        fflush(stdin);
-        scanf("%c", &action);
-
-        switch (action)
-        {
-        case '1':
-            addCategoryHandler(categories, categoriesLen);
-            break;
-        case '2':
-            deleteCategoryHandler(categories, categoriesLen);
-            break;
-        case '3':
-            editCategoryHandler(head, categories, categoriesLen);
-            break;
-        case '4':
-            viewCategoryItems(head, categories, categoriesLen);
             break;
         case 'b':
             return;

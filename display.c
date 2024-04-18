@@ -72,8 +72,10 @@ void printCategoryHeader()
 
 void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
-    for (int i = 0; i < *categoriesLen; i++)
-    {
+    if (*categoriesLen == 0) {
+        printf("::  \t\t\t\t\t%s\t\t\t\t\t  ::\n", "No categories available. Enter 'n' to set it to none for now");
+    }
+    for (int i = 0; i < *categoriesLen; i++) {
         printf("::  \t%-2d\t\t\t%-30s\t\t\t\t\t\t\t\t\t\t  ::\n", i + 1, categories[i]);
     }
 }
@@ -276,7 +278,7 @@ void printItemList(struct Node **head)
     {
         char stocksPercentage[12];
         getPercentage(stocksPercentage, current->data.stocks, current->data.baseStocks);
-        // joinStocks(stocksStr, current->data.stocks, current->data.baseStocks);
+        // joinStocks(stocksPercentage, current->data.stocks, current->data.baseStocks);
         
         // TODO: truncate the name if it's too long
         // if (strlen(current->data.name) >= 8) { / ... / }
