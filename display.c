@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <conio.h>
 #include <string.h>
 #include "main.h"
 
@@ -83,7 +84,6 @@ void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 // the layout breaks if the terminal is not full screen
 void askUserToFullScreen()
 {
-    char x;
     system("cls");
     printf("\n\n\n\n");
     printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
@@ -97,7 +97,7 @@ void askUserToFullScreen()
     printf("::                                                                          ::\n");
     printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
     bannerUserInput();
-    scanf("%c", &x);
+    getch();
 }
 
 // the option 6. in inventory page to view the details of an item

@@ -298,8 +298,6 @@ void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], dou
     }
 }
 
-
-// TODO: allow editing for base stocks
 // handles the editing of an item
 void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {

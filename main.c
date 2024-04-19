@@ -22,7 +22,7 @@ int main()
     initMonthlyProfits(monthlyProfits);                             // fill all the values with zero and sets monthly names
     getItemsFromStorage(&head);
     getCategoriesFromStorage(categories, &categoriesLen);
-    initReportsFromStorage(monthlyProfits);                         // check the storage if there is any record, if yes then read it, if no then make one and initialize it with zeros
+    checkReportsFromStorage(monthlyProfits);                         // check the storage if there is any record, if yes then read it, if no then make one and initialize it with zeros
 
     while (true) {
         system("cls");

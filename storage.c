@@ -219,9 +219,23 @@ void editItemFromStorageById(char *id, struct Item editedItem)
     rename(tempFile, filename);
 }
 
-// this thing is a MESS, it basically just reads the current record saved, if there is none then create one
-// TODO: break this function into multiple chunks
-void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
+// it reads the current record saved, if there is none then create one
+void checkReportsFromStorage(struct ReportPerMonth monthlyProfits[])
+{
+    // where the per month data is stored
+    char monthFilename[] = "storedata/reports/monthlyReport.csv";  
+    // if there's no current record, initialize it with our current record which contains zeros. otherwise, get the records
+    struct stat st;                                         // i don't know what this is, all I know is that it checks if the file exists
+    if (stat(monthFilename, &st) != 0) {
+        // if there's no current record, initialize it with our own record, which is just full of zeros at this point
+        initializeReportsFromStorage(monthlyProfits);
+    } else {
+        // if there is a record, then we get it
+        getReportsFromStorage(monthlyProfits);
+    }
+}
+
+void initializeReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 {
     FILE *monthsFile;
     FILE *daysFile;
@@ -230,6 +244,60 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
     mkdir("storedata");
     mkdir("storedata/reports");
     mkdir("storedata/reports/days");
+
+    int tempFileLength = 50;
+
+    // where the per month data is stored
+    char monthFilename[] = "storedata/reports/monthlyReport.csv";  
+    // the per day report is stored in a /day folder, it will get concatenated with the name of the month
+    // example: storedata/reports/days/January.csv
+    char daysFilename[] = "storedata/reports/days/";
+    char extension[] = ".csv";
+
+    monthsFile = fopen(monthFilename, "w+");
+
+    for (int i = 0; i < MONTHS; i++) {
+        // write the per month record
+        fprintf(
+            monthsFile, 
+            "%lf,%lf,%lf,%lf\n",                        // format of how they are written (csv)
+            monthlyProfits[i].costs,     
+            monthlyProfits[i].additionalCosts,     
+            monthlyProfits[i].revenue,     
+            monthlyProfits[i].profit
+        );
+
+        // the records per day is stored in a file with their respective month name, we're just concatenating it here to get the right filename
+        char currentFilename[tempFileLength];
+        strcpy(currentFilename, daysFilename);
+        strcat(currentFilename, monthlyProfits[i].month);       // dynamic month name
+        strcat(currentFilename, extension);
+        // example: storedata/reports/days/January.csv
+
+        daysFile = fopen(currentFilename, "w+");
+
+        // write the per day record of that month
+        for (int j = 0; j < DAYS_IN_MONTH; j++) {
+            fprintf(
+                daysFile, 
+                "%lf,%lf,%lf,%lf\n", 
+                monthlyProfits[i].day[j].costs,     
+                monthlyProfits[i].day[j].additionalCosts,     
+                monthlyProfits[i].day[j].revenue,     
+                monthlyProfits[i].day[j].profit
+            );
+        }
+
+        fclose(daysFile);
+    }
+
+    fclose(monthsFile);
+}
+
+void getReportsFromStorage(struct ReportPerMonth monthlyProfits[])
+{
+    FILE *monthsFile;
+    FILE *daysFile;
 
     int read = 0;
     int tempFileLength = 50;
@@ -241,103 +309,57 @@ void initReportsFromStorage(struct ReportPerMonth monthlyProfits[])
     char daysFilename[] = "storedata/reports/days/";
     char extension[] = ".csv";
 
-    // if there's no current record, initialize it with our current record which contains zeros. otherwise, get the records
+    monthsFile = fopen(monthFilename, "r");
 
-    struct stat st;                                         // i don't know what this is, all I know is that it checks if the file exists
-    if (stat(monthFilename, &st) != 0) {
-        // if there's no current record, initialize it with our own record, which is just full of zeros at this point 
-        monthsFile = fopen(monthFilename, "w+");
+    for (int i = 0; i < MONTHS; i++) {
+        // copy the per month record
+        read = fscanf(
+            monthsFile, 
+            "%lf,%lf,%lf,%lf\n",
+            &monthlyProfits[i].costs,     
+            &monthlyProfits[i].additionalCosts,     
+            &monthlyProfits[i].revenue,     
+            &monthlyProfits[i].profit
+        );
 
-        for (int i = 0; i < MONTHS; i++) {
-            // write the per month record
-            fprintf(
-                monthsFile, 
-                "%lf,%lf,%lf,%lf\n",                        // format of how they are written (csv)
-                monthlyProfits[i].costs,     
-                monthlyProfits[i].additionalCosts,     
-                monthlyProfits[i].revenue,     
-                monthlyProfits[i].profit
-            );
-
-            // the records per day is stored in a file with their respective month name, we're just concatenating it here to get the right filename
-            char currentFilename[tempFileLength];
-            strcpy(currentFilename, daysFilename);
-            strcat(currentFilename, monthlyProfits[i].month);       // dynamic month name
-            strcat(currentFilename, extension);
-            // example: storedata/reports/days/January.csv
-
-            daysFile = fopen(currentFilename, "w+");
-
-            // write the per day record of that month
-            for (int j = 0; j < DAYS_IN_MONTH; j++) {
-                fprintf(
-                    daysFile, 
-                    "%lf,%lf,%lf,%lf\n", 
-                    monthlyProfits[i].day[j].costs,     
-                    monthlyProfits[i].day[j].additionalCosts,     
-                    monthlyProfits[i].day[j].revenue,     
-                    monthlyProfits[i].day[j].profit
-                );
-            }
-
-            fclose(daysFile);
+        if (read != 4) {
+            printf("There was a problem that occured when trying to read data from the monthlyReports.csv file\n");
+            printf("It is likely that someone touched the file.\n");
+            sleep(SLEEP_TIME);
+            return;
         }
+        
+        // same here, dynamic month name
+        char currentFilename[tempFileLength];
+        strcpy(currentFilename, daysFilename);
+        strcat(currentFilename, monthlyProfits[i].month);
+        strcat(currentFilename, extension);
 
-        fclose(monthsFile);
-    } else {
-        // if there is a record, then we get it
-        monthsFile = fopen(monthFilename, "r");
+        daysFile = fopen(currentFilename, "r");
 
-        for (int i = 0; i < MONTHS; i++) {
-            // copy the per month record
+        for (int j = 0; j < DAYS_IN_MONTH; j++) {
+            // copy the per day record of that month
             read = fscanf(
-                monthsFile, 
-                "%lf,%lf,%lf,%lf\n",
-                &monthlyProfits[i].costs,     
-                &monthlyProfits[i].additionalCosts,     
-                &monthlyProfits[i].revenue,     
-                &monthlyProfits[i].profit
+                daysFile, 
+                "%lf,%lf,%lf,%lf\n", 
+                &monthlyProfits[i].day[j].costs,     
+                &monthlyProfits[i].day[j].additionalCosts,     
+                &monthlyProfits[i].day[j].revenue,     
+                &monthlyProfits[i].day[j].profit
             );
 
             if (read != 4) {
-                printf("There was a problem that occured when trying to read data from the monthlyReports.csv file\n");
+                printf("There was a problem that occured when trying to read data from the [monthName].csv d\n");
                 printf("It is likely that someone touched the file.\n");
                 sleep(SLEEP_TIME);
                 return;
             }
-            
-            // same here, dynamic month name
-            char currentFilename[tempFileLength];
-            strcpy(currentFilename, daysFilename);
-            strcat(currentFilename, monthlyProfits[i].month);
-            strcat(currentFilename, extension);
-
-            daysFile = fopen(currentFilename, "r");
-
-            for (int j = 0; j < DAYS_IN_MONTH; j++) {
-                // copy the per day record of that month
-                read = fscanf(
-                    daysFile, 
-                    "%lf,%lf,%lf,%lf\n", 
-                    &monthlyProfits[i].day[j].costs,     
-                    &monthlyProfits[i].day[j].additionalCosts,     
-                    &monthlyProfits[i].day[j].revenue,     
-                    &monthlyProfits[i].day[j].profit
-                );
-
-                if (read != 4) {
-                    printf("There was a problem that occured when trying to read data from the [monthName].csv d\n");
-                    printf("It is likely that someone touched the file.\n");
-                    sleep(SLEEP_TIME);
-                    return;
-                }
-            }
-
-            fclose(daysFile);
         }
 
-        fclose(monthsFile);
+        fclose(daysFile);
     }
+
+    fclose(monthsFile);
 }
 
 // updates the records per month in the file
