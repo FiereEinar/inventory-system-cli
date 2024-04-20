@@ -222,7 +222,6 @@ void viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN],
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: pos.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void viewPos(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void addCartItemHandler(struct Cart *cart, struct Node **head);
 void addItemToCart(struct Cart *cart, int quantity, struct Item item);
