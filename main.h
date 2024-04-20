@@ -123,8 +123,8 @@ void joinStocks(char *output, int stock, int base);
 void toLowercase(char *str);
 void capitalizeFirst(char *str);
 void getPercentage(char *output, int number, int base);
-// void centerText(int length, char *text);
 void centerText(int length, char *text);
+void clearAllNewline(char *str);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -151,6 +151,8 @@ void updateReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: display.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+void recieptsPage();
+void printRecieptsHeader();
 void pointOfSalePage(struct CartItem items[], int *amountOfItems);
 void printCartItemsHeader();
 void printCartItems(struct CartItem items[], int *amountOfItems);
@@ -201,6 +203,9 @@ void getCategoriesFromStorage(char categories[][CATEGORY_NAME_LEN], int *categor
 void deleteCategoryFromStorage(char *category);
 void editCategoryFromStorage(char *oldCategory, char *newCategory);
 void addRecieptToStorage(char *reciept, char *id);
+void addRecieptMetaDataToStorage(char *recieptId, char *datePurchased);
+void printReceiptsMetaDataFromStorage(int *counter);
+void getReceiptFromStorageById(char *id, char *receiptBuffer);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -230,4 +235,7 @@ void resetCartHandler(struct Cart *cart);
 void resetCart(struct Cart *cart);
 void checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void generateReceipt(struct Cart *cart, char *receiptBuffer);
+void saveRecieptMetaData(char *recieptId);
+void viewReceipts();
+void viewReceiptHandler();
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

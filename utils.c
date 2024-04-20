@@ -194,3 +194,11 @@ void centerText(int length, char *text)
     // Construct the centered text
     sprintf(text, "%*s%s%*s", padding, "", copy, padding, "");
 }
+
+void clearAllNewline(char *str)
+{
+    char *newline;
+    while ((newline = strchr(str, '\n')) != NULL) {
+        *newline = '\0'; // Replace newline with null terminator
+    }
+}

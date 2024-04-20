@@ -32,6 +32,9 @@ void viewPos(struct Cart *cart, struct Node **head, struct ReportPerMonth monthl
         case '4':
             resetCartHandler(cart);
             break;
+        case 'r':
+            viewReceipts();
+            break;
         case 'b':
             return;
         }
@@ -193,8 +196,11 @@ void checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPerMont
         updateReportsFromStorage(monthlyProfits);
     }
 
+    // TODO: maybe generate a metadata of the reciepts?
+    saveRecieptMetaData(cart->cartId);
     // generate a reciept
     system("cls");
+    printf("\n\n\n\n\n");
     generateReceipt(cart, reciept);
     addRecieptToStorage(reciept, cart->cartId);
     printf("%s", reciept);
@@ -216,7 +222,7 @@ void generateReceipt(struct Cart *cart, char *receiptBuffer)
 
     // constructing a centered id
     char idText[100];
-    sprintf(idText, "Receipt ID: %s", cart->cartId);
+    sprintf(idText, " Receipt ID: %s", cart->cartId);
     centerText(width, idText);
 
     // constructing a centered date
@@ -228,10 +234,7 @@ void generateReceipt(struct Cart *cart, char *receiptBuffer)
     char tyText[100] = "Thank You and Come Again!";
     centerText(width, tyText);
 
-    // using snprintf to connect everything into a single string
-    // snprintf(receiptBuffer, MAX_RECEIPT_LENGTH, "Receipt for Cart ID: %s\n", cart->cartId);
-    // snprintf(receiptBuffer, MAX_RECEIPT_LENGTH, "|%s|\n", idText);
-    // snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "Date Purchased: %s %s\n\n", getCurrentDate(), getCurrentTime());
+    // using snprintf to connect everything into a single string, could've used strcat but someone said this is more efficient because we are manually setting the size of the string each addition
     snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "_______________________________________________________________\n");
     snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%s|\n", idText);
     snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%s|\n", dateText);
@@ -241,16 +244,69 @@ void generateReceipt(struct Cart *cart, char *receiptBuffer)
 
     double totalPrice = 0.0;
 
+    // each individual item
     for (int i = 0; i < cart->amountOfItems; i++) {
         struct CartItem item = cart->items[i];
         double totalItemPrice = item.quantity * item.price;
         totalPrice += totalItemPrice;
-        snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%-30s %-10d $%-9.2f $%-7.2f|\n", item.name, item.quantity, item.price, totalItemPrice);
+        snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%-30s %-10d P%-9.2f P%-7.2f|\n", item.name, item.quantity, item.price, totalItemPrice);
     }
 
     snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|-------------------------------------------------------------|\n");
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%-52s $%-7.2f|\n", "Total Price:", totalPrice);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%-52s P%-7.2f|\n", "Total Price:", totalPrice);
     snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%s|\n", tyText);
     snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|_____________________________________________________________|\n");
 
+}
+
+void saveRecieptMetaData(char *recieptId)
+{
+    char datePurchased[DATE_LENGTH];
+    sprintf(datePurchased, "%s %s", getCurrentDate(), getCurrentTime());
+
+    addRecieptMetaDataToStorage(recieptId, datePurchased);
+}
+
+void viewReceipts()
+{
+    char action;
+    
+    while (true)
+    {
+        system("cls");
+        recieptsPage();
+        bannerUserInput();
+        scanf("%c", &action);
+
+        switch (action)
+        {
+        case '1':
+            viewReceiptHandler();
+            break;
+        
+        case 'b':
+            return;
+        }
+    }
+    
+}
+
+void viewReceiptHandler()
+{
+    char id[ID_LENGTH];
+    char receipt[MAX_RECEIPT_LENGTH];
+
+    newUserMessagePage("", "Enter 'b' to go back", "Enter Receipt ID:", "", "", "", "");
+    fflush(stdin);
+    fgets(id, ID_LENGTH, stdin);
+    clearNewline(id);
+
+    getReceiptFromStorageById(id, receipt);
+
+    system("cls");
+    printf("\n\n\n\n\n");
+    printf(receipt);
+    printf("\nEnter any key to go back.");
+    bannerUserInput();
+    getch();
 }

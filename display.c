@@ -5,6 +5,34 @@
 #include <string.h>
 #include "main.h"
 
+void recieptsPage()
+{
+    int receiptsCount = 0;
+
+    topBar("Point of Sale");
+
+    bannerBlankBorder();
+    bannerBlankBorderTextCen("Receipts");
+    bannerBlankBorder();
+
+    printRecieptsHeader();
+    bannerFullBorderSection();
+    printReceiptsMetaDataFromStorage(&receiptsCount);
+
+    printMinimumScreenHeight(receiptsCount);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen("1. view receipt");
+    bannerBlankBorderTextCen("'b' to go back");
+
+    bannerFullBorder();
+}
+
+void printRecieptsHeader()
+{
+    printf("::  \tReceipt ID:\t\t\t\t\tDate Purchased:\t\t\t\t\t\t\t\t\t  ::\n");
+}
+
 void pointOfSalePage(struct CartItem items[], int *amountOfItems)
 {
     topBar("Point of Sale");
@@ -21,7 +49,7 @@ void pointOfSalePage(struct CartItem items[], int *amountOfItems)
     bannerBlankBorder();
 
     bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Checkout | 4. Reset");
-    bannerBlankBorderTextCen("Enter 'b' to go back");
+    bannerBlankBorderTextCen("'b' to go back | 'r' to view receipts");
 
     bannerFullBorder();
 }

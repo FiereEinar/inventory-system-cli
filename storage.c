@@ -578,6 +578,77 @@ void addRecieptToStorage(char *reciept, char *id)
     fclose(file);
 }
 
+void addRecieptMetaDataToStorage(char *recieptId, char *datePurchased)
+{
+    FILE *file;
+
+    mkdir("storedata");
+    mkdir("reciepts");
+    char filename[] = "storedata/reciepts/recieptsMetaData.csv";
+
+    file = fopen(filename, "a");
+
+    if (file == NULL) {
+        printf("Error recording the reciept meta data in storage.");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    fprintf(file, "%s,%s\n", recieptId, datePurchased);
+
+    fclose(file);
+}
+
+// prints all the receipts saved in the storage, only the receipt id and date
+void printReceiptsMetaDataFromStorage(int *counter)
+{
+    FILE *file;
+
+    char filename[] = "storedata/reciepts/recieptsMetaData.csv";
+    char id[ID_LENGTH];
+    char date[DATE_LENGTH];
+
+    file = fopen(filename, "r");
+
+    if (file == NULL) {
+        printf("Error reading the reciept meta data in storage.");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    while (fscanf(file, "%9[^,],%29[^,\n]%*c", id, date) == 2) {
+        clearAllNewline(id);
+        printf("::  \t%-30s \t\t\t%-30s\t\t\t\t\t\t\t  ::\n", id, date);
+        *counter += 1;
+    }
+
+    fclose(file);
+}
+
+// gets the receipt based on the receipt id
+void getReceiptFromStorageById(char *id, char *receiptBuffer)
+{
+    FILE *file;
+
+    char filename[100] = "storedata/reciepts/";
+    char lineText[100];
+    strcat(filename, id);
+    strcat(filename, ".txt");
+
+    file = fopen(filename, "r");
+
+    if (file == NULL) {
+        printf("Error reading the reciept in storage.");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    while (fgets(lineText, 100, file) != NULL) {
+        strcat(receiptBuffer, lineText);
+    }
+
+    fclose(file);
+}
 // TODO: add a function that reads all the receipts, should be pretty easy
 
 /*
