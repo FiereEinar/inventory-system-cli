@@ -5,6 +5,45 @@
 #include <string.h>
 #include "main.h"
 
+void pointOfSalePage(struct CartItem items[], int *amountOfItems)
+{
+    topBar("Point of Sale");
+
+    bannerBlankBorder();
+    bannerBlankBorderTextCen("Items on the cart");
+    bannerBlankBorder();
+
+    printCartItemsHeader();
+    bannerFullBorderSection();
+    printCartItems(items, amountOfItems);
+
+    printMinimumScreenHeight(*amountOfItems);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Checkout | 4. Reset");
+    bannerBlankBorderTextCen("Enter 'b' to go back");
+
+    bannerFullBorder();
+}
+
+void printCartItemsHeader()
+{
+    printf("::  \tName:\t\t\t\t\tQuantity:\t\t\tTotal:\t\t\tId:\t\t\t\t  ::\n");
+}
+
+void printCartItems(struct CartItem items[], int *amountOfItems)
+{
+    if (*amountOfItems == 0) {
+        bannerBlankBorderTextLeft("No items on the cart");
+        return;
+    }
+
+    for (int i = 0; i < *amountOfItems; i++) {
+        double total = items[i].quantity * items[i].price;
+        printf("::  %3d.%-30s\t\t%-3d\t\t\t\t%-10.2lf\t\t%s\t\t\t  ::\n", i + 1, items[i].name, items[i].quantity, total, items[i].itemId);
+    }
+}
+
 // renders the items in a given the category
 void itemCategoryPage(struct Node **head)
 {
@@ -75,6 +114,7 @@ void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     if (*categoriesLen == 0) {
         printf("::  \t\t\t\t\t%s\t\t\t\t\t  ::\n", "No categories available. Enter 'n' to set it to none for now");
+        return;
     }
     for (int i = 0; i < *categoriesLen; i++) {
         printf("::  \t%-2d\t\t\t%-30s\t\t\t\t\t\t\t\t\t\t  ::\n", i + 1, categories[i]);
@@ -277,8 +317,8 @@ void printItemList(struct Node **head)
     while (current != NULL)
     {
         char stocksPercentage[12];
-        getPercentage(stocksPercentage, current->data.stocks, current->data.baseStocks);
-        // joinStocks(stocksPercentage, current->data.stocks, current->data.baseStocks);
+        // getPercentage(stocksPercentage, current->data.stocks, current->data.baseStocks);
+        joinStocks(stocksPercentage, current->data.stocks, current->data.baseStocks);
         
         // TODO: truncate the name if it's too long
         // if (strlen(current->data.name) >= 8) { / ... / }

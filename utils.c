@@ -181,3 +181,16 @@ void getPercentage(char* output, int number, int base)
     double percentage = ((double)number / base) * 100;
     sprintf(output, "%.2f%%", percentage);
 }
+
+void centerText(int length, char *text) 
+{
+    int inputLength = strlen(text);
+    char copy[inputLength + 1];
+    strcpy(copy, text);
+
+    // Calculate padding
+    int padding = (length - inputLength) / 2;
+
+    // Construct the centered text
+    sprintf(text, "%*s%s%*s", padding, "", copy, padding, "");
+}

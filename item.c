@@ -7,51 +7,6 @@
 
 #include "main.h"
 
-// handles the process of selling an item
-void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
-{
-    newUserMessagePage("Point of Sale", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
-
-    char itemId[ID_LENGTH];
-    double quantity;
-
-    scanf("%s", itemId);
-
-    // get the item with that ID
-    struct Node *current = getItemById(head, itemId);
-
-    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0) return;
-
-    if (current == NULL) {
-        newUserMessagePage("Point of Sale", "", "Item not found, please try again.", "", "", "", "");
-        sleep(SLEEP_TIME);
-        return;
-    }
-
-    // ask the user for quantity purchased
-    newUserMessagePage("Point of Sale", "", "Enter the quantity purchased: ", "", "", "", "");
-    scanf("%lf", &quantity);
-
-    // if there's not enough stocks, don't proceed
-    if (current->data.stocks < quantity) {
-        newUserMessagePage("Point of Sale", "", "Not enough stocks to fulfill the purchase.", "", "", "", "");
-        sleep(SLEEP_TIME);
-        return;
-    }
-
-    // once we get the item, update the stocks and tally the revenue
-    current->data.stocks -= (int)quantity;
-    updateRevenue(monthlyProfits, current->data.price, quantity);
-    updateProfit(monthlyProfits, current->data.profit, quantity);
-    
-    // update the data from storage as well
-    editItemFromStorageById(itemId, current->data);
-    updateReportsFromStorage(monthlyProfits);
-
-    newUserMessagePage("Point of Sale", "", "Item purchased successfully", "", "", "", "");
-    sleep(SLEEP_TIME);
-}
-
 // handles the process of restocking an item
 void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {

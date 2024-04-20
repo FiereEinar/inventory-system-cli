@@ -553,3 +553,59 @@ void editCategoryFromStorage(char *oldCategory, char *newCategory)
     remove(filename);
     rename(tempFilename, filename);
 }
+
+void addRecieptToStorage(char *reciept, char *id)
+{
+    FILE *file;
+    char filename[100] = "storedata/reciepts/";
+    strcat(filename, id);
+    strcat(filename, ".txt");
+
+    mkdir("storedata");
+    mkdir("storedata/reciepts");
+
+
+    file = fopen(filename, "w");
+
+    if (file == NULL) {
+        printf("Error recording the reciept in storage.");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    fputs(reciept, file);
+
+    fclose(file);
+}
+
+// TODO: add a function that reads all the receipts, should be pretty easy
+
+/*
+
+int main() {
+    DIR *dir;
+    struct dirent *entry;
+
+    // Specify the directory path
+    const char *folderPath = "testfolder";
+
+    // Open the directory
+    dir = opendir(folderPath);
+    if (dir == NULL) {
+        perror("Error opening directory");
+        return EXIT_FAILURE;
+    }
+
+    // Read each entry in the directory
+    while ((entry = readdir(dir)) != NULL) {
+        // Print the name of each entry
+        printf("%s\n", entry->d_name);
+    }
+
+    // Close the directory
+    closedir(dir);
+
+    return EXIT_SUCCESS;
+}
+
+*/

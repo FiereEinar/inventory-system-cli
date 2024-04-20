@@ -11,6 +11,8 @@
 #define DAYS_IN_MONTH 31
 #define CATEGORY_NAME_LEN 30                            // length of the name of an items category
 #define MAX_CATEGORIES 30                               // maximum amount of categories
+#define MAX_CART_ITEMS 15
+#define MAX_RECEIPT_LENGTH 4096
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      STRUCTS
@@ -55,6 +57,21 @@ struct ReportPerMonth
     double revenue;
     double profit;
 };
+
+struct CartItem 
+{
+    char name[NAME_SIZE];
+    char itemId[ID_LENGTH];
+    int quantity;
+    double price;
+};
+
+struct Cart 
+{
+    struct CartItem items[MAX_CART_ITEMS];
+    int amountOfItems;
+    char cartId[ID_LENGTH];
+};
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -78,7 +95,6 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
 void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
-void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void searchItemHandler(struct Node **head);
 void viewItemDetails(struct Node **head);
 void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
@@ -107,6 +123,8 @@ void joinStocks(char *output, int stock, int base);
 void toLowercase(char *str);
 void capitalizeFirst(char *str);
 void getPercentage(char *output, int number, int base);
+// void centerText(int length, char *text);
+void centerText(int length, char *text);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -133,6 +151,9 @@ void updateReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: display.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+void pointOfSalePage(struct CartItem items[], int *amountOfItems);
+void printCartItemsHeader();
+void printCartItems(struct CartItem items[], int *amountOfItems);
 void categoryPage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void printCategoryHeader();
 void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
@@ -179,6 +200,7 @@ void addCategoryToStorage(char *category);
 void getCategoriesFromStorage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void deleteCategoryFromStorage(char *category);
 void editCategoryFromStorage(char *oldCategory, char *newCategory);
+void addRecieptToStorage(char *reciept, char *id);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -194,4 +216,19 @@ int isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, ch
 void categoryPreview(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      FILE: pos.c
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+void sellItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void viewPos(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void addCartItemHandler(struct Cart *cart, struct Node **head);
+void addItemToCart(struct Cart *cart, int quantity, struct Item item);
+void deleteCartItemHandler(struct Cart *cart);
+void resetCartHandler(struct Cart *cart);
+void resetCart(struct Cart *cart);
+void checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void generateReceipt(struct Cart *cart, char *receiptBuffer);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

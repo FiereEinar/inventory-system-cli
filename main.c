@@ -16,6 +16,8 @@ int main()
     struct ReportPerMonth monthlyProfits[MONTHS];
     char categories[MAX_CATEGORIES][CATEGORY_NAME_LEN];
     int categoriesLen = 0;
+    struct Cart cart;
+    cart.amountOfItems = 0;
     char action;
 
     // initializations
@@ -37,7 +39,8 @@ int main()
             viewInventory(&head, monthlyProfits, categories, &categoriesLen);
             break;
         case '2':
-            sellItemHandler(&head, monthlyProfits);
+            viewPos(&cart, &head, monthlyProfits);
+            // sellItemHandler(&head, monthlyProfits);
             break;
         case '3':
             system("cls");
