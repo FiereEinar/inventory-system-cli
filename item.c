@@ -396,8 +396,11 @@ void addItemToLinkedList(struct Node **head, struct Item item)
 void viewItemDetails(struct Node **head)
 {
     char itemId[ID_LENGTH];
-
-    newUserMessagePage("Viewing an Item", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
+    if (*head == NULL){
+        newUserMessagePage("Viewing an Item", "Enter any key to go back", "No item to view.", "", "", "", "");
+    } else {
+        newUserMessagePage("Viewing an Item", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
+    }
     scanf("%s", itemId);
 
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) {

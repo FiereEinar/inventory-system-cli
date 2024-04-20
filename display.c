@@ -62,7 +62,8 @@ void printCartItemsHeader()
 void printCartItems(struct CartItem items[], int *amountOfItems)
 {
     if (*amountOfItems == 0) {
-        bannerBlankBorderTextLeft("No items on the cart");
+        // bannerBlankBorderTextLeft("No items on the cart");
+        printf("::  %s\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ::\n", "No items on the cart.");
         return;
     }
 
@@ -141,7 +142,7 @@ void printCategoryHeader()
 void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     if (*categoriesLen == 0) {
-        printf("::  \t\t\t\t\t%s\t\t\t\t\t  ::\n", "No categories available. Enter 'n' to set it to none for now");
+        printf("::  %s\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ::\n", "No categories available.");
         return;
     }
     for (int i = 0; i < *categoriesLen; i++) {
@@ -341,6 +342,12 @@ void printItemList(struct Node **head)
 {
     struct Node *current = *head;
     int i = 1;
+
+    if (current == NULL)
+    {
+        printf("::  No items in the inventory.\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ::\n");
+        return;
+    }
     // loop over the entire list and print the data on each iteration
     while (current != NULL)
     {

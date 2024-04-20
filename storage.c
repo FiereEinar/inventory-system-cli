@@ -611,8 +611,9 @@ void printReceiptsMetaDataFromStorage(int *counter)
     file = fopen(filename, "r");
 
     if (file == NULL) {
-        printf("Error reading the reciept meta data in storage.");
-        sleep(SLEEP_TIME);
+        printf("::  %s\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ::\n", "No receipts available.");
+        // printf("Error reading the reciept meta data in storage.");
+        // sleep(SLEEP_TIME);
         return;
     }
 
@@ -626,7 +627,7 @@ void printReceiptsMetaDataFromStorage(int *counter)
 }
 
 // gets the receipt based on the receipt id
-void getReceiptFromStorageById(char *id, char *receiptBuffer)
+int getReceiptFromStorageById(char *id, char *receiptBuffer)
 {
     FILE *file;
 
@@ -637,15 +638,13 @@ void getReceiptFromStorageById(char *id, char *receiptBuffer)
 
     file = fopen(filename, "r");
 
-    if (file == NULL) {
-        printf("Error reading the reciept in storage.");
-        sleep(SLEEP_TIME);
-        return;
-    }
+    if (file == NULL) return 0;
 
     while (fgets(lineText, 100, file) != NULL) {
         strcat(receiptBuffer, lineText);
     }
 
     fclose(file);
+
+    return 1;
 }

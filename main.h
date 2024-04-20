@@ -205,7 +205,7 @@ void editCategoryFromStorage(char *oldCategory, char *newCategory);
 void addRecieptToStorage(char *reciept, char *id);
 void addRecieptMetaDataToStorage(char *recieptId, char *datePurchased);
 void printReceiptsMetaDataFromStorage(int *counter);
-void getReceiptFromStorageById(char *id, char *receiptBuffer);
+int getReceiptFromStorageById(char *id, char *receiptBuffer);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

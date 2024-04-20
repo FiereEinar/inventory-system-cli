@@ -132,11 +132,16 @@ void resetCartHandler(struct Cart *cart)
 {
     char action;
 
-    newUserMessagePage("Point of Sale", "", "Are you sure you want to remove", "all items in the cart?", "[ y / n ]", "", "");
+    if (cart->amountOfItems == 0) {
+        newUserMessagePage("Point of Sale", "Enter any key to go back", "No items in the cart", "", "", "", "");
+    } else {
+        newUserMessagePage("Point of Sale", "", "Are you sure you want to remove", "all items in the cart?", "[ y / n ]", "", "");
+    }
+
     fflush(stdin);
     scanf("%c", &action);
 
-    if (action == 'n' || action == 'N') return;
+    if (action == 'n' || action == 'N' || cart->amountOfItems == 0) return;
 
     resetCart(cart);
 
@@ -196,13 +201,12 @@ void checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPerMont
         updateReportsFromStorage(monthlyProfits);
     }
 
-    // TODO: maybe generate a metadata of the reciepts?
-    saveRecieptMetaData(cart->cartId);
     // generate a reciept
     system("cls");
     printf("\n\n\n\n\n");
     generateReceipt(cart, reciept);
     addRecieptToStorage(reciept, cart->cartId);
+    saveRecieptMetaData(cart->cartId);
     printf("%s", reciept);
 
     printf("\nEnter any key to continue");
@@ -296,12 +300,20 @@ void viewReceiptHandler()
     char id[ID_LENGTH];
     char receipt[MAX_RECEIPT_LENGTH];
 
-    newUserMessagePage("", "Enter 'b' to go back", "Enter Receipt ID:", "", "", "", "");
+    newUserMessagePage("Viewing a Receipt", "Enter 'b' to go back", "Enter Receipt ID:", "", "", "", "");
     fflush(stdin);
     fgets(id, ID_LENGTH, stdin);
     clearNewline(id);
+    
+    if (strcmp(id, "b") == 0 || strcmp(id, "B") == 0) return;
 
-    getReceiptFromStorageById(id, receipt);
+    int status = getReceiptFromStorageById(id, receipt);
+
+    if (status == 0) {
+        newUserMessagePage("Viewing a Receipt", "", "Receipt not found.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    } 
 
     system("cls");
     printf("\n\n\n\n\n");
