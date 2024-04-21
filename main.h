@@ -2,17 +2,17 @@
 //      CONSTANTS
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-#define NAME_SIZE 30
-#define ID_LENGTH 10
-#define MONTHS 12
-#define SLEEP_TIME 1                                    // the pause when showing information or errors before returning to previous page
-#define DATE_LENGTH 30
-#define MONTH_NAME_LEN 15
-#define DAYS_IN_MONTH 31
-#define CATEGORY_NAME_LEN 30                            // length of the name of an items category
-#define MAX_CATEGORIES 30                               // maximum amount of categories
-#define MAX_CART_ITEMS 15
-#define MAX_RECEIPT_LENGTH 4096
+#define NAME_SIZE               30
+#define ID_LENGTH               10
+#define MONTHS                  12
+#define SLEEP_TIME              1                               // the pause when showing information or errors before returning to previous page
+#define DATE_LENGTH             30
+#define MONTH_NAME_LEN          15
+#define DAYS_IN_MONTH           31
+#define CATEGORY_NAME_LEN       30                              // length of the name of an items category
+#define MAX_CATEGORIES          30                              // maximum amount of categories
+#define MAX_CART_ITEMS          15                              // maximum amount of item in the cart
+#define MAX_RECEIPT_LENGTH      4096                            // the receipt is one giant string and this is the size
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      STRUCTS
@@ -58,6 +58,7 @@ struct ReportPerMonth
     double profit;
 };
 
+// structure of an individual item in a cart, will be stored in an array
 struct CartItem 
 {
     char name[NAME_SIZE];
@@ -66,6 +67,7 @@ struct CartItem
     double price;
 };
 
+// structure of a session cart
 struct Cart 
 {
     struct CartItem items[MAX_CART_ITEMS];
@@ -238,4 +240,17 @@ void generateReceipt(struct Cart *cart, char *receiptBuffer);
 void saveRecieptMetaData(char *recieptId);
 void viewReceipts();
 void viewReceiptHandler();
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+/*
+
+    ███╗  ██╗       ███████╗         ██████╗        ██╗  ██╗                                                    ██╗  ██╗
+    ████╗ ██║       ╚═██║══╝        ██╔════╝        ██║ ██╔╝                                                    ╚██╗██╔╝
+    ██╔██╗██║         ██║           ██║             █████╔╝             https://github.com/FiereEinar            ╚███╔╝ 
+    ██║╚████║         ██║           ██║             ██╔═██╗                                                      ██╔██╗ 
+    ██║ ╚███║       ███████╗        ╚██████╗        ██║  ██╗                                                    ██╔╝ ██╗  ██╗
+    ╚═╝  ╚══╝       ╚══════╝         ╚═════╝        ╚═╝  ╚═╝                                                    ╚═╝  ╚═╝  ╚═╝
+
+*/
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

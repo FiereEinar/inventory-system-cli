@@ -1,34 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "main.h"
 
 // the sales report page
 void viewReports(struct ReportPerMonth monthlyProfits[])
 {
-    system("cls");
-    salesReportPage(monthlyProfits);
-
     char action[2];
 
-    bannerUserInput();
-    fflush(stdin);
-    scanf("%s", action);
+    while (true) {
+        system("cls");
+        salesReportPage(monthlyProfits);
 
-    if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) return;
+        bannerUserInput();
+        fflush(stdin);
+        scanf("%s", action);
 
-    // if the user enters the number of month, it will be a string. so convert it to int
-    int month = atoi(action) - 1;
+        if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) return;
 
-    // render the report per day by passing the record using the month entered
-    system("cls");
-    salesPerDayReportPage(monthlyProfits[month].day, monthlyProfits, month);
+        // if the user enters the number of month, it will be a string. so convert it to int
+        int month = atoi(action) - 1;
 
-    // allows the user to go back to monthly report
-    bannerUserInput();
-    fflush(stdin);
-    scanf("%s", action);
-    viewReports(monthlyProfits);
+        if (month < 0 || month > 11) continue;
+
+        // render the report per day by passing the record using the month entered
+        system("cls");
+        salesPerDayReportPage(monthlyProfits[month].day, monthlyProfits, month);
+        
+        // allows the user to go back to monthly report
+        bannerUserInput();
+        fflush(stdin);
+        scanf("%s", action);
+    }
 }
 
 // we don't subtract the additional costs on every purchased because it will cause some miscalculation

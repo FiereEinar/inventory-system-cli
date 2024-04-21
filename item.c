@@ -440,7 +440,6 @@ void updateItemsCategory(struct Node **head, char *oldCategory, char *newCategor
             strcpy(current->data.category, newCategory);
             editItemFromStorageById(current->data.id, current->data);
         }
-        
         current = current->next;
     }
 }
