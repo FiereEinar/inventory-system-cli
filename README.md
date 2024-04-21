@@ -1,6 +1,6 @@
 # Inventory System CLI
 
-## Prerequisites
+## Reminders
 
 - Use this application in your computer, not phone.
 - Before entering, make sure to set the window to fullscreen, the layout will break if the window is not large enough.
@@ -9,7 +9,7 @@
 
 ## Installation
 
-installation guide coming soon
+Installation hidden for now. However, the makefile is available so you're free to do it yourself if you know how to.
 
 <!-- Here's how you can install the application to your computer.
 
