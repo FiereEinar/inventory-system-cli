@@ -450,7 +450,7 @@ void getItemsByCategory(struct Node **head, char *category, struct Node **placeh
 {
     struct Node *current = *head;
 
-    while (current->next != NULL) {
+    while (current != NULL) {
         // if the current item has the matching category, add it to the placeholder
         if (strcmp(current->data.category, category) == 0) {
             addItemToLinkedList(placeholder, current->data);
