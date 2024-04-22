@@ -58,7 +58,7 @@ void deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categories
     if (*categoriesLen == 0) {
         newUserMessagePage(header, "Enter any key to go back", "No category to be deleted", "", "", "", "");
     } else {
-        newUserMessagePage(header, "Enter 'b' to go back", "Enter the index of the item you want to delete:", "", "", "", "");
+        categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to delete:", "Enter 'b' to go back");
     }
 
     fflush(stdin);
@@ -97,7 +97,7 @@ void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN
     if (*categoriesLen == 0) {
         newUserMessagePage(header, "Enter any key to go back", "No category to be deleted", "", "", "", "");
     } else {
-        newUserMessagePage(header, "Enter 'b' to go back", "Enter the index of the item you want to edit:", "", "", "", "");
+        categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to edit:", "Enter 'b' to go back");
     }
 
     fflush(stdin);
@@ -175,7 +175,7 @@ void viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN],
     if (*categoriesLen == 0) {
         newUserMessagePage(header, "Enter any key to go back", "No category to be viewed", "", "", "", "");
     } else {
-        newUserMessagePage(header, "Enter 'b' to go back", "Enter the index of the category you want to view:", "", "", "", "");
+        categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to view:", "Enter 'b' to go back");
     }
 
     fflush(stdin);

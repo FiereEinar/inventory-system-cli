@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string.h>
+#include <conio.h>
 #include <time.h>
 #include <unistd.h>
 #include <stdbool.h>
@@ -13,7 +14,7 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
     if (*head == NULL){
         newUserMessagePage("Restocking an Item", "Enter any key to go back", "No item to restock.", "", "", "", "");
     } else {
-        newUserMessagePage("Restocking an Item", "Enter 'b' to go back", "Enter the ID of the item: ", "", "", "", "");
+        inventoryPromptPage(head, "Enter the ID of the item you want to restock:", "Enter 'b' to go back");
     }
     
     int addedStocks;
@@ -107,14 +108,12 @@ void searchItemHandler(struct Node **list)
 
     // render the results
     system("cls");
-    inventoryPage(&results);
+    inventoryPromptPage(&results, "", "Enter any key to go back.");
     // free the memory of results
     freeLinkedList(&results);
 
     // to be able to go back to inventory page
-    char x;
-    bannerUserInput();
-    scanf("%c", &x);
+    getch();
 }
 
 // handles the process of prompting the user for an item to be added
@@ -182,7 +181,7 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
     if (*head == NULL) {
         newUserMessagePage("Deleting an Item", "Enter any key to go back", "No item to delete.", "", "", "", "");
     } else {
-        newUserMessagePage("Deleting an Item", "Enter 'b' to go back", "Enter the ID of the item you want to delete: ", "", "", "", "");
+        inventoryPromptPage(head, "Enter the ID of the item you want to delete:", "Enter 'b' to go back");
     }
 
     // get the ID to be deleted
@@ -261,7 +260,7 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
     if (*head == NULL) {
         newUserMessagePage("Editing an Item", "Enter any key to go back", "No item to edit.", "", "", "", "");
     } else {
-        newUserMessagePage("Editing an Item", "Enter 'b' to go back", "Enter the ID of the item: ", "", "", "", "");
+        inventoryPromptPage(head, "Enter the ID of the item you want to edit:", "Enter 'b' to go back");
     }
 
     // the options to edit
@@ -401,7 +400,7 @@ void viewItemDetails(struct Node **head)
     if (*head == NULL){
         newUserMessagePage("Viewing an Item", "Enter any key to go back", "No item to view.", "", "", "", "");
     } else {
-        newUserMessagePage("Viewing an Item", "Enter 'b' to go back", "Enter the item ID: ", "", "", "", "");
+        inventoryPromptPage(head, "Enter the ID of the item you want to view:", "Enter 'b' to go back");
     }
     scanf("%s", itemId);
 
@@ -457,5 +456,21 @@ void getItemsByCategory(struct Node **head, char *category, struct Node **placeh
             addItemToLinkedList(placeholder, current->data);
         }
         current = current->next;
+    }
+}
+
+void getStockStatus(char *status, int stocks, int baseStocks)
+{
+    double percentage = ((double)stocks / baseStocks) * 100.0;
+
+    if (percentage >= 30.0) {
+        strcpy(status, "In Stock");
+        return;
+    } else if (percentage >= 0.1) {
+        strcpy(status, "Low Stock");
+        return;
+    } else {
+        strcpy(status, "No Stock");
+        return;
     }
 }

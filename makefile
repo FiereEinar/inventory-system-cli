@@ -19,3 +19,6 @@ $(BINARY): $(OBJECTS)
 
 clean:
 	del $(OBJECTS)
+
+run:
+	./$(BINARY)

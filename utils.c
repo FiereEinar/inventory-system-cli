@@ -66,19 +66,19 @@ char* getCurrentDate()
 // generates an id of 4 random character and 4 random numbers
 void generateId(char placeholder[])
 {
-    char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    // char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char nums[] = "1234567890";
 
     placeholder[0] = '\0';
 
     // get 4 random characters
-    for (int i = 0; i < 4; i++) {
-        char temp[2] = {chars[rand() % strlen(chars)], '\0'};
-        strcat(placeholder, temp);
-    }
+    // for (int i = 0; i < 4; i++) {
+    //     char temp[2] = {chars[rand() % strlen(chars)], '\0'};
+    //     strcat(placeholder, temp);
+    // }
 
-    // get 4 random numbers
-    for (int i = 0; i < 4; i++) {
+    // get 8 random numbers
+    for (int i = 0; i < 8; i++) {
         char temp[2] = {nums[rand() % strlen(nums)], '\0'};
         strcat(placeholder, temp);
     }

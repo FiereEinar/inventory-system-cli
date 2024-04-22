@@ -5,6 +5,10 @@
 #include <string.h>
 #include "main.h"
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      RECEIPT PAGE
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 void recieptsPage()
 {
     int receiptsCount = 0;
@@ -28,9 +32,64 @@ void recieptsPage()
     bannerFullBorder();
 }
 
+void recieptsPromptPage(char *message1, char *message2)
+{
+    system("cls");
+    int receiptsCount = 0;
+
+    topBar("Point of Sale");
+
+    bannerBlankBorder();
+    bannerBlankBorderTextCen("Receipts");
+    bannerBlankBorder();
+
+    printRecieptsHeader();
+    bannerFullBorderSection();
+    printReceiptsMetaDataFromStorage(&receiptsCount);
+
+    printMinimumScreenHeight(receiptsCount);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen(message1);
+    bannerBlankBorderTextCen(message2);
+
+    bannerFullBorder();
+    bannerUserInput();
+}
+
 void printRecieptsHeader()
 {
     printf("::  \tReceipt ID:\t\t\t\t\tDate Purchased:\t\t\t\t\t\t\t\t\t  ::\n");
+}
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      CART PAGE
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+void pointOfSalePromptPage(struct CartItem items[], int *amountOfItems, char *message1, char *message2)
+{
+    system("cls");
+    topBar("Point of Sale");
+
+    bannerBlankBorder();
+    bannerBlankBorderTextCen("Items on the cart");
+    bannerBlankBorder();
+
+    printCartItemsHeader();
+    bannerFullBorderSection();
+    printCartItems(items, amountOfItems);
+
+    printMinimumScreenHeight(*amountOfItems);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen(message1);
+    bannerBlankBorderTextCen(message2);
+
+    bannerFullBorder();
+    bannerUserInput();
 }
 
 void pointOfSalePage(struct CartItem items[], int *amountOfItems)
@@ -73,6 +132,13 @@ void printCartItems(struct CartItem items[], int *amountOfItems)
     }
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      CATEGORY PAGE
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 // renders the items in a given the category
 void itemCategoryPage(struct Node **head)
 {
@@ -112,6 +178,30 @@ void categoryPreview(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
     bannerFullBorder();
 }
 
+void categoryPromptPage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *message1, char *message2)
+{
+    system("cls");
+    bannerFullBorder();
+    bannerBlankBorder();
+
+    printCategoryHeader();
+
+    bannerBlankBorder();
+    bannerFullBorder();
+
+    bannerBlankBorder();
+    printCategoryList(categories, categoriesLen);
+
+    printMinimumScreenHeight(*categoriesLen - 5);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen(message1);
+    bannerBlankBorderTextCen(message2);
+
+    bannerFullBorder();
+    bannerUserInput();
+}
+
 void categoryPage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     bannerFullBorder();
@@ -149,6 +239,8 @@ void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
         printf("::  \t%-2d\t\t\t%-30s\t\t\t\t\t\t\t\t\t\t  ::\n", i + 1, categories[i]);
     }
 }
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // the layout breaks if the terminal is not full screen
 void askUserToFullScreen()
@@ -312,6 +404,31 @@ void printReportHeader()
     printf("::  Month\t\t\t\t\tCosts\t\t\tExtra Costs\t\tRevenue\t\t\tProfit\t\t  ::\n");
 }
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      INVENTORY PAGE
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+void inventoryPromptPage(struct Node **head, char *bottomMessage1, char *bottomMessage2)
+{
+    system("cls");
+    bannerFullBorder();
+    bannerBlankBorder();
+    printItemHeader();
+    bannerBlankBorder();
+    bannerFullBorder();
+    bannerBlankBorder();
+    printItemList(head);
+
+    printMinimumScreenHeight(getListSize(head) - 5);
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen(bottomMessage1);
+    bannerBlankBorderTextCen(bottomMessage2);
+
+    bannerFullBorder();
+    bannerUserInput();
+}
+
 // renders the items in the inventory
 void inventoryPage(struct Node **head)
 {
@@ -334,7 +451,10 @@ void inventoryPage(struct Node **head)
 
 void printItemHeader()
 {
-    printf("::\tItem\t\t\t\tCategory\t\t\tStocks\t\tSelling Price\tProfit/item\tId\t\t  ::\n");
+    printf(
+        "::  %-10s %-30s\t %-30s %-12s\t %-16s\t %-15s  ::\n",
+        "ID", "Item", "Category", "Stocks", "Price", "Status (s)"
+    );
 }
 
 // each individual item in the inventory
@@ -352,21 +472,24 @@ void printItemList(struct Node **head)
     while (current != NULL)
     {
         char stocksPercentage[12];
+        char stocksStatus[12];
         // getPercentage(stocksPercentage, current->data.stocks, current->data.baseStocks);
         joinStocks(stocksPercentage, current->data.stocks, current->data.baseStocks);
-        
-        // TODO: truncate the name if it's too long
-        // if (strlen(current->data.name) >= 8) { / ... / }
-        printf
-        (
-            "::  %3d. %-30s\t%-32s%-12s\tP%-14.2lf\t%.2lf\t\t%s\t  ::\n",
-            i, current->data.name, current->data.category, stocksPercentage, current->data.price, current->data.profit, current->data.id
+        getStockStatus(stocksStatus, current->data.stocks, current->data.baseStocks);
+
+        printf(
+            "::  %-10s %-30s\t %-30s %-12s\t P%-14.2lf\t %-15s  ::\n",
+            current->data.id, current->data.name, current->data.category, stocksPercentage, current->data.price, stocksStatus
         );
+
         // iterator
         current = current->next;
         i++;
     }
 }
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // renders the main menu
 void menuPage()

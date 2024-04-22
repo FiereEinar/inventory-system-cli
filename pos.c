@@ -10,7 +10,7 @@
 void addCartItemHandler(struct Cart *cart, struct Node **head)
 {
     char header[] = "Point of Sale";
-    newUserMessagePage(header, "Enter 'b' to go back", "Enter the item ID:", "", "", "", "");
+    inventoryPromptPage(head, "Enter the item ID:", "Enter 'b' to go back");
 
     char itemId[ID_LENGTH];
     double quantity;
@@ -63,7 +63,7 @@ void deleteCartItemHandler(struct Cart *cart)
     if (cart->amountOfItems == 0) {
         newUserMessagePage(header, "Enter any key to go back", "No cart item to be deleted", "", "", "", "");
     } else {
-        newUserMessagePage(header, "Enter 'b' to go back", "Enter the number of the item:", "", "", "", "");
+        pointOfSalePromptPage(cart->items, &cart->amountOfItems, "Enter the number of the item in the cart:", "Enter 'b' to go back");
     }
 
     char userInput[2];
@@ -242,7 +242,7 @@ void viewReceiptHandler()
     char id[ID_LENGTH];
     char receipt[MAX_RECEIPT_LENGTH];
 
-    newUserMessagePage("Viewing a Receipt", "Enter 'b' to go back", "Enter Receipt ID:", "", "", "", "");
+    recieptsPromptPage("Enter 'b' to go back", "Enter the ID of the receipt:");
     fflush(stdin);
     fgets(id, ID_LENGTH, stdin);
     clearNewline(id);

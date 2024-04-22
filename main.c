@@ -53,6 +53,7 @@ int main()
 
 // all the funcitons defined in main are page handlers
 
+// TODO: maybe add sorting feature? or just show stocks that are low
 void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char action;
@@ -126,6 +127,7 @@ void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], in
     }
 }
 
+// TODO: add total profit from purchases at the bottom
 void viewPos(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     char action;
