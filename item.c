@@ -45,7 +45,7 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
     current->data.stocks += addedStocks;
     if (current->data.stocks > current->data.baseStocks) current->data.baseStocks = current->data.stocks;
 
-    newUserMessagePage("Restocking an Item", "", "Enter additional costs (gas, transportation, etc.)", "", "", "", "");
+    newUserMessagePage("Restocking an Item", "", "Enter additional costs if there are any:", "", "", "", "");
     scanf("%lf", &additionalCosts);
 
     // tally the costs
@@ -129,7 +129,7 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], 
         "Enter the the initial stocks of item: ",
         "Enter the selling price of item: ",
         "Enter the original price of item: ",
-        "Enter additional costs (gas, transportation, etc.)",
+        "Enter additional costs if there are any:",
         "Enter the index of category for the new item. Press enter to skip"
     };
 
@@ -198,11 +198,12 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
 
     // if the user is trying to delete the first item, we simply set the head to point to the next node
     if (strcmp(current->data.id, idToDelete) == 0) {
+        deleted = *head;
+
         // ask the user if he/she wants to deduct the total costs of the deleted item
-        double deduction = current->data.originalPrice * current->data.stocks;
+        double deduction = deleted->data.originalPrice * (double)deleted->data.stocks;
         reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
 
-        deleted = *head;
         if (current->next == NULL) *head = NULL;
         else *head = current->next;
     } else {
@@ -219,11 +220,12 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
             return;
         }
 
+        deleted = current->next;
+
         // ask the user if he/she wants to deduct the total costs of the deleted item
-        double deduction = current->data.originalPrice * current->data.stocks;
+        double deduction = deleted->data.originalPrice * (double)deleted->data.stocks;
         reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
 
-        deleted = current->next;
         // delete it by overwritting it
         if (current->next->next == NULL) current->next = NULL;
         else current->next = current->next->next;

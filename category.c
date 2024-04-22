@@ -7,38 +7,6 @@
 
 #include "main.h"
 
-void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
-{
-    char action;
-
-    while (true) {
-        system("cls");
-        categoryPage(categories, categoriesLen);
-        
-        bannerUserInput();
-        fflush(stdin);
-        scanf("%c", &action);
-
-        switch (action)
-        {
-        case '1':
-            addCategoryHandler(categories, categoriesLen);
-            break;
-        case '2':
-            deleteCategoryHandler(categories, categoriesLen);
-            break;
-        case '3':
-            editCategoryHandler(head, categories, categoriesLen);
-            break;
-        case '4':
-            viewCategoryItems(head, categories, categoriesLen);
-            break;
-        case 'b':
-            return;
-        }
-    }
-}
-
 // handles the addition of category, like user inputs, user input validations, etc.
 void addCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {

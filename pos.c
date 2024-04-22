@@ -7,40 +7,6 @@
 
 #include "main.h"
 
-// handles the event cycle in point of sale page
-void viewPos(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[])
-{
-    char action;
-
-    while (true){
-        system("cls");
-        pointOfSalePage(cart->items, &cart->amountOfItems);
-        bannerUserInput();
-        scanf("%c", &action);
-
-        switch (action)
-        {
-        case '1':
-            addCartItemHandler(cart, head);
-            break;
-        case '2':
-            deleteCartItemHandler(cart);
-            break;
-        case '3':
-            checkoutHandler(cart, head, monthlyProfits);
-            break;
-        case '4':
-            resetCartHandler(cart);
-            break;
-        case 'r':
-            viewReceipts();
-            break;
-        case 'b':
-            return;
-        }
-    }
-}
-
 void addCartItemHandler(struct Cart *cart, struct Node **head)
 {
     char header[] = "Point of Sale";
@@ -269,30 +235,6 @@ void saveRecieptMetaData(char *recieptId)
     sprintf(datePurchased, "%s %s", getCurrentDate(), getCurrentTime());
 
     addRecieptMetaDataToStorage(recieptId, datePurchased);
-}
-
-void viewReceipts()
-{
-    char action;
-    
-    while (true)
-    {
-        system("cls");
-        recieptsPage();
-        bannerUserInput();
-        scanf("%c", &action);
-
-        switch (action)
-        {
-        case '1':
-            viewReceiptHandler();
-            break;
-        
-        case 'b':
-            return;
-        }
-    }
-    
 }
 
 void viewReceiptHandler()
