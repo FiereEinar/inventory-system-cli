@@ -1,13 +1,9 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/stat.h>
 #include "main.h"
 
 // TODO: add error checking
 
 // adds an item to the file
-void addItemToStorage(struct Item item)
+void storage_addItemToStorage(struct Item item)
 {
     FILE *file;
     // make the folder
@@ -40,7 +36,7 @@ void addItemToStorage(struct Item item)
 }
 
 // gets all the items in the file and store it in the head
-void getItemsFromStorage(struct Node **head)
+void storage_getItemsFromStorage(struct Node **head)
 {
     FILE *file;
     struct Item newItem;
@@ -69,9 +65,9 @@ void getItemsFromStorage(struct Node **head)
     )) == 10) 
     // get it, clear the newlines, and add it to the head(list)
     {
-        clearNewline(newItem.id);
-        clearNewline(newItem.category);
-        addItemToLinkedList(head, newItem);
+        utils_clearNewline(newItem.id);
+        utils_clearNewline(newItem.category);
+        item_addItemToList(head, newItem);
     }
 
     if (read != EOF) {
@@ -88,7 +84,7 @@ void getItemsFromStorage(struct Node **head)
 // to delete an item, we rewrite everything in a temporary file EXEPT for the item being deleted
 // after that the temporary file will contain the new list without the item that was deleted
 // then we simply rename that temporary file to storage file and deleted the old storage file, kinda like swapping them
-void deleteItemFromStorageById(char *id)
+void storage_deleteItemFromStorageById(char *id)
 {
     FILE *file;
     FILE *temp;
@@ -130,8 +126,8 @@ void deleteItemFromStorageById(char *id)
 
         // clear the newline character from ID
         //  I AM SO MAD AT THIS, TOOK ME LONG TO FIGURE OUT AN ISSUE, IT WAS JUST A NEWLINE THE ENTIRE TIME
-        clearNewline(newItem.id);
-        clearNewline(newItem.category);
+        utils_clearNewline(newItem.id);
+        utils_clearNewline(newItem.category);
 
         // if it match the ID, don't include it, which basically deletes it
         if (strcmp(newItem.id, id) != 0) fputs(placeholder, temp);
@@ -149,7 +145,7 @@ void deleteItemFromStorageById(char *id)
 // replaces an item in the file
 // when it comes to editing a certain data in a file, it is the same in deleting an item
 // but instead of NOT writing the data, we write the NEW data, effectively replacing it
-void editItemFromStorageById(char *id, struct Item editedItem)
+void storage_editItemFromStorageById(char *id, struct Item editedItem)
 {
     FILE *file;
     FILE *temp;
@@ -186,8 +182,8 @@ void editItemFromStorageById(char *id, struct Item editedItem)
             currentItem.category
         );
 
-        clearNewline(currentItem.id);
-        clearNewline(currentItem.category);
+        utils_clearNewline(currentItem.id);
+        utils_clearNewline(currentItem.category);
 
         // if it matches the ID, don't include it, 
         if (strcmp(currentItem.id, id) != 0) {
@@ -220,7 +216,7 @@ void editItemFromStorageById(char *id, struct Item editedItem)
 }
 
 // it reads the current record saved, if there is none then create one
-void checkReportsFromStorage(struct ReportPerMonth monthlyProfits[])
+void storage_checkReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 {
     // where the per month data is stored
     char monthFilename[] = "storedata/reports/monthlyReport.csv";  
@@ -228,14 +224,14 @@ void checkReportsFromStorage(struct ReportPerMonth monthlyProfits[])
     struct stat st;                                         // i don't know what this is, all I know is that it checks if the file exists
     if (stat(monthFilename, &st) != 0) {
         // if there's no current record, initialize it with our own record, which is just full of zeros at this point
-        initializeReportsFromStorage(monthlyProfits);
+        storage_initializeReportsFromStorage(monthlyProfits);
     } else {
         // if there is a record, then we get it
-        getReportsFromStorage(monthlyProfits);
+        storage_getReportsFromStorage(monthlyProfits);
     }
 }
 
-void initializeReportsFromStorage(struct ReportPerMonth monthlyProfits[])
+void storage_initializeReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 {
     FILE *monthsFile;
     FILE *daysFile;
@@ -294,7 +290,7 @@ void initializeReportsFromStorage(struct ReportPerMonth monthlyProfits[])
     fclose(monthsFile);
 }
 
-void getReportsFromStorage(struct ReportPerMonth monthlyProfits[])
+void storage_getReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 {
     FILE *monthsFile;
     FILE *daysFile;
@@ -364,7 +360,7 @@ void getReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 
 // updates the records per month in the file
 // the same logic for editing an item, except we're using index(month) instead of ID
-void updateReportDataFromStorage(int month, int day, struct ReportPerMonth monthData, struct ReportPerDay dayData)
+void storage_updateReportDataFromStorage(int month, int day, struct ReportPerMonth monthData, struct ReportPerDay dayData)
 {
     FILE *file;
     FILE *temp;
@@ -402,12 +398,12 @@ void updateReportDataFromStorage(int month, int day, struct ReportPerMonth month
     remove(filename);
     rename(tempFilename, filename);
 
-    updatePerDayData(monthData.month, day, dayData);
+    storage_updatePerDayDataFromStorage(monthData.month, day, dayData);
 }
 
 // updates the per day records in the file
 // same also here, except we need to get the month name and concatenate it with filename to get the correct filename
-void updatePerDayData(char *month, int day, struct ReportPerDay dayData)
+void storage_updatePerDayDataFromStorage(char *month, int day, struct ReportPerDay dayData)
 {
     FILE *file;
     FILE *temp;
@@ -450,7 +446,7 @@ void updatePerDayData(char *month, int day, struct ReportPerDay dayData)
     rename(tempFilename, filename);
 }
 
-void addCategoryToStorage(char *category)
+void storage_addCategoryToStorage(char *category)
 {
     FILE *file;
     // make the folder
@@ -470,7 +466,7 @@ void addCategoryToStorage(char *category)
 }
 
 // gets the categories currently stored in users device if there are any 
-void getCategoriesFromStorage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void storage_getCategoriesFromStorage(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     FILE *file;
     char placeholder[CATEGORY_NAME_LEN];
@@ -484,7 +480,7 @@ void getCategoriesFromStorage(char categories[][CATEGORY_NAME_LEN], int *categor
     // while there is a record to read, continue reading... duhh
     // %*[,] instructs fscanf to read and discard a comma if present, and %*[\n] does the same for a newline character
     while (fscanf(file, "%29[^,\n]%*[,]%*[\n]", placeholder) == 1) {
-        addCategory(categories, categoriesLen, placeholder);
+        category_addCategory(categories, categoriesLen, placeholder);
     }
 
     fclose(file);
@@ -492,7 +488,7 @@ void getCategoriesFromStorage(char categories[][CATEGORY_NAME_LEN], int *categor
 
 // creates a temp file and rewrites all the content EXCEPT for the one being deleted. which kinda deletes it
 // after rewriting the contents, swap the files
-void deleteCategoryFromStorage(char *category)
+void storage_deleteCategoryFromStorage(char *category)
 {
     FILE *file;
     FILE *temp;
@@ -521,7 +517,7 @@ void deleteCategoryFromStorage(char *category)
     rename(tempFilename, filename);
 }
 
-void editCategoryFromStorage(char *oldCategory, char *newCategory)
+void storage_editCategoryFromStorage(char *oldCategory, char *newCategory)
 {
     FILE *file;
     FILE *temp;
@@ -554,7 +550,7 @@ void editCategoryFromStorage(char *oldCategory, char *newCategory)
     rename(tempFilename, filename);
 }
 
-void addRecieptToStorage(char *reciept, char *id)
+void storage_addRecieptToStorage(char *reciept, char *id)
 {
     FILE *file;
     char filename[100] = "storedata/reciepts/";
@@ -578,12 +574,12 @@ void addRecieptToStorage(char *reciept, char *id)
     fclose(file);
 }
 
-void addRecieptMetaDataToStorage(char *recieptId, char *datePurchased)
+void storage_addRecieptMetaDataToStorage(char *recieptId, char *datePurchased)
 {
     FILE *file;
 
     mkdir("storedata");
-    mkdir("reciepts");
+    mkdir("storedata/reciepts");
     char filename[] = "storedata/reciepts/recieptsMetaData.csv";
 
     file = fopen(filename, "a");
@@ -600,7 +596,7 @@ void addRecieptMetaDataToStorage(char *recieptId, char *datePurchased)
 }
 
 // prints all the receipts saved in the storage, only the receipt id and date
-void printReceiptsMetaDataFromStorage(int *counter)
+void storage_printReceiptsMetaDataFromStorage(int *counter)
 {
     FILE *file;
 
@@ -618,7 +614,7 @@ void printReceiptsMetaDataFromStorage(int *counter)
     }
 
     while (fscanf(file, "%9[^,],%29[^,\n]%*c", id, date) == 2) {
-        clearAllNewline(id);
+        utils_clearAllNewline(id);
         printf("::  \t%-30s \t\t\t%-30s\t\t\t\t\t\t\t  ::\n", id, date);
         *counter += 1;
     }
@@ -627,7 +623,7 @@ void printReceiptsMetaDataFromStorage(int *counter)
 }
 
 // gets the receipt based on the receipt id
-int getReceiptFromStorageById(char *id, char *receiptBuffer)
+int storage_getReceiptFromStorageById(char *id, char *receiptBuffer)
 {
     FILE *file;
 

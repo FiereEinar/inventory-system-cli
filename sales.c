@@ -1,53 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
 #include "main.h"
 
-// we don't subtract the additional costs on every purchased because it will cause some miscalculation
-// we instead just calculate it based on month or day not by items
-double getTotalProfit(struct ReportPerMonth monthlyProfits[])
-{
-    double total = 0;
-
-    for (int i = 0; i < MONTHS; i++)
-        total += monthlyProfits[i].revenue - monthlyProfits[i].costs - monthlyProfits[i].additionalCosts;
-
-    return total;
-}
-
-double getTotalCosts(struct ReportPerMonth monthlyProfits[])
-{
-    double total = 0;
-
-    for (int i = 0; i < MONTHS; i++)
-        total += monthlyProfits[i].costs;
-
-    return total;
-}
-
-double getTotalRevenue(struct ReportPerMonth monthlyProfits[])
-{
-    double total = 0;
-
-    for (int i = 0; i < MONTHS; i++)
-        total += monthlyProfits[i].revenue;
-
-    return total;
-}
-
-double getTotalExtraCosts(struct ReportPerMonth monthlyProfits[])
-{
-    double total = 0;
-
-    for (int i = 0; i < MONTHS; i++)
-        total += monthlyProfits[i].additionalCosts;
-
-    return total;
-}
-
 // fills the record with zero and sets the names of month
-void initMonthlyProfits(struct ReportPerMonth monthlyProfits[])
+void sales_initMonthlyProfits(struct ReportPerMonth monthlyProfits[])
 {
     char months[MONTHS][15] = 
     {
@@ -74,58 +28,116 @@ void initMonthlyProfits(struct ReportPerMonth monthlyProfits[])
     }
 }
 
+// we don't subtract the additional costs on every purchased because it will cause some miscalculation
+// we instead just calculate it based on month or day not by items
+double sales_getTotalProfit(struct ReportPerMonth monthlyProfits[])
+{
+    double total = 0;
+
+    for (int i = 0; i < MONTHS; i++)
+        total += monthlyProfits[i].revenue - monthlyProfits[i].costs - monthlyProfits[i].additionalCosts;
+
+    return total;
+}
+
+double sales_getTotalCosts(struct ReportPerMonth monthlyProfits[])
+{
+    double total = 0;
+
+    for (int i = 0; i < MONTHS; i++)
+        total += monthlyProfits[i].costs;
+
+    return total;
+}
+
+double sales_getTotalRevenue(struct ReportPerMonth monthlyProfits[])
+{
+    double total = 0;
+
+    for (int i = 0; i < MONTHS; i++)
+        total += monthlyProfits[i].revenue;
+
+    return total;
+}
+
+double sales_getTotalExtraCosts(struct ReportPerMonth monthlyProfits[])
+{
+    double total = 0;
+
+    for (int i = 0; i < MONTHS; i++)
+        total += monthlyProfits[i].additionalCosts;
+
+    return total;
+}
+
 // same here, per month subtraction of additional costs instead of per item
-double getProfitForMonth(struct ReportPerMonth monthlyProfits)
+double sales_getProfitForMonth(struct ReportPerMonth monthlyProfits)
 {
     double profit = monthlyProfits.revenue - monthlyProfits.costs - monthlyProfits.additionalCosts;
     return profit;
 }
 
 // same here, per day subtraction of additional costs instead of per item
-double getProfitForDay(struct ReportPerDay day)
+double sales_getProfitForDay(struct ReportPerDay day)
 {
     double profit = day.revenue - day.costs - day.additionalCosts;
     return profit;
 }
 
 // updater functions for the records
-void updateRevenue(struct ReportPerMonth monthlyProfits[], double price, double quantity)
+void sales_updateRevenue(struct ReportPerMonth monthlyProfits[], double price, double quantity)
 {
-    monthlyProfits[getCurrentDateInt()].revenue += quantity * price;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].revenue += quantity * price;
+    monthlyProfits[utils_getCurrentMonthInt()].revenue += quantity * price;
+    monthlyProfits[utils_getCurrentMonthInt()].day[utils_getCurrentDayInt()].revenue += quantity * price;
 }
 
 // updater functions for the records
-void updateProfit(struct ReportPerMonth monthlyProfits[], double profit, double quantity)
+void sales_updateProfit(struct ReportPerMonth monthlyProfits[], double profit, double quantity)
 {
-    monthlyProfits[getCurrentDateInt()].profit += quantity * profit;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].profit += quantity * profit;
+    monthlyProfits[utils_getCurrentMonthInt()].profit += quantity * profit;
+    monthlyProfits[utils_getCurrentMonthInt()].day[utils_getCurrentDayInt()].profit += quantity * profit;
 }
 
 // updater functions for the records
-void updateCosts(struct ReportPerMonth monthlyProfits[], int addedStocks, double originalPrice)
+void sales_updateCosts(struct ReportPerMonth monthlyProfits[], int addedStocks, double originalPrice)
 {
-    monthlyProfits[getCurrentDateInt()].costs += addedStocks * originalPrice;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs += addedStocks * originalPrice;
+    monthlyProfits[utils_getCurrentMonthInt()].costs += addedStocks * originalPrice;
+    monthlyProfits[utils_getCurrentMonthInt()].day[utils_getCurrentDayInt()].costs += addedStocks * originalPrice;
 }
 
 // updater functions for the records
-void updateAdditionalCosts(struct ReportPerMonth monthlyProfits[], double additionalCosts)
+void sales_updateAdditionalCosts(struct ReportPerMonth monthlyProfits[], double additionalCosts)
 {
-    monthlyProfits[getCurrentDateInt()].additionalCosts += additionalCosts;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].additionalCosts += additionalCosts;
+    monthlyProfits[utils_getCurrentMonthInt()].additionalCosts += additionalCosts;
+    monthlyProfits[utils_getCurrentMonthInt()].day[utils_getCurrentDayInt()].additionalCosts += additionalCosts;
 }
 
 // updater functions for the records
-void reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction)
+void sales_reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction)
 {
-    monthlyProfits[getCurrentDateInt()].costs -= deduction;
-    monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()].costs -= deduction;
+    monthlyProfits[utils_getCurrentMonthInt()].costs -= deduction;
+    monthlyProfits[utils_getCurrentMonthInt()].day[utils_getCurrentDayInt()].costs -= deduction;
 }
 // end
 
 // the updater function for the storage
-void updateReportsFromStorage(struct ReportPerMonth monthlyProfits[])
+void sales_updateReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 {
-    updateReportDataFromStorage(getCurrentDateInt(), getCurrentDayInt(), monthlyProfits[getCurrentDateInt()], monthlyProfits[getCurrentDateInt()].day[getCurrentDayInt()] );
+    storage_updateReportDataFromStorage(utils_getCurrentMonthInt(), utils_getCurrentDayInt(), monthlyProfits[utils_getCurrentMonthInt()], monthlyProfits[utils_getCurrentMonthInt()].day[utils_getCurrentDayInt()] );
+}
+
+// asks the user if he/she wants to deduct the total costs of the deleted item
+void sales_reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction)
+{
+    char action;
+
+    display_newUserMessagePage("Deleting an Item", "", "Do you want to deduct the total costs of deleted item to your monthly costs report?[y/n]", "", "", "", "");
+    fflush(stdin);
+    scanf("%c", &action);
+
+    // TODO: account for additional costs
+    if (action == 'y' || action == 'Y') {
+        sales_reduceCosts(monthlyProfits, deduction);
+        sales_updateReportsFromStorage(monthlyProfits);
+    }
 }

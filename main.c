@@ -1,36 +1,22 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
-#include <stdbool.h>
-
 #include "main.h"
 
 int main()
 {
-    askUserToFullScreen();
+    display_askUserToFullScreen();
     srand(time(NULL));
 
-    // TODO: transfer this here 
-    settings.sortBy = 0;
-    struct Node *head = NULL;                                       // this is where the items are stored
-    struct ReportPerMonth monthlyProfits[MONTHS];                   // this is where the reports are stored
-    char categories[MAX_CATEGORIES][CATEGORY_NAME_LEN];             // this is where the categories are stored
-    int categoriesLen = 0;                                          // this keeps track of the lenght of categories
-    struct Cart cart;                                               // this stores the items in the cart
-    cart.amountOfItems = 0;                                         // this keeps track of the lenght of cart items
-    char action;                                                    // action of user
+    struct Node *head = NULL;                                               // this is where the items are stored
+    struct ReportPerMonth monthlyProfits[MONTHS];                           // this is where the reports are stored
+    char categories[MAX_CATEGORIES][CATEGORY_NAME_LEN];                     // this is where the categories are stored, just an array of strings
+    int categoriesLen = 0;                                                  // this keeps track of the lenght of categories
+    struct Cart cart;                                                       // this stores the items in the cart
+    char action;                                                            // action of user
 
-    // initializations
-    initMonthlyProfits(monthlyProfits);                             // fill all the values with zero and sets monthly names
-    getItemsFromStorage(&head);
-    getCategoriesFromStorage(categories, &categoriesLen);
-    checkReportsFromStorage(monthlyProfits);                        // check the storage if there is any record, if yes then read it, if no then make one and initialize it with zeros
+    main_initialize(&head, &cart, monthlyProfits, categories, &categoriesLen);
 
     while (true) {
         system("cls");
-        menuPage();
+        display_menuPage();
 
         bannerUserInput();
         scanf("%c", &action);
@@ -38,14 +24,13 @@ int main()
         switch (action)
         {
         case '1':
-            viewInventory(&head, monthlyProfits, categories, &categoriesLen);
+            main_inventoryPageSessionHandler(&head, monthlyProfits, categories, &categoriesLen);
             break;
         case '2':
-            viewPos(&cart, &head, monthlyProfits);
+            main_posPageSessionHandler(&cart, &head, monthlyProfits);
             break;
         case '3':
-            system("cls");
-            viewReports(monthlyProfits);
+            main_reportsPageSessionHandler(monthlyProfits);
             break;
         case 'q':
             return 0;
@@ -53,17 +38,27 @@ int main()
     }
 }
 
-// all the funcitons defined in main are page handlers
+void main_initialize(struct Node **head, struct Cart *cart, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    cart->amountOfItems = 0;                                                 // this keeps track of the lenght of cart items
+    settings.sortBy = 0;                                                    // sorting setting is initialized by 0. Default
+    sales_initMonthlyProfits(monthlyProfits);                               // fill all the values with zero and sets monthly names
+    storage_getItemsFromStorage(head);
+    storage_getCategoriesFromStorage(categories, categoriesLen);
+    storage_checkReportsFromStorage(monthlyProfits);                        // check the storage if there is any record, if yes then read it, if no then make one and initialize it with zeros
+}
+
+// all the functions defined in main are page handlers
 
 // TODO: maybe add sorting feature? or just show stocks that are low
-void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void main_inventoryPageSessionHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char action;
 
     while (true) {
         system("cls");
         // TODO: sort here based on sortBy value first
-        inventoryPage(head);
+        display_inventoryPage(head);
 
         bannerUserInput();
         fflush(stdin);
@@ -72,28 +67,28 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
         switch (action)
         {
         case '1':
-            addItemHandler(head, monthlyProfits, categories, categoriesLen);
+            item_addItemHandler(head, monthlyProfits, categories, categoriesLen);
             break;
         case '2':
-            deleteItemHandler(head, monthlyProfits);
+            item_deleteItemHandler(head, monthlyProfits);
             break;
         case '3':
-            editItemHandler(head, categories, categoriesLen);
+            item_editItemHandler(head, categories, categoriesLen);
             break;
         case '4':
-            restockItemHandler(head, monthlyProfits);
+            item_restockItemHandler(head, monthlyProfits);
             break;
         case '5':
-            searchItemHandler(head);
+            item_searchItemHandler(head);
             break;
         case '6':
-            viewItemDetails(head);
+            item_viewItemDetailsHandler(head);
             break;
         case 'c':
-            viewCategories(head, categories, categoriesLen);
+            main_categoriesPageSessionHandler(head, categories, categoriesLen);
             break;
         case 's':
-            sortItemsHandler(head);
+            item_changeSortingHandler(head);
             break;
         case 'b':
             return;
@@ -101,13 +96,13 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
     }
 }
 
-void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void main_categoriesPageSessionHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char action;
 
     while (true) {
         system("cls");
-        categoryPage(categories, categoriesLen);
+        display_categoryPage(categories, categoriesLen);
         
         bannerUserInput();
         fflush(stdin);
@@ -116,16 +111,16 @@ void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], in
         switch (action)
         {
         case '1':
-            addCategoryHandler(categories, categoriesLen);
+            category_addCategoryHandler(categories, categoriesLen);
             break;
         case '2':
-            deleteCategoryHandler(categories, categoriesLen);
+            category_deleteCategoryHandler(categories, categoriesLen);
             break;
         case '3':
-            editCategoryHandler(head, categories, categoriesLen);
+            category_editCategoryHandler(head, categories, categoriesLen);
             break;
         case '4':
-            viewCategoryItems(head, categories, categoriesLen);
+            category_viewCategoryItems(head, categories, categoriesLen);
             break;
         case 'b':
             return;
@@ -134,32 +129,32 @@ void viewCategories(struct Node **head, char categories[][CATEGORY_NAME_LEN], in
 }
 
 // TODO: add total profit from purchases at the bottom
-void viewPos(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[])
+void main_posPageSessionHandler(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     char action;
 
     while (true){
         system("cls");
-        pointOfSalePage(cart->items, &cart->amountOfItems);
+        display_pointOfSalePage(cart->items, &cart->amountOfItems);
         bannerUserInput();
         scanf("%c", &action);
 
         switch (action)
         {
         case '1':
-            addCartItemHandler(cart, head);
+            pos_addCartItemHandler(cart, head);
             break;
         case '2':
-            deleteCartItemHandler(cart);
+            pos_deleteCartItemHandler(cart);
             break;
         case '3':
-            checkoutHandler(cart, head, monthlyProfits);
+            pos_checkoutHandler(cart, head, monthlyProfits);
             break;
         case '4':
-            resetCartHandler(cart);
+            pos_resetCartHandler(cart);
             break;
         case 'r':
-            viewReceipts();
+            main_receiptsPageSessionHandler();
             break;
         case 'b':
             return;
@@ -167,21 +162,21 @@ void viewPos(struct Cart *cart, struct Node **head, struct ReportPerMonth monthl
     }
 }
 
-void viewReceipts()
+void main_receiptsPageSessionHandler()
 {
     char action;
     
     while (true)
     {
         system("cls");
-        recieptsPage();
+        display_recieptsPage();
         bannerUserInput();
         scanf("%c", &action);
 
         switch (action)
         {
         case '1':
-            viewReceiptHandler();
+            pos_viewReceiptHandler();
             break;
         
         case 'b':
@@ -191,13 +186,13 @@ void viewReceipts()
 }
 
 // TODO: allow editing for records
-void viewReports(struct ReportPerMonth monthlyProfits[])
+void main_reportsPageSessionHandler(struct ReportPerMonth monthlyProfits[])
 {
     char action[2];
 
     while (true) {
         system("cls");
-        salesReportPage(monthlyProfits);
+        display_salesReportPage(monthlyProfits);
 
         bannerUserInput();
         fflush(stdin);
@@ -212,7 +207,7 @@ void viewReports(struct ReportPerMonth monthlyProfits[])
 
         // render the report per day by passing the record using the month entered
         system("cls");
-        salesPerDayReportPage(monthlyProfits[month].day, monthlyProfits, month);
+        display_salesPerDayReportPage(monthlyProfits[month].day, monthlyProfits, month);
         
         // allows the user to go back to monthly report
         bannerUserInput();

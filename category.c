@@ -1,64 +1,57 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
-#include <stdbool.h>
-
 #include "main.h"
 
 // handles the addition of category, like user inputs, user input validations, etc.
-void addCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void category_addCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char header[] = "Adding a Category";
     char userInput[CATEGORY_NAME_LEN];
 
-    newUserMessagePage(header, "Enter 'b' to go back", "Enter the name of the new Category:", "", "", "", "");
+    display_newUserMessagePage(header, "Enter 'b' to go back", "Enter the name of the new Category:", "", "", "", "");
     fflush(stdin);
     fgets(userInput, CATEGORY_NAME_LEN, stdin);
-    clearNewline(userInput);
+    utils_clearNewline(userInput);
 
     if (strcmp(userInput, "b") == 0 || strcmp(userInput, "B") == 0) return;
 
     // if the name is too short or none at all, don't proceed
     if (strlen(userInput) <= 1) {
-        newUserMessagePage(header, "", "Empty names are not allowed.", "", "", "", "");
+        display_newUserMessagePage(header, "", "Empty names are not allowed.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // if the name is too long, don't proceed
     if (strlen(userInput) > CATEGORY_NAME_LEN - 1) {
-        newUserMessagePage(header, "", "Category name is too long, please try again.", "", "", "", "");
+        display_newUserMessagePage(header, "", "Category name is too long, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // if it passes all the error checks, we proceed to add it
-    addCategory(categories, categoriesLen, userInput);
-    addCategoryToStorage(userInput);
+    category_addCategory(categories, categoriesLen, userInput);
+    storage_addCategoryToStorage(userInput);
 
-    newUserMessagePage(header, "", "Category added successfully!", "", "", "", "");
+    display_newUserMessagePage(header, "", "Category added successfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
 // function logic to add a category to the array, also used in getting categories from storage
-void addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *categoryToAdd)
+void category_addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *categoryToAdd)
 {
-    // toLowercase(categoryToAdd);
+    // utils_toLowercase(categoryToAdd);
     strcpy(categories[*categoriesLen], categoryToAdd);
     *categoriesLen += 1;
 }
 
-void deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void category_deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char header[] = "Deleting a Category";
     char userInput[2];
 
     if (*categoriesLen == 0) {
-        newUserMessagePage(header, "Enter any key to go back", "No category to be deleted", "", "", "", "");
+        display_newUserMessagePage(header, "Enter any key to go back", "No category to be deleted", "", "", "", "");
     } else {
-        categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to delete:", "Enter 'b' to go back");
+        display_categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to delete:", "Enter 'b' to go back");
     }
 
     fflush(stdin);
@@ -70,13 +63,13 @@ void deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categories
     int index = atoi(userInput) - 1;
 
     if (index < 0 || index >= *categoriesLen) {
-        newUserMessagePage(header, "", "Invalid index.", "", "", "", "");
+        display_newUserMessagePage(header, "", "Invalid index.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // delete it from file storage first
-    deleteCategoryFromStorage(categories[index]);
+    storage_deleteCategoryFromStorage(categories[index]);
 
     // shift the items to the left, overwritting the deleted item
     for (int i = index; i < *categoriesLen - 1; i++)
@@ -85,24 +78,24 @@ void deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categories
     // decrease the counter
     *categoriesLen -= 1;
     
-    newUserMessagePage(header, "", "Category deleted successfully!", "", "", "", "");
+    display_newUserMessagePage(header, "", "Category deleted successfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
-void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void category_editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char header[] = "Editing a Category";
     char userInput[3];
 
     if (*categoriesLen == 0) {
-        newUserMessagePage(header, "Enter any key to go back", "No category to be edited", "", "", "", "");
+        display_newUserMessagePage(header, "Enter any key to go back", "No category to be edited", "", "", "", "");
     } else {
-        categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to edit:", "");
+        display_categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to edit:", "");
     }
 
     fflush(stdin);
     scanf("%s", userInput);
-    // clearAllNewline(userInput);
+    // utils_clearAllNewline(userInput);
 
     if (strcmp(userInput, "b") == 0 || strcmp(userInput, "B") == 0 || *categoriesLen == 0) return;
 
@@ -110,7 +103,7 @@ void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN
     int index = atoi(userInput) - 1;
 
     if (index < 0 || index >= *categoriesLen) {
-        newUserMessagePage(header, "", "Invalid index.", "", "", "", "");
+        display_newUserMessagePage(header, "", "Invalid index.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
@@ -121,20 +114,20 @@ void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN
     char message[50] = "Enter a new name for ";
     strcat(message, categories[index]);
 
-    newUserMessagePage(header, "", message, "", "", "", "");
+    display_newUserMessagePage(header, "", message, "", "", "", "");
     fflush(stdin);
     fgets(categories[index], CATEGORY_NAME_LEN, stdin);
-    clearNewline(categories[index]);
+    utils_clearNewline(categories[index]);
 
     // update the list with the old category
-    updateItemsCategory(head, oldVer, categories[index]);
+    item_updateItemsCategory(head, oldVer, categories[index]);
 
     // update the data from storage
-    editCategoryFromStorage(oldVer, categories[index]);
+    storage_editCategoryFromStorage(oldVer, categories[index]);
 }
 
 // checks if the inputted category exists, returns 1 if true, 0 if false
-int isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *category)
+int category_isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *category)
 {
     for (int i = 0; i < *categoriesLen; i++) 
         if (strcmp(categories[i], category) == 0) return 1;
@@ -143,12 +136,12 @@ int isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, ch
 }
 
 // the page that pops up when asking a user for a category 
-void itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void category_itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     while (true) {
         char index[2];
         system("cls");
-        categoryPreview(categories, categoriesLen);
+        display_categoryPreview(categories, categoriesLen);
         bannerUserInput();
         scanf("%s", index);
 
@@ -168,15 +161,15 @@ void itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN
     }
 }
 
-void viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void category_viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char header[] = "Viewing items of a category";
     char userInput[2];
 
     if (*categoriesLen == 0) {
-        newUserMessagePage(header, "Enter any key to go back", "No category to be viewed", "", "", "", "");
+        display_newUserMessagePage(header, "Enter any key to go back", "No category to be viewed", "", "", "", "");
     } else {
-        categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to view:", "Enter 'b' to go back");
+        display_categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to view:", "Enter 'b' to go back");
     }
 
     fflush(stdin);
@@ -188,21 +181,21 @@ void viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN],
     int index = atoi(userInput) - 1;
 
     if (index < 0 || index >= *categoriesLen) {
-        newUserMessagePage(header, "", "Invalid index.", "", "", "", "");
+        display_newUserMessagePage(header, "", "Invalid index.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // get the items based on category input
     struct Node *categoryItems = NULL;
-    getItemsByCategory(head, categories[index], &categoryItems);
+    item_getItemsByCategory(head, categories[index], &categoryItems);
 
     // render the result
     system("cls");
-    itemCategoryPage(&categoryItems);
+    display_itemCategoryPage(&categoryItems);
 
     // free the memory
-    freeLinkedList(&categoryItems);
+    utils_freeLinkedList(&categoryItems);
 
     bannerUserInput();
     fflush(stdin);

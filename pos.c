@@ -1,16 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h> 
-#include <unistd.h>
-#include <conio.h>
-#include <string.h>
-#include <stdbool.h>
-
 #include "main.h"
 
-void addCartItemHandler(struct Cart *cart, struct Node **head)
+void pos_addCartItemHandler(struct Cart *cart, struct Node **head)
 {
     char header[] = "Point of Sale";
-    inventoryPromptPage(head, "Enter the item ID:", "Enter 'b' to go back");
+    display_inventoryPromptPage(head, "Enter the item ID:", "Enter 'b' to go back");
 
     char itemId[ID_LENGTH];
     double quantity;
@@ -18,53 +11,42 @@ void addCartItemHandler(struct Cart *cart, struct Node **head)
     scanf("%s", itemId);
 
     // get the item with that ID
-    struct Node *current = getItemById(head, itemId);
+    struct Node *current = item_getItemById(head, itemId);
 
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0) return;
 
     if (current == NULL) {
-        newUserMessagePage(header, "", "Item not found, please try again.", "", "", "", "");
+        display_newUserMessagePage(header, "", "Item not found, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // ask the user for quantity purchased
-    newUserMessagePage(header, "", "Enter the quantity:", "", "", "", "");
+    display_newUserMessagePage(header, "", "Enter the quantity:", "", "", "", "");
     scanf("%lf", &quantity);
 
     // if there's not enough stocks, don't proceed
     if (current->data.stocks < quantity) {
-        newUserMessagePage(header, "", "Not enough stocks to fulfill the purchase.", "", "", "", "");
+        display_newUserMessagePage(header, "", "Not enough stocks to fulfill the purchase.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
-    addItemToCart(cart, quantity, current->data);
+    pos_addItemToCart(cart, quantity, current->data);
 
-    newUserMessagePage(header, "", "Item added to cart!", "", "", "", "");
+    display_newUserMessagePage(header, "", "Item added to cart!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
-void addItemToCart(struct Cart *cart, int quantity, struct Item item)
-{
-    strcpy(cart->items[cart->amountOfItems].name, item.name);
-    strcpy(cart->items[cart->amountOfItems].itemId, item.id);
-    cart->items[cart->amountOfItems].quantity = quantity;
-    cart->items[cart->amountOfItems].price = item.price;
-    cart->items[cart->amountOfItems].profit = item.profit * quantity;
 
-    cart->amountOfItems += 1;
-}
-
-
-void deleteCartItemHandler(struct Cart *cart)
+void pos_deleteCartItemHandler(struct Cart *cart)
 {
     char header[] = "Point of Sale";
 
     if (cart->amountOfItems == 0) {
-        newUserMessagePage(header, "Enter any key to go back", "No cart item to be deleted", "", "", "", "");
+        display_newUserMessagePage(header, "Enter any key to go back", "No cart item to be deleted", "", "", "", "");
     } else {
-        pointOfSalePromptPage(cart->items, &cart->amountOfItems, "Enter the number of the item in the cart:", "Enter 'b' to go back");
+        display_pointOfSalePromptPage(cart->items, &cart->amountOfItems, "Enter the number of the item in the cart:", "Enter 'b' to go back");
     }
 
     char userInput[2];
@@ -77,7 +59,7 @@ void deleteCartItemHandler(struct Cart *cart)
     int index = atoi(userInput) - 1;
 
     if (index < 0 || index >= cart->amountOfItems) {
-        newUserMessagePage(header, "", "Invalid number.", "", "", "", "");
+        display_newUserMessagePage(header, "", "Invalid number.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
@@ -89,20 +71,18 @@ void deleteCartItemHandler(struct Cart *cart)
     // decrease the counter
     cart->amountOfItems -= 1;
 
-    newUserMessagePage(header, "", "Item deleted from the cart!", "", "", "", "");
+    display_newUserMessagePage(header, "", "Item deleted from the cart!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
-
-
-void resetCartHandler(struct Cart *cart) 
+void pos_resetCartHandler(struct Cart *cart) 
 {
     char action;
 
     if (cart->amountOfItems == 0) {
-        newUserMessagePage("Point of Sale", "Enter any key to go back", "No items in the cart", "", "", "", "");
+        display_newUserMessagePage("Point of Sale", "Enter any key to go back", "No items in the cart", "", "", "", "");
     } else {
-        newUserMessagePage("Point of Sale", "", "Are you sure you want to remove", "all items in the cart?", "[ y / n ]", "", "");
+        display_newUserMessagePage("Point of Sale", "", "Are you sure you want to remove", "all items in the cart?", "[ y / n ]", "", "");
     }
 
     fflush(stdin);
@@ -110,13 +90,98 @@ void resetCartHandler(struct Cart *cart)
 
     if (action == 'n' || action == 'N' || cart->amountOfItems == 0) return;
 
-    resetCart(cart);
+    pos_resetCart(cart);
 
-    newUserMessagePage("Point of Sale", "", "Cart items removed.", "", "", "", "");
+    display_newUserMessagePage("Point of Sale", "", "Cart items removed.", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
-void resetCart(struct Cart *cart)
+void pos_checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[])
+{
+    char header[] = "Point of Sale";
+
+    if (cart->amountOfItems == 0) {
+        display_newUserMessagePage(header, "Enter any key to go back", "No items in the cart to checkout", "", "", "", "");
+    } else {
+        display_newUserMessagePage("Point of Sale", "", "Are you sure you want to checkout", "all items in the cart?", "[ y / n ]", "", "");
+    }
+
+    char action;
+    fflush(stdin);
+    scanf("%c", &action);
+
+    if (action == 'n' || action == 'N' || cart->amountOfItems == 0) return;
+    
+    utils_generateId(cart->cartId);
+    char reciept[MAX_RECEIPT_LENGTH];
+
+    // TODO: maybe separate this into a function
+    // deduct all items from the inventory and tally the revenues
+    for (int i = 0; i < cart->amountOfItems; i++) {
+        int quantity = cart->items[i].quantity;
+        char itemId[ID_LENGTH];
+        strcpy(itemId, cart->items[i].itemId);
+
+        // get the item in the inventory
+        struct Node *current = item_getItemById(head, itemId);
+
+        // tally the stocks, revenue and profit
+        current->data.stocks -= quantity;
+        sales_updateRevenue(monthlyProfits, current->data.price, quantity);
+        sales_updateProfit(monthlyProfits, current->data.profit, quantity);
+        
+        // update the data from storage as well
+        storage_editItemFromStorageById(itemId, current->data);
+        sales_updateReportsFromStorage(monthlyProfits);
+    }
+
+    // generate a reciept
+    system("cls");
+    printf("\n\n\n\n\n");
+    pos_generateReceipt(cart, reciept);
+    storage_addRecieptToStorage(reciept, cart->cartId);
+    pos_saveRecieptMetaData(cart->cartId);
+    printf("%s", reciept);
+
+    printf("\nEnter any key to continue");
+    bannerUserInput();
+    getch();
+    // reset the cart
+    pos_resetCart(cart);
+
+    display_newUserMessagePage(header, "", "Checkout successfull!", "", "", "", "");
+    sleep(SLEEP_TIME);
+}
+
+void pos_viewReceiptHandler()
+{
+    char id[ID_LENGTH];
+    char receipt[MAX_RECEIPT_LENGTH];
+
+    display_recieptsPromptPage("Enter the ID of the receipt:", "Enter 'b' to go back");
+    fflush(stdin);
+    fgets(id, ID_LENGTH, stdin);
+    utils_clearNewline(id);
+    
+    if (strcmp(id, "b") == 0 || strcmp(id, "B") == 0) return;
+
+    int status = storage_getReceiptFromStorageById(id, receipt);
+
+    if (status == 0) {
+        display_newUserMessagePage("Viewing a Receipt", "", "Receipt not found.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    } 
+
+    system("cls");
+    printf("\n\n\n\n\n");
+    printf(receipt);
+    printf("\nEnter any key to go back.");
+    bannerUserInput();
+    getch();
+}
+
+void pos_resetCart(struct Cart *cart)
 {
     // reset the name, itemId, quantity, and price of each item in the cart
     for (int i = 0; i < cart->amountOfItems; i++) {
@@ -130,64 +195,18 @@ void resetCart(struct Cart *cart)
     cart->amountOfItems = 0;
 }
 
-void checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[])
+void pos_addItemToCart(struct Cart *cart, int quantity, struct Item item)
 {
-    char header[] = "Point of Sale";
+    strcpy(cart->items[cart->amountOfItems].name, item.name);
+    strcpy(cart->items[cart->amountOfItems].itemId, item.id);
+    cart->items[cart->amountOfItems].quantity = quantity;
+    cart->items[cart->amountOfItems].price = item.price;
+    cart->items[cart->amountOfItems].profit = item.profit * quantity;
 
-    if (cart->amountOfItems == 0) {
-        newUserMessagePage(header, "Enter any key to go back", "No items in the cart to checkout", "", "", "", "");
-    } else {
-        newUserMessagePage("Point of Sale", "", "Are you sure you want to checkout", "all items in the cart?", "[ y / n ]", "", "");
-    }
-
-    char action;
-    fflush(stdin);
-    scanf("%c", &action);
-
-    if (action == 'n' || action == 'N' || cart->amountOfItems == 0) return;
-    
-    generateId(cart->cartId);
-    char reciept[MAX_RECEIPT_LENGTH];
-
-    // TODO: maybe separate this into a function
-    // deduct all items from the inventory and tally the revenues
-    for (int i = 0; i < cart->amountOfItems; i++) {
-        int quantity = cart->items[i].quantity;
-        char itemId[ID_LENGTH];
-        strcpy(itemId, cart->items[i].itemId);
-
-        // get the item in the inventory
-        struct Node *current = getItemById(head, itemId);
-
-        // tally the stocks, revenue and profit
-        current->data.stocks -= quantity;
-        updateRevenue(monthlyProfits, current->data.price, quantity);
-        updateProfit(monthlyProfits, current->data.profit, quantity);
-        
-        // update the data from storage as well
-        editItemFromStorageById(itemId, current->data);
-        updateReportsFromStorage(monthlyProfits);
-    }
-
-    // generate a reciept
-    system("cls");
-    printf("\n\n\n\n\n");
-    generateReceipt(cart, reciept);
-    addRecieptToStorage(reciept, cart->cartId);
-    saveRecieptMetaData(cart->cartId);
-    printf("%s", reciept);
-
-    printf("\nEnter any key to continue");
-    bannerUserInput();
-    getch();
-    // reset the cart
-    resetCart(cart);
-
-    newUserMessagePage(header, "", "Checkout successfull!", "", "", "", "");
-    sleep(SLEEP_TIME);
+    cart->amountOfItems += 1;
 }
 
-void generateReceipt(struct Cart *cart, char *receiptBuffer) 
+void pos_generateReceipt(struct Cart *cart, char *receiptBuffer) 
 {
     // width of the reciept
     int width = 62;
@@ -195,16 +214,16 @@ void generateReceipt(struct Cart *cart, char *receiptBuffer)
     // constructing a centered id
     char idText[100];
     sprintf(idText, " Receipt ID: %s", cart->cartId);
-    centerText(width, idText);
+    utils_centerText(width, idText);
 
     // constructing a centered date
     char dateText[100];
-    sprintf(dateText, "Date Purchased: %s %s", getCurrentDate(), getCurrentTime());
-    centerText(width, dateText);
+    sprintf(dateText, "Date Purchased: %s %s", utils_getCurrentDate(), utils_getCurrentTime());
+    utils_centerText(width, dateText);
 
     // constructing a centered thank you
     char tyText[100] = "Thank You and Come Again!";
-    centerText(width, tyText);
+    utils_centerText(width, tyText);
 
     // using snprintf to connect everything into a single string, could've used strcat but someone said this is more efficient because we are manually setting the size of the string each addition
     snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "_______________________________________________________________\n");
@@ -231,38 +250,10 @@ void generateReceipt(struct Cart *cart, char *receiptBuffer)
 
 }
 
-void saveRecieptMetaData(char *recieptId)
+void pos_saveRecieptMetaData(char *recieptId)
 {
     char datePurchased[DATE_LENGTH];
-    sprintf(datePurchased, "%s %s", getCurrentDate(), getCurrentTime());
+    sprintf(datePurchased, "%s %s", utils_getCurrentDate(), utils_getCurrentTime());
 
-    addRecieptMetaDataToStorage(recieptId, datePurchased);
-}
-
-void viewReceiptHandler()
-{
-    char id[ID_LENGTH];
-    char receipt[MAX_RECEIPT_LENGTH];
-
-    recieptsPromptPage("Enter the ID of the receipt:", "Enter 'b' to go back");
-    fflush(stdin);
-    fgets(id, ID_LENGTH, stdin);
-    clearNewline(id);
-    
-    if (strcmp(id, "b") == 0 || strcmp(id, "B") == 0) return;
-
-    int status = getReceiptFromStorageById(id, receipt);
-
-    if (status == 0) {
-        newUserMessagePage("Viewing a Receipt", "", "Receipt not found.", "", "", "", "");
-        sleep(SLEEP_TIME);
-        return;
-    } 
-
-    system("cls");
-    printf("\n\n\n\n\n");
-    printf(receipt);
-    printf("\nEnter any key to go back.");
-    bannerUserInput();
-    getch();
+    storage_addRecieptMetaDataToStorage(recieptId, datePurchased);
 }

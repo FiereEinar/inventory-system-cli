@@ -1,20 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h> 
-#include <string.h>
-#include <conio.h>
-#include <time.h>
-#include <unistd.h>
-#include <stdbool.h>
-
 #include "main.h"
 
 // handles the process of restocking an item
-void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
+void item_restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     if (*head == NULL){
-        newUserMessagePage("Restocking an Item", "Enter any key to go back", "No item to restock.", "", "", "", "");
+        display_newUserMessagePage("Restocking an Item", "Enter any key to go back", "No item to restock.", "", "", "", "");
     } else {
-        inventoryPromptPage(head, "Enter the ID of the item you want to restock:", "Enter 'b' to go back");
+        display_inventoryPromptPage(head, "Enter the ID of the item you want to restock:", "Enter 'b' to go back");
     }
     
     int addedStocks;
@@ -27,11 +19,11 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
 
     // get the item based on id
-    struct Node *current = getItemById(head, itemId);
+    struct Node *current = item_getItemById(head, itemId);
 
     // if we didn't find the item, give them an error
     if (current == NULL) {
-        newUserMessagePage("Restocking an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
+        display_newUserMessagePage("Restocking an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
@@ -40,7 +32,7 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
     char messageWithName[100];
     strcpy(messageWithName, "Enter the amount of stocks added in ");
     strcat(messageWithName, current->data.name);
-    itemDataPromptPage(current->data, "Restocking an Item", messageWithName, "");
+    display_itemDataPromptPage(current->data, "Restocking an Item", messageWithName, "");
     scanf("%d", &addedStocks);
 
     // TODO: ask the user for costs again, but have an option to use the previous costs
@@ -49,42 +41,29 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
     current->data.stocks += addedStocks;
     if (current->data.stocks > current->data.baseStocks) current->data.baseStocks = current->data.stocks;
 
-    newUserMessagePage("Restocking an Item", "", "Enter additional costs if there are any:", "", "", "", "");
+    display_newUserMessagePage("Restocking an Item", "", "Enter additional costs if there are any:", "", "", "", "");
     scanf("%lf", &additionalCosts);
 
     // tally the costs
-    updateCosts(monthlyProfits, addedStocks, current->data.originalPrice);
-    updateAdditionalCosts(monthlyProfits, additionalCosts);
+    sales_updateCosts(monthlyProfits, addedStocks, current->data.originalPrice);
+    sales_updateAdditionalCosts(monthlyProfits, additionalCosts);
     
     // update the data from storage
-    updateReportsFromStorage(monthlyProfits);
-    editItemFromStorageById(current->data.id, current->data);
+    sales_updateReportsFromStorage(monthlyProfits);
+    storage_editItemFromStorageById(current->data.id, current->data);
 
-    updateDate(current->data.lastUpdated);
-    newUserMessagePage("Restocking an Item", "", "Item restocked successfully!", "", "", "", "");
+    utils_updateDate(current->data.lastUpdated);
+    display_newUserMessagePage("Restocking an Item", "", "Item restocked successfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
-// gives you the item based on ID, returns NULL if not found
-struct Node *getItemById(struct Node **list, char itemId[])
-{
-    struct Node *current = *list;
-
-    while (current != NULL) {
-        if (strcmp(current->data.id, itemId) == 0) return current;
-        
-        current = current->next;
-    }
-    return NULL;
-}
-
 // handles the searching of an item
-void searchItemHandler(struct Node **list)
+void item_searchItemHandler(struct Node **list)
 {
     if (*list == NULL) {
-        newUserMessagePage("Searching an Item", "Enter any key to go back", "No item to search.", "", "", "", "");
+        display_newUserMessagePage("Searching an Item", "Enter any key to go back", "No item to search.", "", "", "", "");
     } else {
-        newUserMessagePage("Searching an Item", "Enter 'b' to go back.", "Enter a keyword to search: ", "", "", "", "");
+        display_newUserMessagePage("Searching an Item", "Enter 'b' to go back.", "Enter a keyword to search: ", "", "", "", "");
     }
 
     char searchTerm[NAME_SIZE];
@@ -96,7 +75,7 @@ void searchItemHandler(struct Node **list)
     fflush(stdin);
     fgets(searchTerm, NAME_SIZE, stdin);
 
-    clearNewline(searchTerm);
+    utils_clearNewline(searchTerm);
 
     if (strcmp(searchTerm, "b") == 0 || strcmp(searchTerm, "B") == 0 || *list == NULL) return;
 
@@ -104,23 +83,23 @@ void searchItemHandler(struct Node **list)
     while(current != NULL) {
         // strstr() is a function in <string.h> that will check if a string is a substring of another string. in simple term, if it fits the searchTerm
         if(strstr(current->data.name, searchTerm) != NULL) 
-            addItemToLinkedList(&results, current->data);
+            item_addItemToList(&results, current->data);
         // go to next node (iterator)
         current = current->next;
     }
 
     // render the results
     system("cls");
-    inventoryPromptPage(&results, "", "Enter any key to go back.");
+    display_inventoryPromptPage(&results, "", "Enter any key to go back.");
     // free the memory of results
-    freeLinkedList(&results);
+    utils_freeLinkedList(&results);
 
     // to be able to go back to inventory page
     getch();
 }
 
 // handles the process of prompting the user for an item to be added
-void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     // using item struct to store values, less variable declaration needed
     struct Item newItem;
@@ -135,56 +114,56 @@ void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], 
         "Enter the index of category for the new item. Press enter to skip"
     };
 
-    newUserMessagePage("Adding an Item", "Enter 'b' to go back", message[0], "", "", "", "");
+    display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", message[0], "", "", "", "");
     fflush(stdin);
     fgets(newItem.name, NAME_SIZE, stdin);
-    clearNewline(newItem.name);
+    utils_clearNewline(newItem.name);
 
     if (strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "B") == 0) return;
 
     // if the name is too short or none at all, don't proceed
     if (strlen(newItem.name) <= 1) {
-        newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Items with no name are not allowed.", "", "", "", "");
+        display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Items with no name are not allowed.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // if the name is too long, don't proceed
     if (strlen(newItem.name) > NAME_SIZE - 1) {
-        newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Item name is too long, please try again.", "", "", "", "");
+        display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Item name is too long, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // ask the user for the category
-    itemCategoryPrompter(newItem.category, categories, categoriesLen);
+    category_itemCategoryPrompter(newItem.category, categories, categoriesLen);
 
-    newUserMessagePage("Adding an Item", "", message[1], "", "", "", "");
+    display_newUserMessagePage("Adding an Item", "", message[1], "", "", "", "");
     scanf("%d", &newItem.stocks);
     newItem.baseStocks = newItem.stocks;
 
-    newUserMessagePage("Adding an Item", "", message[2], "", "", "", "");
+    display_newUserMessagePage("Adding an Item", "", message[2], "", "", "", "");
     scanf("%lf", &newItem.price);
 
-    newUserMessagePage("Adding an Item", "", message[3], "", "", "", "");
+    display_newUserMessagePage("Adding an Item", "", message[3], "", "", "", "");
     scanf("%lf", &newItem.originalPrice);
 
-    newUserMessagePage("Adding an Item", "", message[4], "", "", "", "");
+    display_newUserMessagePage("Adding an Item", "", message[4], "", "", "", "");
     scanf("%lf", &additionalCosts);
     
     // after getting all the necessary data from user, add it to the list
-    addItemToList(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, newItem.category, additionalCosts);
-    newUserMessagePage("Adding an Item", "", "Item added succesfully!", "", "", "", "");
+    item_addItemMetaData(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, newItem.category, additionalCosts);
+    display_newUserMessagePage("Adding an Item", "", "Item added succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
 // handles the process of deleting an item on the inventory based on ID
-void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
+void item_deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
     if (*head == NULL) {
-        newUserMessagePage("Deleting an Item", "Enter any key to go back", "No item to delete.", "", "", "", "");
+        display_newUserMessagePage("Deleting an Item", "Enter any key to go back", "No item to delete.", "", "", "", "");
     } else {
-        inventoryPromptPage(head, "Enter the ID of the item you want to delete:", "Enter 'b' to go back");
+        display_inventoryPromptPage(head, "Enter the ID of the item you want to delete:", "Enter 'b' to go back");
     }
 
     // get the ID to be deleted
@@ -204,7 +183,7 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
 
         // ask the user if he/she wants to deduct the total costs of the deleted item
         double deduction = deleted->data.originalPrice * (double)deleted->data.stocks;
-        reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
+        sales_reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
 
         if (current->next == NULL) *head = NULL;
         else *head = current->next;
@@ -217,7 +196,7 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
         }
         // if we didn't find the item, give them an error
         if (current->next == NULL || strcmp(current->next->data.id, idToDelete) != 0) {
-            newUserMessagePage("Deleting an Item", "", "Error: Item does not exist. Please try again.", "", "", "", "");
+            display_newUserMessagePage("Deleting an Item", "", "Error: Item does not exist. Please try again.", "", "", "", "");
             sleep(SLEEP_TIME);
             return;
         }
@@ -226,7 +205,7 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
 
         // ask the user if he/she wants to deduct the total costs of the deleted item
         double deduction = deleted->data.originalPrice * (double)deleted->data.stocks;
-        reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
+        sales_reflectToMonthlyCostsOnDeletion(monthlyProfits, deduction);
 
         // delete it by overwritting it
         if (current->next->next == NULL) current->next = NULL;
@@ -234,36 +213,20 @@ void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[
     }
 
     // delete it from the storage as well
-    deleteItemFromStorageById(idToDelete);
-    newUserMessagePage("Deleting an Item", "", "Item deleted succesfully!", "", "", "", "");
+    storage_deleteItemFromStorageById(idToDelete);
+    display_newUserMessagePage("Deleting an Item", "", "Item deleted succesfully!", "", "", "", "");
     // free the memory
     free(deleted);
     sleep(SLEEP_TIME);
 }
 
-// asks the user if he/she wants to deduct the total costs of the deleted item
-void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction)
-{
-    char action;
-
-    newUserMessagePage("Deleting an Item", "", "Do you want to deduct the total costs of deleted item to your monthly costs report?[y/n]", "", "", "", "");
-    fflush(stdin);
-    scanf("%c", &action);
-
-    // TODO: account for additional costs
-    if (action == 'y' || action == 'Y') {
-        reduceCosts(monthlyProfits, deduction);
-        updateReportsFromStorage(monthlyProfits);
-    }
-}
-
 // handles the editing of an item
-void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+void item_editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     if (*head == NULL) {
-        newUserMessagePage("Editing an Item", "Enter any key to go back", "No item to edit.", "", "", "", "");
+        display_newUserMessagePage("Editing an Item", "Enter any key to go back", "No item to edit.", "", "", "", "");
     } else {
-        inventoryPromptPage(head, "Enter the ID of the item you want to edit:", "Enter 'b' to go back");
+        display_inventoryPromptPage(head, "Enter the ID of the item you want to edit:", "Enter 'b' to go back");
     }
 
     // the options to edit
@@ -275,17 +238,17 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
 
     // get the item
-    struct Node *current = getItemById(head, itemId);
+    struct Node *current = item_getItemById(head, itemId);
 
     // if we didn't find the item, give them an error
     if (current == NULL) {
-        newUserMessagePage("Editing an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
+        display_newUserMessagePage("Editing an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
-    itemDataPromptPage(current->data, "Editing an Item", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?");
-    // newUserMessagePage("Editing an Item", "", "Options:", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?: ", "", "");
+    display_itemDataPromptPage(current->data, "Editing an Item", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?");
+    // display_newUserMessagePage("Editing an Item", "", "Options:", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?: ", "", "");
     scanf("%d", &toUpdate);
 
     // this is just to dynamically show a message with the name of item
@@ -296,21 +259,21 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         case 1:
             strcpy(headerWithName, "Enter a new name for ");
             strcat(headerWithName, current->data.name);
-            itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
+            display_itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
 
             fflush(stdin);
             fgets(current->data.name, NAME_SIZE, stdin);
-            clearNewline(current->data.name);
+            utils_clearNewline(current->data.name);
             break;
         // EDITED: category
         case 2:
-            itemCategoryPrompter(current->data.category, categories, categoriesLen);
+            category_itemCategoryPrompter(current->data.category, categories, categoriesLen);
             break;
         // EDITED: selling price
         case 3:
             strcpy(headerWithName, "Enter an updated selling price of ");
             strcat(headerWithName, current->data.name);
-            itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
+            display_itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
 
             scanf("%lf", &current->data.price);
             current->data.profit = current->data.price - current->data.originalPrice;
@@ -319,7 +282,7 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         case 4:
             strcpy(headerWithName, "Enter an updated original price of ");
             strcat(headerWithName, current->data.name);
-            itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
+            display_itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
             
             scanf("%lf", &current->data.originalPrice);
             current->data.profit = current->data.price - current->data.originalPrice;
@@ -328,25 +291,98 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         case 5:
             strcpy(headerWithName, "Enter an updated base stocks of ");
             strcat(headerWithName, current->data.name);
-            itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
+            display_itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
 
             scanf("%d", &current->data.baseStocks);
             break;
         default:
-            newUserMessagePage("Editing an Item", "", "Incorrect number entered", "", "", "", "");
+            display_newUserMessagePage("Editing an Item", "", "Incorrect number entered", "", "", "", "");
             return;
     }
 
-    updateDate(current->data.lastUpdated);
+    utils_updateDate(current->data.lastUpdated);
     // update the item in the storage
-    editItemFromStorageById(itemId, current->data);
+    storage_editItemFromStorageById(itemId, current->data);
 
-    newUserMessagePage("Editing an Item", "", "Item edited succesfully!", "", "", "", "");
+    display_newUserMessagePage("Editing an Item", "", "Item edited succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
 
+// handles the process of viewing more details of an item by asking for ID
+void item_viewItemDetailsHandler(struct Node **head)
+{
+    char itemId[ID_LENGTH];
+    if (*head == NULL){
+        display_newUserMessagePage("Viewing an Item", "Enter any key to go back", "No item to view.", "", "", "", "");
+    } else {
+        display_inventoryPromptPage(head, "Enter the ID of the item you want to view:", "Enter 'b' to go back");
+    }
+    scanf("%s", itemId);
+
+    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) {
+        system("cls");
+        display_inventoryPage(head);
+        return;
+    }
+
+    // get the item
+    struct Node *itemData = item_getItemById(head, itemId);
+
+    if (itemData == NULL) {
+        display_newUserMessagePage("Viewing an Item", "", "Item not found, please try again.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    // render it if it is found
+    system("cls");
+    display_itemDataPage(itemData->data);
+
+    // to be able to go back to inventory page
+    char x;
+    bannerUserInput();
+    fflush(stdin);
+    scanf("%c", &x);
+}
+
+void item_changeSortingHandler(struct Node **head)
+{
+    if (*head == NULL) {
+        display_newUserMessagePage("Sorting Items", "", "No items to sort.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    } else {
+        display_inventoryPromptPage(head, "0. Default | 1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit", "Sort items by:");
+    }
+
+    int userInput;
+    scanf("%d", &userInput);
+
+    // if the input is out of bounds, don't proceed
+    if (userInput < 0 || userInput > 6) {
+        display_newUserMessagePage("Sorting Items", "", "Invalid Input.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    settings.sortBy = userInput;
+}
+
+// gives you the item based on ID, returns NULL if not found
+struct Node *item_getItemById(struct Node **list, char itemId[])
+{
+    struct Node *current = *list;
+
+    while (current != NULL) {
+        if (strcmp(current->data.id, itemId) == 0) return current;
+        
+        current = current->next;
+    }
+    return NULL;
+}
+
 // handles the process of setting the data and tallying the costs, records of an item being added
-void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost)
+void item_addItemMetaData(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost)
 {
     // tbh, i could've just passed the entire Item struct, but im using this function for generating test items as well so...
     struct Item newItem;
@@ -360,24 +396,24 @@ void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], c
     newItem.originalPrice = originalPrice;
     newItem.profit = newItem.price - newItem.originalPrice;
 
-    updateDate(newItem.dateAdded);
-    updateDate(newItem.lastUpdated);
+    utils_updateDate(newItem.dateAdded);
+    utils_updateDate(newItem.lastUpdated);
 
-    generateId(newItem.id);
+    utils_generateId(newItem.id);
 
     // tally the costs
-    updateCosts(monthlyProfits, newItem.stocks, newItem.originalPrice);
-    updateAdditionalCosts(monthlyProfits, additionalCost);
+    sales_updateCosts(monthlyProfits, newItem.stocks, newItem.originalPrice);
+    sales_updateAdditionalCosts(monthlyProfits, additionalCost);
     // update the storage
-    updateReportsFromStorage(monthlyProfits);
+    sales_updateReportsFromStorage(monthlyProfits);
 
-    addItemToLinkedList(head, newItem);
-    addItemToStorage(newItem);
+    item_addItemToList(head, newItem);
+    storage_addItemToStorage(newItem);
 }
 
 // handles the actual addition to the list
-// REMINDER: use the function freeLinkedList() after using this funciton because it dynamically allocates memory
-void addItemToLinkedList(struct Node **head, struct Item item)
+// REMINDER: use the function utils_freeLinkedList() after using this funciton because it dynamically allocates memory
+void item_addItemToList(struct Node **head, struct Item item)
 {
     struct Item newItem = item;                 // TODO: remove this
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
@@ -397,45 +433,8 @@ void addItemToLinkedList(struct Node **head, struct Item item)
     }
 }
 
-// handles the process of viewing more details of an item by asking for ID
-void viewItemDetails(struct Node **head)
-{
-    char itemId[ID_LENGTH];
-    if (*head == NULL){
-        newUserMessagePage("Viewing an Item", "Enter any key to go back", "No item to view.", "", "", "", "");
-    } else {
-        inventoryPromptPage(head, "Enter the ID of the item you want to view:", "Enter 'b' to go back");
-    }
-    scanf("%s", itemId);
-
-    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) {
-        system("cls");
-        inventoryPage(head);
-        return;
-    }
-
-    // get the item
-    struct Node *itemData = getItemById(head, itemId);
-
-    if (itemData == NULL) {
-        newUserMessagePage("Viewing an Item", "", "Item not found, please try again.", "", "", "", "");
-        sleep(SLEEP_TIME);
-        return;
-    }
-
-    // render it if it is found
-    system("cls");
-    itemDataPage(itemData->data);
-
-    // to be able to go back to inventory page
-    char x;
-    bannerUserInput();
-    fflush(stdin);
-    scanf("%c", &x);
-}
-
 // updates the category of the affected items in both the list and file storage. could be optimized but im not willing to write any more code
-void updateItemsCategory(struct Node **head, char *oldCategory, char *newCategory)
+void item_updateItemsCategory(struct Node **head, char *oldCategory, char *newCategory)
 {
     struct Node *current = *head;
 
@@ -443,29 +442,29 @@ void updateItemsCategory(struct Node **head, char *oldCategory, char *newCategor
         // if it matches the old category, replace it with the new one
         if (strcmp(current->data.category, oldCategory) == 0) {
             strcpy(current->data.category, newCategory);
-            editItemFromStorageById(current->data.id, current->data);
+            storage_editItemFromStorageById(current->data.id, current->data);
         }
         current = current->next;
     }
 }
 
 // gets the items with the given category and appends it in your desired placeholder
-void getItemsByCategory(struct Node **head, char *category, struct Node **placeholder)
+void item_getItemsByCategory(struct Node **head, char *category, struct Node **placeholder)
 {
     struct Node *current = *head;
 
     while (current != NULL) {
         // if the current item has the matching category, add it to the placeholder
         if (strcmp(current->data.category, category) == 0) {
-            addItemToLinkedList(placeholder, current->data);
+            item_addItemToList(placeholder, current->data);
         }
         current = current->next;
     }
 }
 
-void getStockStatus(char *status, int stocks, int baseStocks)
+void item_getStockStatus(char *status, int stocks, int baseStocks)
 {
-    double percentage = getPercentage(stocks, baseStocks);
+    double percentage = utils_getPercentage(stocks, baseStocks);
 
     if (percentage > 35.0) {
         strcpy(status, "In Stock");
@@ -479,30 +478,7 @@ void getStockStatus(char *status, int stocks, int baseStocks)
     }
 }
 
-void sortItemsHandler(struct Node **head)
-{
-    if (*head == NULL) {
-        newUserMessagePage("Sorting Items", "", "No items to sort.", "", "", "", "");
-        sleep(SLEEP_TIME);
-        return;
-    } else {
-        inventoryPromptPage(head, "0. Default | 1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit", "Sort items by:");
-    }
-
-    int userInput;
-    scanf("%d", &userInput);
-
-    // if the input is out of bounds, don't proceed
-    if (userInput < 0 || userInput > 6) {
-        newUserMessagePage("Sorting Items", "", "Invalid Input.", "", "", "", "");
-        sleep(SLEEP_TIME);
-        return;
-    }
-
-    settings.sortBy = userInput;
-}
-
-void determineWhatToSort(char *placeholder)
+void item_determineWhatToSort(char *placeholder)
 {
     switch (settings.sortBy)
     {
@@ -530,31 +506,31 @@ void determineWhatToSort(char *placeholder)
     }
 }
 
-void getSortedItems(struct Node **head, struct Node **output)
+void item_getSortedItems(struct Node **head, struct Node **output)
 {
     if (*head == NULL) return;
 
-    freeLinkedList(output);
+    utils_freeLinkedList(output);
     
     switch (settings.sortBy)
     {
     case 1:
-        sortItemsBy(isStocksLessThan, head, output);
+        item_sortItemsBy(item_isStocksLessThan, head, output);
         break;
     case 2:
-        sortItemsBy(isStocksGreaterThan, head, output);
+        item_sortItemsBy(item_isStocksGreaterThan, head, output);
         break;
     case 3:
-        sortItemsBy(isPriceLessThan, head, output);
+        item_sortItemsBy(item_isPriceLessThan, head, output);
         break;
     case 4:
-        sortItemsBy(isPriceGreaterThan, head, output);
+        item_sortItemsBy(item_isPriceGreaterThan, head, output);
         break;
     case 5:
-        sortItemsBy(isProfitLessThan, head, output);
+        item_sortItemsBy(item_isProfitLessThan, head, output);
         break;
     case 6:
-        sortItemsBy(isProfitGreaterThan, head, output);
+        item_sortItemsBy(item_isProfitGreaterThan, head, output);
         break;
     case 0:
         *output = *head;
@@ -564,7 +540,7 @@ void getSortedItems(struct Node **head, struct Node **output)
 
 // TODO: maybe just pass the data instead of the stocks to the callback function?
 // gives a sorted output list of a given original list based on a callback function passed into it
-void sortItemsBy(bool (*callbackFn)(struct Item, struct Item), struct Node **head, struct Node **output)
+void item_sortItemsBy(bool (*callbackFn)(struct Item, struct Item), struct Node **head, struct Node **output)
 {
     // head is the source, output is where the sorted list goes
     struct Node *current = *head;
@@ -593,7 +569,7 @@ void sortItemsBy(bool (*callbackFn)(struct Item, struct Item), struct Node **hea
         while (currentOutput != NULL) {
             // the condition depends on the callback function passed
             if (callbackFn(current->data, currentOutput->data)) {
-                insertItemAt(index, output, &current);
+                item_insertItemAt(index, output, &current);
                 break;
             }
 
@@ -603,7 +579,7 @@ void sortItemsBy(bool (*callbackFn)(struct Item, struct Item), struct Node **hea
 
         // if its the last item, insert it at the end
         if (currentOutput == NULL) {
-            insertItemAt(index, output, &current);
+            item_insertItemAt(index, output, &current);
         }
 
         current = current->next;
@@ -612,37 +588,37 @@ void sortItemsBy(bool (*callbackFn)(struct Item, struct Item), struct Node **hea
 
 // CALLBACK FUNCTION FOR SORTING OPTIONS
 
-bool isStocksLessThan(struct Item item1, struct Item item2)
+bool item_isStocksLessThan(struct Item item1, struct Item item2)
 {
-    if (getPercentage(item1.stocks, item1.baseStocks) < getPercentage(item2.stocks, item2.baseStocks)) return true;
+    if (utils_getPercentage(item1.stocks, item1.baseStocks) < utils_getPercentage(item2.stocks, item2.baseStocks)) return true;
     return false;
 }
 
-bool isStocksGreaterThan(struct Item item1,struct Item item2)
+bool item_isStocksGreaterThan(struct Item item1,struct Item item2)
 {
-    if (getPercentage(item1.stocks, item1.baseStocks) > getPercentage(item2.stocks, item2.baseStocks)) return true;
+    if (utils_getPercentage(item1.stocks, item1.baseStocks) > utils_getPercentage(item2.stocks, item2.baseStocks)) return true;
     return false;
 }
 
-bool isPriceLessThan(struct Item item1, struct Item item2)
+bool item_isPriceLessThan(struct Item item1, struct Item item2)
 {
     if (item1.price < item2.price) return true;
     return false;
 }
 
-bool isPriceGreaterThan(struct Item item1,struct Item item2)
+bool item_isPriceGreaterThan(struct Item item1,struct Item item2)
 {
     if (item1.price > item2.price) return true;
     return false;
 }
 
-bool isProfitLessThan(struct Item item1, struct Item item2)
+bool item_isProfitLessThan(struct Item item1, struct Item item2)
 {
     if (item1.profit < item2.profit) return true;
     return false;
 }
 
-bool isProfitGreaterThan(struct Item item1,struct Item item2)
+bool item_isProfitGreaterThan(struct Item item1,struct Item item2)
 {
     if (item1.profit > item2.profit) return true;
     return false;
@@ -650,7 +626,7 @@ bool isProfitGreaterThan(struct Item item1,struct Item item2)
 
 // END
 
-void insertItemAt(int index, struct Node **destination, struct Node **toInsert)
+void item_insertItemAt(int index, struct Node **destination, struct Node **toInsert)
 {
     struct Node *current = *destination;
     struct Node *nodeToInsert = *toInsert;
@@ -714,8 +690,8 @@ void insertItemAt(int index, struct Node **destination, struct Node **toInsert)
 //         // loop over the output and compare the current source item to the current output item
 //         while (currentOutput != NULL) {
 //             // if the current source item's stock is lower than the current output item's stock, insert it before that current output item
-//             if (getPercentage(current->data.stocks, current->data.baseStocks) < getPercentage(currentOutput->data.stocks, currentOutput->data.baseStocks)) {
-//                 insertItemAt(index, output, &current);
+//             if (utils_getPercentage(current->data.stocks, current->data.baseStocks) < utils_getPercentage(currentOutput->data.stocks, currentOutput->data.baseStocks)) {
+//                 item_insertItemAt(index, output, &current);
 //                 break;
 //             }
 
@@ -725,7 +701,7 @@ void insertItemAt(int index, struct Node **destination, struct Node **toInsert)
 
 //         // if its the last item, insert it at the end
 //         if (currentOutput == NULL) {
-//             insertItemAt(index, output, &current);
+//             item_insertItemAt(index, output, &current);
 //         }
 
 //         current = current->next;

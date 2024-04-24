@@ -1,14 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
-#include <ctype.h>
-#include <stdbool.h>
-
 #include "main.h"
 
-char* getCurrentTime() {
+char* utils_getCurrentTime() {
     time_t now;
     struct tm *localTime;
     // the string to store the final output
@@ -43,7 +35,7 @@ char* getCurrentTime() {
     return timeString;
 }
 
-char* getCurrentDate()
+char* utils_getCurrentDate()
 {
     time_t currentTime;
     struct tm *localTime;
@@ -64,7 +56,7 @@ char* getCurrentDate()
 }
 
 // generates an id of 4 random character and 4 random numbers
-void generateId(char placeholder[])
+void utils_generateId(char placeholder[])
 {
     // char chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     char nums[] = "1234567890";
@@ -84,7 +76,7 @@ void generateId(char placeholder[])
     }
 }
 
-int getCurrentDateInt()
+int utils_getCurrentMonthInt()
 {
     time_t rawtime;
     struct tm *info;
@@ -94,7 +86,7 @@ int getCurrentDateInt()
     return info->tm_mon;
 }
 
-int getCurrentDayInt()
+int utils_getCurrentDayInt()
 {
     time_t rawtime;
     struct tm *info;
@@ -105,7 +97,7 @@ int getCurrentDayInt()
 }
 
 // gives the size of a linked list
-int getListSize(struct Node **head)
+int utils_getListSize(struct Node **head)
 {
     struct Node *current = *head;
     int size = 0;
@@ -118,7 +110,7 @@ int getListSize(struct Node **head)
 }
 
 // frees the memory of a nodes in a linked list
-void freeLinkedList(struct Node **head)
+void utils_freeLinkedList(struct Node **head)
 {
     struct Node *current = *head;
     struct Node *next;
@@ -133,19 +125,19 @@ void freeLinkedList(struct Node **head)
     }
 }
 
-void clearNewline(char *string)
+void utils_clearNewline(char *string)
 {
     size_t len = strlen(string);                                                
     if (len > 0 && string[len - 1] == '\n') string[len - 1] = '\0';
 }
 
-void updateDate(char *placeholder)
+void utils_updateDate(char *placeholder)
 {
-    sprintf(placeholder, "%s / %s", getCurrentDate(), getCurrentTime());
+    sprintf(placeholder, "%s / %s", utils_getCurrentDate(), utils_getCurrentTime());
 }
 
 // the stocks column in inventory page (10/10)
-void joinStocks(char *output, int stock, int base)
+void utils_joinStocks(char *output, int stock, int base)
 {
     char stockStr[5];
     char baseStr[5];
@@ -159,7 +151,7 @@ void joinStocks(char *output, int stock, int base)
 }
 
 // turns a string into all lowercase
-void toLowercase(char *str) 
+void utils_toLowercase(char *str) 
 {
     while (*str) {
         *str = tolower((unsigned char)*str);
@@ -168,7 +160,7 @@ void toLowercase(char *str)
 }
 
 // capitalizes the first letter of a string
-void capitalizeFirst(char *str) 
+void utils_capitalizeFirst(char *str) 
 {
     if (str[0] != '\0') { // Check if string is not empty
         str[0] = toupper((unsigned char)str[0]);
@@ -176,19 +168,19 @@ void capitalizeFirst(char *str)
 }
 
 // gets the percentage of stocks
-void getStringPercentage(char* output, int number, int base) 
+void utils_getStringPercentage(char* output, int number, int base) 
 {
-    double percentage = getPercentage(number, base);
+    double percentage = utils_getPercentage(number, base);
     sprintf(output, "%.2f%%", percentage);
 }
 
-double getPercentage(int number, int base)
+double utils_getPercentage(int number, int base)
 {
     double percentage = ((double)number / base) * 100;
     return percentage;
 }
 
-void centerText(int length, char *text) 
+void utils_centerText(int length, char *text) 
 {
     int inputLength = strlen(text);
     char copy[inputLength + 1];
@@ -201,7 +193,7 @@ void centerText(int length, char *text)
     sprintf(text, "%*s%s%*s", padding, "", copy, padding, "");
 }
 
-void clearAllNewline(char *str)
+void utils_clearAllNewline(char *str)
 {
     char *newline;
     while ((newline = strchr(str, '\n')) != NULL) {
