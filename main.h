@@ -1,3 +1,5 @@
+#ifndef MAIN_H
+#define MAIN_H
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      CONSTANTS
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,6 +67,7 @@ struct CartItem
     char itemId[ID_LENGTH];
     int quantity;
     double price;
+    double profit;
 };
 
 // structure of a session cart
@@ -74,15 +77,20 @@ struct Cart
     int amountOfItems;
     char cartId[ID_LENGTH];
 };
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+struct Settings
+{
+    int sortBy;
+};
+
+struct Settings settings;
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //      FUNCTION PROTOTYPES
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: main.c
@@ -111,6 +119,11 @@ void addItemToLinkedList(struct Node **head, struct Item newItem);
 void updateItemsCategory(struct Node **head, char *oldCategory, char *newCategory);
 void getItemsByCategory(struct Node **head, char *category, struct Node **placeholder);
 void getStockStatus(char *status, int stocks, int baseStocks);
+void sortItemsHandler(struct Node **head);
+void determineWhatToSort(char *placeholder);
+void getSortedItems(struct Node **head, struct Node **output);
+void sortItemsByLowStocks(struct Node **head, struct Node **output);
+void insertItemAt(int index, struct Node **destination, struct Node **toInsert);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -129,7 +142,8 @@ void updateDate(char *placeholder);
 void joinStocks(char *output, int stock, int base);
 void toLowercase(char *str);
 void capitalizeFirst(char *str);
-void getPercentage(char *output, int number, int base);
+void getStringPercentage(char *output, int number, int base);
+double getPercentage(int number, int base);
 void centerText(int length, char *text);
 void clearAllNewline(char *str);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -174,10 +188,12 @@ void printCategoryHeader();
 void printCategoryList(char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 
 void askUserToFullScreen();
+void itemDataPromptPage(struct Item item, char *header, char *message1, char *message2);
 void itemDataPage(struct Item item);
 void newUserMessagePage(char *header, char *bottomMessage, char *message1, char *message2, char *message3, char *message4, char *message5);
 void userMessagePage(char *header, char *bottomMessage, char *message1, char *message2, char *message3, char *message4, char *message5);
 void printMinimumScreenHeight(int itemsLength);
+
 // SALES REPORT PAGE
 void salesReportPage(struct ReportPerMonth monthlyProfits[]);
 void salesPerDayReportPage(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month);
@@ -254,7 +270,7 @@ void generateReceipt(struct Cart *cart, char *receiptBuffer);
 void saveRecieptMetaData(char *recieptId);
 void viewReceiptHandler();
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+#endif
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 /*
 

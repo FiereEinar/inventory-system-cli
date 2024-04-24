@@ -176,10 +176,16 @@ void capitalizeFirst(char *str)
 }
 
 // gets the percentage of stocks
-void getPercentage(char* output, int number, int base) 
+void getStringPercentage(char* output, int number, int base) 
+{
+    double percentage = getPercentage(number, base);
+    sprintf(output, "%.2f%%", percentage);
+}
+
+double getPercentage(int number, int base)
 {
     double percentage = ((double)number / base) * 100;
-    sprintf(output, "%.2f%%", percentage);
+    return percentage;
 }
 
 void centerText(int length, char *text) 

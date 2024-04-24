@@ -115,21 +115,30 @@ void pointOfSalePage(struct CartItem items[], int *amountOfItems)
 
 void printCartItemsHeader()
 {
-    printf("::  \tName:\t\t\t\t\tQuantity:\t\t\tTotal:\t\t\tId:\t\t\t\t  ::\n");
+    printf("::  \tName:\t\t\t\t\tQuantity:\t\t\tTotal:\t\t\tProfit:\t\t\t\t  ::\n");
 }
 
 void printCartItems(struct CartItem items[], int *amountOfItems)
 {
     if (*amountOfItems == 0) {
-        // bannerBlankBorderTextLeft("No items on the cart");
         printf("::  %s\t\t\t\t\t\t\t\t\t\t\t\t\t\t  ::\n", "No items on the cart.");
         return;
     }
 
+    double totalProfit = 0;
+
     for (int i = 0; i < *amountOfItems; i++) {
         double total = items[i].quantity * items[i].price;
-        printf("::  %3d.%-30s\t\t%-3d\t\t\t\t%-10.2lf\t\t%s\t\t\t  ::\n", i + 1, items[i].name, items[i].quantity, total, items[i].itemId);
+        totalProfit +=  items[i].profit;
+
+        printf(
+            "::  %3d.%-30s\t\t%-3d\t\t\t\t%-10.2lf\t\t%-10.2lf\t\t\t  ::\n",
+             i + 1, items[i].name, items[i].quantity, total, items[i].profit
+        );
     }
+
+    bannerFullBorderSection();
+    printf("::    Total Profit: \t\t\t\t\t\t\t\t\t\t\t%-12.2lf\t\t\t    ::\n", totalProfit);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -259,6 +268,32 @@ void askUserToFullScreen()
     printf("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n");
     bannerUserInput();
     getch();
+}
+
+void itemDataPromptPage(struct Item item, char *header, char *message1, char *message2)
+{
+    system("cls");
+    topBar(header);
+    bannerBlankBorder();
+
+    char stocksStr[20];
+    joinStocks(stocksStr, item.stocks, item.baseStocks);
+    
+    printf("::  Item Name:\t\t\t\t\t\t\t%-30s\t\t\t\t\t\t  ::\n", item.name);
+    printf("::  Category:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", item.category);
+    printf("::  Stocks:\t\t\t\t\t\t\t%-20s\t\t\t\t\t\t\t  ::\n", stocksStr);
+    printf("::  Selling Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.price);
+    printf("::  Original Price:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.originalPrice);
+    printf("::  Profit per item:\t\t\t\t\t\t%-20.2lf\t\t\t\t\t\t\t  ::\n", item.profit);
+    printf("::  Date Added:\t\t\t\t\t\t\t%-15s\t\t\t\t\t\t\t  ::\n", item.dateAdded);
+    printf("::  Last Updated:\t\t\t\t\t\t%-15s\t\t\t\t\t\t\t  ::\n", item.lastUpdated);
+    printf("::  Item ID:\t\t\t\t\t\t\t%-15s\t\t\t\t\t\t\t\t  ::\n", item.id);
+
+    printMinimumScreenHeight(2);
+    bannerBlankBorderTextCen(message1);
+    bannerBlankBorderTextCen(message2);
+    bannerFullBorder();
+    bannerUserInput();
 }
 
 // the option 6. in inventory page to view the details of an item
@@ -432,19 +467,27 @@ void inventoryPromptPage(struct Node **head, char *bottomMessage1, char *bottomM
 // renders the items in the inventory
 void inventoryPage(struct Node **head)
 {
+    char sortedBy[30], text[15];
+    determineWhatToSort(text);
+    sprintf(sortedBy, "Sorted by: %s", text);
+
+    struct Node *sorted = NULL;
+    getSortedItems(head, &sorted);
+
     bannerFullBorder();
     bannerBlankBorder();
     printItemHeader();
     bannerBlankBorder();
     bannerFullBorder();
     bannerBlankBorder();
-    printItemList(head);
+    printItemList(&sorted);
 
     printMinimumScreenHeight(getListSize(head) - 5);
-    bannerBlankBorder();
+    bannerBlankBorderTextCen(sortedBy);
+    // bannerBlankBorder();
 
     bannerBlankBorderTextCen("1. Add | 2. Delete | 3. Edit | 4. Restock | 5. Search | 6. Item Details");
-    bannerBlankBorderTextCen("'b' to go back to Menu Page | 'c' to go to Categories Page");
+    bannerBlankBorderTextCen("'b' Go Back | 'c' Categories Page | 's' Sort Items");
 
     bannerFullBorder();
 }
@@ -452,8 +495,8 @@ void inventoryPage(struct Node **head)
 void printItemHeader()
 {
     printf(
-        "::  %-10s %-30s\t %-30s %-12s\t %-16s\t %-15s  ::\n",
-        "ID", "Item", "Category", "Stocks", "Price", "Status (s)"
+        "::  %-10s %-30s\t %-30s %-10s\t %-12s %-12s %-13s  ::\n",
+        "ID", "Item", "Category", "Stocks", "Price", "Profit", "Status"
     );
 }
 
@@ -473,13 +516,13 @@ void printItemList(struct Node **head)
     {
         char stocksPercentage[12];
         char stocksStatus[12];
-        // getPercentage(stocksPercentage, current->data.stocks, current->data.baseStocks);
+        // getStringPercentage(stocksPercentage, current->data.stocks, current->data.baseStocks);
         joinStocks(stocksPercentage, current->data.stocks, current->data.baseStocks);
         getStockStatus(stocksStatus, current->data.stocks, current->data.baseStocks);
 
         printf(
-            "::  %-10s %-30s\t %-30s %-12s\t P%-14.2lf\t %-15s  ::\n",
-            current->data.id, current->data.name, current->data.category, stocksPercentage, current->data.price, stocksStatus
+            "::  %-10s %-30s\t %-30s %-10s\t P%-11.2lf P%-11.2lf %-13s  ::\n",
+            current->data.id, current->data.name, current->data.category, stocksPercentage, current->data.price, current->data.profit, stocksStatus
         );
 
         // iterator

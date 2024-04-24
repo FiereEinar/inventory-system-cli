@@ -36,11 +36,14 @@ void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits
         return;
     }
 
+    // constructing the message to show on the page for the user
     char messageWithName[100];
     strcpy(messageWithName, "Enter the amount of stocks added in ");
     strcat(messageWithName, current->data.name);
-    newUserMessagePage("Restocking an Item", "", messageWithName, "", "", "", "");
+    itemDataPromptPage(current->data, "Restocking an Item", messageWithName, "");
     scanf("%d", &addedStocks);
+
+    // TODO: ask the user for costs again, but have an option to use the previous costs
 
     // update the stocks and base stocks
     current->data.stocks += addedStocks;
@@ -281,7 +284,8 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         return;
     }
 
-    newUserMessagePage("Editing an Item", "", "Options:", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?: ", "", "");
+    itemDataPromptPage(current->data, "Editing an Item", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?");
+    // newUserMessagePage("Editing an Item", "", "Options:", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?: ", "", "");
     scanf("%d", &toUpdate);
 
     // this is just to dynamically show a message with the name of item
@@ -292,7 +296,7 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         case 1:
             strcpy(headerWithName, "Enter a new name for ");
             strcat(headerWithName, current->data.name);
-            newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
+            itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
 
             fflush(stdin);
             fgets(current->data.name, NAME_SIZE, stdin);
@@ -306,7 +310,7 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         case 3:
             strcpy(headerWithName, "Enter an updated selling price of ");
             strcat(headerWithName, current->data.name);
-            newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
+            itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
 
             scanf("%lf", &current->data.price);
             current->data.profit = current->data.price - current->data.originalPrice;
@@ -315,7 +319,7 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         case 4:
             strcpy(headerWithName, "Enter an updated original price of ");
             strcat(headerWithName, current->data.name);
-            newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
+            itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
             
             scanf("%lf", &current->data.originalPrice);
             current->data.profit = current->data.price - current->data.originalPrice;
@@ -324,7 +328,7 @@ void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], i
         case 5:
             strcpy(headerWithName, "Enter an updated base stocks of ");
             strcat(headerWithName, current->data.name);
-            newUserMessagePage("Editing an Item", "", headerWithName, "", "", "", "");
+            itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
 
             scanf("%d", &current->data.baseStocks);
             break;
@@ -461,7 +465,7 @@ void getItemsByCategory(struct Node **head, char *category, struct Node **placeh
 
 void getStockStatus(char *status, int stocks, int baseStocks)
 {
-    double percentage = ((double)stocks / baseStocks) * 100.0;
+    double percentage = getPercentage(stocks, baseStocks);
 
     if (percentage >= 30.0) {
         strcpy(status, "In Stock");
@@ -473,4 +477,168 @@ void getStockStatus(char *status, int stocks, int baseStocks)
         strcpy(status, "No Stock");
         return;
     }
+}
+
+void sortItemsHandler(struct Node **head)
+{
+    if (*head == NULL) {
+        newUserMessagePage("Sorting Items", "", "No items to sort.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    } else {
+        inventoryPromptPage(head, "0. Default | 1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit", "Sort items by:");
+    }
+
+    int userInput;
+    scanf("%d", &userInput);
+
+    // if the input is out of bounds, don't proceed
+    if (userInput < 0 || userInput > 6) {
+        newUserMessagePage("Sorting Items", "", "Invalid Input.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    settings.sortBy = userInput;
+}
+
+void determineWhatToSort(char *placeholder)
+{
+    switch (settings.sortBy)
+    {
+    case 1:
+        strcpy(placeholder, "Low Stock");
+        break;
+    case 2:
+        strcpy(placeholder, "High Stock");
+        break;
+    case 3:
+        strcpy(placeholder, "Low Price");
+        break;
+    case 4:
+        strcpy(placeholder, "High Price");
+        break;
+    case 5:
+        strcpy(placeholder, "Low Profit");
+        break;
+    case 6:
+        strcpy(placeholder, "High Profit");
+        break;
+    case 0:
+        strcpy(placeholder, "Default");
+        break;
+    }
+}
+
+void getSortedItems(struct Node **head, struct Node **output)
+{
+    if (*head == NULL) return;
+
+    freeLinkedList(output);
+    
+    switch (settings.sortBy)
+    {
+    case 1:
+        sortItemsByLowStocks(head, output);
+        break;
+    case 2:
+        
+        break;
+    case 3:
+        
+        break;
+    case 4:
+        
+        break;
+    case 5:
+        
+        break;
+    case 6:
+        
+        break;
+    case 0:
+        *output = *head;
+        break;
+    }
+}
+
+void sortItemsByLowStocks(struct Node **head, struct Node **output)
+{
+    // head is the source, output is where the sorted list goes
+    struct Node *current = *head;
+
+    // loop over the source(head)
+    while (current != NULL) {
+        struct Node *currentOutput = *output;
+        int index = 0;
+
+        // if it's the first item, just add it directly
+        if (currentOutput == NULL) {
+            struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+            newNode->data = current->data;
+            newNode->next = NULL;
+
+            *output = newNode;
+
+            // iterate the next before continueing
+            current = current->next;
+            continue;
+        }
+
+        // loop over the output and compare the current source item to the current output item
+        while (currentOutput != NULL) {
+            // if the current source item's stock is lower than the current output item's stock, insert it before that current output item
+            if (
+                getPercentage(current->data.stocks, current->data.baseStocks) < getPercentage(currentOutput->data.stocks, currentOutput->data.baseStocks)
+            ) {
+                insertItemAt(index, output, &current);
+                break;
+            }
+
+            index++;
+            currentOutput = currentOutput->next;
+        }
+
+        // if its the last item, insert it at the end
+        if (currentOutput == NULL) {
+            insertItemAt(index, output, &current);
+        }
+
+        current = current->next;
+    }
+}
+
+void insertItemAt(int index, struct Node **destination, struct Node **toInsert)
+{
+    struct Node *current = *destination;
+    struct Node *nodeToInsert = *toInsert;
+
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    newNode->data = nodeToInsert->data;
+    newNode->next = NULL;
+
+    // if we're trying to insert it first
+    if (index == 0) {
+        newNode->next = *destination;
+        *destination = newNode;
+        return;
+    }
+
+    // traverse to the index
+    for (int i = 0; i < index - 1; i++) {
+        // if we're trying to add it in the end
+        if (current->next == NULL) {
+            current->next = newNode;
+            return;
+        }
+        // otherwise, continue traversing
+        current = current->next;
+    }
+
+    // save the rest of the list
+    struct Node *rest = current->next;
+    // add the node to be inserted
+    current->next = newNode;
+
+    newNode->next = rest;
 }

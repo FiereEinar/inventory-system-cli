@@ -12,6 +12,8 @@ int main()
     askUserToFullScreen();
     srand(time(NULL));
 
+    // TODO: transfer this here 
+    settings.sortBy = 0;
     struct Node *head = NULL;                                       // this is where the items are stored
     struct ReportPerMonth monthlyProfits[MONTHS];                   // this is where the reports are stored
     char categories[MAX_CATEGORIES][CATEGORY_NAME_LEN];             // this is where the categories are stored
@@ -60,6 +62,7 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
 
     while (true) {
         system("cls");
+        // TODO: sort here based on sortBy value first
         inventoryPage(head);
 
         bannerUserInput();
@@ -88,6 +91,9 @@ void viewInventory(struct Node **head, struct ReportPerMonth monthlyProfits[], c
             break;
         case 'c':
             viewCategories(head, categories, categoriesLen);
+            break;
+        case 's':
+            sortItemsHandler(head);
             break;
         case 'b':
             return;

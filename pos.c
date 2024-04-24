@@ -51,6 +51,7 @@ void addItemToCart(struct Cart *cart, int quantity, struct Item item)
     strcpy(cart->items[cart->amountOfItems].itemId, item.id);
     cart->items[cart->amountOfItems].quantity = quantity;
     cart->items[cart->amountOfItems].price = item.price;
+    cart->items[cart->amountOfItems].profit = item.profit * quantity;
 
     cart->amountOfItems += 1;
 }
@@ -123,8 +124,9 @@ void resetCart(struct Cart *cart)
         strcpy(cart->items[i].itemId, "");
         cart->items[i].quantity = 0;
         cart->items[i].price = 0.0;
+        cart->items[i].profit = 0.0;
     }
-    // reset the amount of items to zero
+    // reset the amount of items to zero    
     cart->amountOfItems = 0;
 }
 
@@ -242,7 +244,7 @@ void viewReceiptHandler()
     char id[ID_LENGTH];
     char receipt[MAX_RECEIPT_LENGTH];
 
-    recieptsPromptPage("Enter 'b' to go back", "Enter the ID of the receipt:");
+    recieptsPromptPage("Enter the ID of the receipt:", "Enter 'b' to go back");
     fflush(stdin);
     fgets(id, ID_LENGTH, stdin);
     clearNewline(id);
