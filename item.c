@@ -467,7 +467,7 @@ void getStockStatus(char *status, int stocks, int baseStocks)
 {
     double percentage = getPercentage(stocks, baseStocks);
 
-    if (percentage >= 30.0) {
+    if (percentage > 35.0) {
         strcpy(status, "In Stock");
         return;
     } else if (percentage >= 0.1) {
@@ -539,22 +539,22 @@ void getSortedItems(struct Node **head, struct Node **output)
     switch (settings.sortBy)
     {
     case 1:
-        sortItemsByLowStocks(head, output);
+        sortItemsBy(isStocksLessThan, head, output);
         break;
     case 2:
-        
+        sortItemsBy(isStocksGreaterThan, head, output);
         break;
     case 3:
-        
+        sortItemsBy(isPriceLessThan, head, output);
         break;
     case 4:
-        
+        sortItemsBy(isPriceGreaterThan, head, output);
         break;
     case 5:
-        
+        sortItemsBy(isProfitLessThan, head, output);
         break;
     case 6:
-        
+        sortItemsBy(isProfitGreaterThan, head, output);
         break;
     case 0:
         *output = *head;
@@ -562,7 +562,9 @@ void getSortedItems(struct Node **head, struct Node **output)
     }
 }
 
-void sortItemsByLowStocks(struct Node **head, struct Node **output)
+// TODO: maybe just pass the data instead of the stocks to the callback function?
+// gives a sorted output list of a given original list based on a callback function passed into it
+void sortItemsBy(bool (*callbackFn)(struct Item, struct Item), struct Node **head, struct Node **output)
 {
     // head is the source, output is where the sorted list goes
     struct Node *current = *head;
@@ -574,10 +576,12 @@ void sortItemsByLowStocks(struct Node **head, struct Node **output)
 
         // if it's the first item, just add it directly
         if (currentOutput == NULL) {
+            // create a new  block of memory forthe output list so that it doesn't disappear
             struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
             newNode->data = current->data;
             newNode->next = NULL;
 
+            // add it to the output list
             *output = newNode;
 
             // iterate the next before continueing
@@ -587,10 +591,8 @@ void sortItemsByLowStocks(struct Node **head, struct Node **output)
 
         // loop over the output and compare the current source item to the current output item
         while (currentOutput != NULL) {
-            // if the current source item's stock is lower than the current output item's stock, insert it before that current output item
-            if (
-                getPercentage(current->data.stocks, current->data.baseStocks) < getPercentage(currentOutput->data.stocks, currentOutput->data.baseStocks)
-            ) {
+            // the condition depends on the callback function passed
+            if (callbackFn(current->data, currentOutput->data)) {
                 insertItemAt(index, output, &current);
                 break;
             }
@@ -608,11 +610,52 @@ void sortItemsByLowStocks(struct Node **head, struct Node **output)
     }
 }
 
+// CALLBACK FUNCTION FOR SORTING OPTIONS
+
+bool isStocksLessThan(struct Item item1, struct Item item2)
+{
+    if (getPercentage(item1.stocks, item1.baseStocks) < getPercentage(item2.stocks, item2.baseStocks)) return true;
+    return false;
+}
+
+bool isStocksGreaterThan(struct Item item1,struct Item item2)
+{
+    if (getPercentage(item1.stocks, item1.baseStocks) > getPercentage(item2.stocks, item2.baseStocks)) return true;
+    return false;
+}
+
+bool isPriceLessThan(struct Item item1, struct Item item2)
+{
+    if (item1.price < item2.price) return true;
+    return false;
+}
+
+bool isPriceGreaterThan(struct Item item1,struct Item item2)
+{
+    if (item1.price > item2.price) return true;
+    return false;
+}
+
+bool isProfitLessThan(struct Item item1, struct Item item2)
+{
+    if (item1.profit < item2.profit) return true;
+    return false;
+}
+
+bool isProfitGreaterThan(struct Item item1,struct Item item2)
+{
+    if (item1.profit > item2.profit) return true;
+    return false;
+}
+
+// END
+
 void insertItemAt(int index, struct Node **destination, struct Node **toInsert)
 {
     struct Node *current = *destination;
     struct Node *nodeToInsert = *toInsert;
 
+    // create a new  block of memory forthe output list so that it doesn't disappear
     struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
     newNode->data = nodeToInsert->data;
     newNode->next = NULL;
@@ -642,3 +685,49 @@ void insertItemAt(int index, struct Node **destination, struct Node **toInsert)
 
     newNode->next = rest;
 }
+
+
+// void sortItemsByLowStocks(struct Node **head, struct Node **output)
+// {
+//     // head is the source, output is where the sorted list goes
+//     struct Node *current = *head;
+
+//     // loop over the source(head)
+//     while (current != NULL) {
+//         struct Node *currentOutput = *output;
+//         int index = 0;
+
+//         // if it's the first item, just add it directly
+//         if (currentOutput == NULL) {
+//             // create a new  block of memory forthe output list so that it doesn't disappear
+//             struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+//             newNode->data = current->data;
+//             newNode->next = NULL;
+
+//             *output = newNode;
+
+//             // iterate the next before continueing
+//             current = current->next;
+//             continue;
+//         }
+
+//         // loop over the output and compare the current source item to the current output item
+//         while (currentOutput != NULL) {
+//             // if the current source item's stock is lower than the current output item's stock, insert it before that current output item
+//             if (getPercentage(current->data.stocks, current->data.baseStocks) < getPercentage(currentOutput->data.stocks, currentOutput->data.baseStocks)) {
+//                 insertItemAt(index, output, &current);
+//                 break;
+//             }
+
+//             index++;
+//             currentOutput = currentOutput->next;
+//         }
+
+//         // if its the last item, insert it at the end
+//         if (currentOutput == NULL) {
+//             insertItemAt(index, output, &current);
+//         }
+
+//         current = current->next;
+//     }
+// }

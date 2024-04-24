@@ -1,5 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
+
+#include <stdbool.h>
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      CONSTANTS
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -106,23 +109,36 @@ void viewReports(struct ReportPerMonth monthlyProfits[]);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      FILE: item.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// handlers
 void addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void searchItemHandler(struct Node **head);
+void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void sortItemsHandler(struct Node **head);
+
 void viewItemDetails(struct Node **head);
 void reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
 void addItemToList(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost);
-void restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[]);
 struct Node *getItemById(struct Node **list, char itemId[]);
 void addItemToLinkedList(struct Node **head, struct Item newItem);
 void updateItemsCategory(struct Node **head, char *oldCategory, char *newCategory);
 void getItemsByCategory(struct Node **head, char *category, struct Node **placeholder);
 void getStockStatus(char *status, int stocks, int baseStocks);
-void sortItemsHandler(struct Node **head);
 void determineWhatToSort(char *placeholder);
 void getSortedItems(struct Node **head, struct Node **output);
-void sortItemsByLowStocks(struct Node **head, struct Node **output);
+void sortItemsBy(bool (*callbackFn)(struct Item, struct Item), struct Node **head, struct Node **output);
+
+// callback functions for sorting options
+bool isStocksLessThan(struct Item item1, struct Item item2);
+bool isStocksGreaterThan(struct Item item1,struct Item item2);
+
+bool isPriceLessThan(struct Item item1, struct Item item2);
+bool isPriceGreaterThan(struct Item item1,struct Item item2);
+
+bool isProfitLessThan(struct Item item1, struct Item item2);
+bool isProfitGreaterThan(struct Item item1,struct Item item2);
+
 void insertItemAt(int index, struct Node **destination, struct Node **toInsert);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

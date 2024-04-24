@@ -132,13 +132,13 @@ void printCartItems(struct CartItem items[], int *amountOfItems)
         totalProfit +=  items[i].profit;
 
         printf(
-            "::  %3d.%-30s\t\t%-3d\t\t\t\t%-10.2lf\t\t%-10.2lf\t\t\t  ::\n",
+            "::  %3d.%-30s\t\t%-3d\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\t\t  ::\n",
              i + 1, items[i].name, items[i].quantity, total, items[i].profit
         );
     }
 
     bannerFullBorderSection();
-    printf("::    Total Profit: \t\t\t\t\t\t\t\t\t\t\t%-12.2lf\t\t\t    ::\n", totalProfit);
+    printf("::    Total Profit: \t\t\t\t\t\t\t\t\t\t\tP%-12.2lf\t\t\t  ::\n", totalProfit);
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -446,13 +446,18 @@ void printReportHeader()
 void inventoryPromptPage(struct Node **head, char *bottomMessage1, char *bottomMessage2)
 {
     system("cls");
+
+    struct Node *sorted = NULL;
+    getSortedItems(head, &sorted);
+
     bannerFullBorder();
     bannerBlankBorder();
     printItemHeader();
     bannerBlankBorder();
     bannerFullBorder();
     bannerBlankBorder();
-    printItemList(head);
+    printItemList(&sorted);
+    // freeLinkedList(&sorted);
 
     printMinimumScreenHeight(getListSize(head) - 5);
     bannerBlankBorder();
@@ -481,6 +486,7 @@ void inventoryPage(struct Node **head)
     bannerFullBorder();
     bannerBlankBorder();
     printItemList(&sorted);
+    // freeLinkedList(&sorted);
 
     printMinimumScreenHeight(getListSize(head) - 5);
     bannerBlankBorderTextCen(sortedBy);

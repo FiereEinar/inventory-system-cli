@@ -92,16 +92,17 @@ void deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categories
 void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char header[] = "Editing a Category";
-    char userInput[2];
+    char userInput[3];
 
     if (*categoriesLen == 0) {
-        newUserMessagePage(header, "Enter any key to go back", "No category to be deleted", "", "", "", "");
+        newUserMessagePage(header, "Enter any key to go back", "No category to be edited", "", "", "", "");
     } else {
-        categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to edit:", "Enter 'b' to go back");
+        categoryPromptPage(categories, categoriesLen, "Enter the index of the category you want to edit:", "");
     }
 
     fflush(stdin);
     scanf("%s", userInput);
+    // clearAllNewline(userInput);
 
     if (strcmp(userInput, "b") == 0 || strcmp(userInput, "B") == 0 || *categoriesLen == 0) return;
 
@@ -120,7 +121,7 @@ void editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN
     char message[50] = "Enter a new name for ";
     strcat(message, categories[index]);
 
-    newUserMessagePage(header, "Enter 'b' to go back", message, "", "", "", "");
+    newUserMessagePage(header, "", message, "", "", "", "");
     fflush(stdin);
     fgets(categories[index], CATEGORY_NAME_LEN, stdin);
     clearNewline(categories[index]);
