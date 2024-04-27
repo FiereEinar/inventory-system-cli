@@ -361,9 +361,26 @@ void display_salesReportPage(struct ReportPerMonth monthlyProfits[])
     display_printMonthlyReports(monthlyProfits);
     display_printMinimumScreenHeight(MONTHS - 6);
 
-    bannerBlankBorderTextCen("Enter the number of month to see more details.");
-    bannerBlankBorderTextCen("'b' to go back to Menu Page");
+    bannerBlankBorderTextCen("Enter the number of the month to view more details");
+    bannerBlankBorderTextCen("'e' Edit | 'b' Go back");
     bannerFullBorder();
+}
+
+void display_salesReportPromptPage(struct ReportPerMonth monthlyProfits[], char *message1, char *message2)
+{
+    system("cls");
+    bannerFullBorder();
+    bannerBlankBorder();
+    display_printReportHeader();
+    bannerFullBorderSection();
+
+    display_printMonthlyReports(monthlyProfits);
+    display_printMinimumScreenHeight(MONTHS - 6);
+
+    bannerBlankBorderTextCen(message1);
+    bannerBlankBorderTextCen(message2);
+    bannerFullBorder();
+    bannerUserInput();
 }
 
 // per day report
@@ -378,8 +395,26 @@ void display_salesPerDayReportPage(struct ReportPerDay day[], struct ReportPerMo
     display_printMinimumScreenHeight(DAYS_IN_MONTH - 1);
 
     bannerBlankBorder();
-    bannerBlankBorderTextCen("Enter 'b' to go back");
+    bannerBlankBorderTextCen("'e' Edit | 'b' Go back");
     bannerFullBorder();
+}
+
+void display_salesPerDayReportPromptPage(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month, char *message1, char *message2)
+{
+    system("cls");
+    bannerFullBorder();
+    bannerBlankBorder();
+    display_printMonthlyReportHeader(monthlyProfits[month].month);
+    bannerFullBorderSection();
+
+    display_printPerDayReports(day, monthlyProfits, month);
+    display_printMinimumScreenHeight(DAYS_IN_MONTH);
+
+    // bannerBlankBorder();
+    bannerBlankBorderTextCen(message1);
+    bannerBlankBorderTextCen(message2);
+    bannerFullBorder();
+    bannerUserInput();
 }
 
 // each individual month report
@@ -420,7 +455,7 @@ void display_printPerDayReports(struct ReportPerDay day[], struct ReportPerMonth
     printf
     (
         "::  Total\t\t\t\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t\tP%-10.2lf\t  ::\n", 
-        monthlyProfits[month].costs, monthlyProfits[month].additionalCosts, monthlyProfits[month].revenue, sales_getProfitForMonth(monthlyProfits[month])
+        sales_getTotalCostsOfMonth(monthlyProfits, month), sales_getTotalExtraCostsOfMonth(monthlyProfits, month), sales_getTotalRevenueOfMonth(monthlyProfits, month), sales_getTotalProfitOfMonth(monthlyProfits, month)
     );
 }
 

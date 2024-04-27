@@ -35,14 +35,6 @@ void category_addCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *cate
     sleep(SLEEP_TIME);
 }
 
-// function logic to add a category to the array, also used in getting categories from storage
-void category_addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *categoryToAdd)
-{
-    // utils_toLowercase(categoryToAdd);
-    strcpy(categories[*categoriesLen], categoryToAdd);
-    *categoriesLen += 1;
-}
-
 void category_deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     char header[] = "Deleting a Category";
@@ -124,6 +116,14 @@ void category_editCategoryHandler(struct Node **head, char categories[][CATEGORY
 
     // update the data from storage
     storage_editCategoryFromStorage(oldVer, categories[index]);
+}
+
+// function logic to add a category to the array, also used in getting categories from storage
+void category_addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *categoryToAdd)
+{
+    // utils_toLowercase(categoryToAdd);
+    strcpy(categories[*categoriesLen], categoryToAdd);
+    *categoriesLen += 1;
 }
 
 // checks if the inputted category exists, returns 1 if true, 0 if false

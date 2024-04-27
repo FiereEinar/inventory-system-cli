@@ -360,7 +360,7 @@ void storage_getReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 
 // updates the records per month in the file
 // the same logic for editing an item, except we're using index(month) instead of ID
-void storage_updateReportDataFromStorage(int month, int day, struct ReportPerMonth monthData, struct ReportPerDay dayData)
+void storage_updatePerMonthReportDataFromStorage(int month, struct ReportPerMonth monthData)
 {
     FILE *file;
     FILE *temp;
@@ -398,7 +398,7 @@ void storage_updateReportDataFromStorage(int month, int day, struct ReportPerMon
     remove(filename);
     rename(tempFilename, filename);
 
-    storage_updatePerDayDataFromStorage(monthData.month, day, dayData);
+    // storage_updatePerDayDataFromStorage(monthData.month, day, dayData);
 }
 
 // updates the per day records in the file

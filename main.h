@@ -93,11 +93,13 @@ struct Cart
     char cartId[ID_LENGTH];
 };
 
+// settings stored in a struct, might wanna add more 
 struct Settings
 {
     int sortBy;                                                 // what to sort the item by. 0. Default | 1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit
 };
 
+// global declaration of settings
 struct Settings settings;
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -181,10 +183,18 @@ void utils_clearAllNewline(char *str);
 //      FILE: sales.c
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 void sales_initMonthlyProfits(struct ReportPerMonth monthlyProfits[]);
+// total for the year
 double sales_getTotalProfit(struct ReportPerMonth monthlyProfits[]);
 double sales_getTotalCosts(struct ReportPerMonth monthlyProfits[]);
 double sales_getTotalRevenue(struct ReportPerMonth monthlyProfits[]);
 double sales_getTotalExtraCosts(struct ReportPerMonth monthlyProfits[]);
+
+//total for the month
+double sales_getTotalProfitOfMonth(struct ReportPerMonth monthlyProfits[], int month);
+double sales_getTotalCostsOfMonth(struct ReportPerMonth monthlyProfits[], int month);
+double sales_getTotalRevenueOfMonth(struct ReportPerMonth monthlyProfits[], int month);
+double sales_getTotalExtraCostsOfMonth(struct ReportPerMonth monthlyProfits[], int month);
+
 double sales_getProfitForMonth(struct ReportPerMonth monthlyProfits);
 double sales_getProfitForDay(struct ReportPerDay day);
 void sales_updateRevenue(struct ReportPerMonth monthlyProfits[], double price, double quantity);
@@ -194,6 +204,9 @@ void sales_updateAdditionalCosts(struct ReportPerMonth monthlyProfits[], double 
 void sales_reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction);
 void sales_updateReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
 void sales_reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
+void main_perDayReportsOfMonthSessionHandler(struct ReportPerMonth monthlyProfits[], int month);
+void sales_editPerMonthReportsHandler(struct ReportPerMonth monthlyProfits[]);
+void sales_editPerDayReportsHandler(struct ReportPerMonth monthlyProfits[], int month);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -226,8 +239,10 @@ void display_printMinimumScreenHeight(int itemsLength);
 
 // SALES REPORT PAGE
 void display_salesReportPage(struct ReportPerMonth monthlyProfits[]);
+void display_salesReportPromptPage(struct ReportPerMonth monthlyProfits[], char *message1, char *message2);
 void display_salesPerDayReportPage(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month);
 void display_printPerDayReports(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month);
+void display_salesPerDayReportPromptPage(struct ReportPerDay day[], struct ReportPerMonth monthlyProfits[], int month, char *message1, char *message2);
 void display_printMonthlyReports(struct ReportPerMonth monthlyProfits[]);
 void display_printReportHeader();
 void display_printMonthlyReportHeader(char *month);
@@ -262,7 +277,7 @@ void storage_editItemFromStorageById(char *id, struct Item item);
 void storage_checkReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
 void storage_initializeReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
 void storage_getReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
-void storage_updateReportDataFromStorage(int month, int day, struct ReportPerMonth monthData, struct ReportPerDay dayData);
+void storage_updatePerMonthReportDataFromStorage(int month, struct ReportPerMonth monthData);
 void storage_updatePerDayDataFromStorage(char *month, int day, struct ReportPerDay dayData);
 // category
 void storage_addCategoryToStorage(char *category);

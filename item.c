@@ -538,7 +538,6 @@ void item_getSortedItems(struct Node **head, struct Node **output)
     }
 }
 
-// TODO: maybe just pass the data instead of the stocks to the callback function?
 // gives a sorted output list of a given original list based on a callback function passed into it
 void item_sortItemsBy(bool (*callbackFn)(struct Item, struct Item), struct Node **head, struct Node **output)
 {

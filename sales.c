@@ -70,6 +70,49 @@ double sales_getTotalExtraCosts(struct ReportPerMonth monthlyProfits[])
     return total;
 }
 
+// per day total
+double sales_getTotalProfitOfMonth(struct ReportPerMonth monthlyProfits[], int month)
+{
+    double total = 0;
+
+    for (int i = 0; i < DAYS_IN_MONTH; i++)
+        total += monthlyProfits[month].day[i].revenue - monthlyProfits[month].day[i].costs - monthlyProfits[month].day[i].additionalCosts;
+
+    return total;
+}
+
+double sales_getTotalCostsOfMonth(struct ReportPerMonth monthlyProfits[], int month)
+{
+    double total = 0;
+
+    for (int i = 0; i < DAYS_IN_MONTH; i++)
+        total += monthlyProfits[month].day[i].costs;
+
+    return total;
+}
+
+double sales_getTotalRevenueOfMonth(struct ReportPerMonth monthlyProfits[], int month)
+{
+    double total = 0;
+
+    for (int i = 0; i < DAYS_IN_MONTH; i++)
+        total += monthlyProfits[month].day[i].revenue;
+
+    return total;
+}
+
+double sales_getTotalExtraCostsOfMonth(struct ReportPerMonth monthlyProfits[], int month)
+{
+    double total = 0;
+
+    for (int i = 0; i < DAYS_IN_MONTH; i++)
+        total += monthlyProfits[month].day[i].additionalCosts;
+
+    return total;
+}
+
+//////
+
 // same here, per month subtraction of additional costs instead of per item
 double sales_getProfitForMonth(struct ReportPerMonth monthlyProfits)
 {
@@ -123,7 +166,8 @@ void sales_reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction)
 // the updater function for the storage
 void sales_updateReportsFromStorage(struct ReportPerMonth monthlyProfits[])
 {
-    storage_updateReportDataFromStorage(utils_getCurrentMonthInt(), utils_getCurrentDayInt(), monthlyProfits[utils_getCurrentMonthInt()], monthlyProfits[utils_getCurrentMonthInt()].day[utils_getCurrentDayInt()] );
+    storage_updatePerMonthReportDataFromStorage(utils_getCurrentMonthInt(), monthlyProfits[utils_getCurrentMonthInt()]);
+    storage_updatePerDayDataFromStorage(monthlyProfits[utils_getCurrentMonthInt()].month, utils_getCurrentDayInt(), monthlyProfits[utils_getCurrentMonthInt()].day[utils_getCurrentDayInt()] );
 }
 
 // asks the user if he/she wants to deduct the total costs of the deleted item
@@ -140,4 +184,157 @@ void sales_reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[
         sales_reduceCosts(monthlyProfits, deduction);
         sales_updateReportsFromStorage(monthlyProfits);
     }
+}
+
+// THESE FUNCTION LOOKS SO MESSYYYY 
+void sales_editPerDayReportsHandler(struct ReportPerMonth monthlyProfits[], int month)
+{
+    display_salesPerDayReportPromptPage(monthlyProfits[month].day, monthlyProfits, month, "Enter the number of the day you want to edit:", "");
+    int day;
+    scanf("%d", &day);
+
+    if (day < 1 || day > 31) {
+        display_newUserMessagePage("Editing Reports", "", "Invalid input.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    // ask the user what to edit
+    display_salesPerDayReportPromptPage(monthlyProfits[month].day, monthlyProfits, month, "Options: [ 1. Costs | 2. Extra Costs | 3. Revenue ]", "What do you want to edit?");
+    int option;
+    scanf("%d", &option);
+
+    // pointers that point to whatever the user wants to edit
+    double *beingEditedPerDay;                                      // points to per day data
+    double *beingEditedPerMonth;                                    // points to month data
+
+    char editingInfo[100];
+    sprintf(editingInfo, "Editing: %s %d", monthlyProfits[month].month, day);
+
+    // determine what the user wants to edit and setting up the pointers, and constructing the message to show the user
+    switch (option)
+    {
+    case 1:
+        strcat(editingInfo, " - Costs");
+        beingEditedPerDay = &monthlyProfits[month].day[day - 1].costs;
+        beingEditedPerMonth = &monthlyProfits[month].costs;
+        break;
+    case 2:
+        strcat(editingInfo, " - Extra Costs");
+        beingEditedPerDay = &monthlyProfits[month].day[day - 1].additionalCosts;
+        beingEditedPerMonth = &monthlyProfits[month].additionalCosts;
+        break;
+    case 3:
+        strcat(editingInfo, " - Revenue");
+        beingEditedPerDay = &monthlyProfits[month].day[day - 1].revenue;
+        beingEditedPerMonth = &monthlyProfits[month].revenue;
+        break;
+    // case 4:
+    //     strcat(editingInfo, " - Profits");
+    //     beingEditedPerDay = &monthlyProfits[month].day[day - 1].profit;
+        // beingEditedPerMonth = &monthlyProfits[month].profit;
+    //     break;
+    default:
+        display_newUserMessagePage("Editing Reports", "", "Invalid option.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    // ask for the new value and show to constructed message
+    display_salesPerDayReportPromptPage(monthlyProfits[month].day, monthlyProfits, month, "Enter an edited value:", editingInfo);
+    double newValue;
+    scanf("%lf", &newValue);
+
+    // use that pointer to update the option that was chosen
+    (*beingEditedPerDay) = newValue;
+
+    // recalculate the new total of the month edited
+    double newTotal;
+    switch (option)
+    {
+    case 1:
+        newTotal = sales_getTotalCostsOfMonth(monthlyProfits, month);
+        break;
+    case 2:
+        newTotal = sales_getTotalExtraCostsOfMonth(monthlyProfits, month);
+        break;
+    case 3:
+        newTotal = sales_getTotalRevenueOfMonth(monthlyProfits, month);
+        break;
+    }
+
+    // update the total of that month
+    (*beingEditedPerMonth) = newTotal;
+    // update the data from storage
+    storage_updatePerDayDataFromStorage(monthlyProfits[month].month, day - 1, monthlyProfits[month].day[day - 1]);
+    storage_updatePerMonthReportDataFromStorage(month, monthlyProfits[month]);
+}
+
+// i don't care if variables are not defined at the top
+void sales_editPerMonthReportsHandler(struct ReportPerMonth monthlyProfits[])
+{
+    char action[2];
+
+    // ask the user for the month
+    display_salesReportPromptPage(monthlyProfits, "Enter the number of the month you want to edit:", "Enter 'b' to go back");
+    scanf("%s", action);
+
+    if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) return;
+
+    // if the user enters the number of month, it will be a string. so convert it to int
+    int month = atoi(action) - 1;
+
+    // if the user input is out of bounds, don't proceed
+    if (month < 0 || month > 11) {
+        display_newUserMessagePage("Editing Reports", "", "Invalid input.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    // ask the user what to edit
+    display_salesReportPromptPage(monthlyProfits, "Options: [ 1. Costs | 2. Extra Costs | 3. Revenue ]", "What do you want to edit?");
+    int option;
+    scanf("%d", &option);
+    
+    // pointer that points to whatever the user wants to edit
+    double *beingEdited;
+
+    char editingInfo[100] = "Editing: ";
+    strcat(editingInfo, monthlyProfits[month].month);
+
+    // determine what the user wants to edit and setting up the pointer
+    switch (option)
+    {
+    case 1:
+        strcat(editingInfo, " - Costs");
+        beingEdited = &monthlyProfits[month].costs;
+        break;
+    case 2:
+        strcat(editingInfo, " - Extra Costs");
+        beingEdited = &monthlyProfits[month].additionalCosts;
+        break;
+    case 3:
+        strcat(editingInfo, " - Revenue");
+        beingEdited = &monthlyProfits[month].revenue;
+        break;
+    // case 4:
+    //     strcat(editingInfo, " - Profits");
+    //     beingEdited = &monthlyProfits[month].profit;
+    //     break;
+    default:
+        display_newUserMessagePage("Editing Reports", "", "Invalid option.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+    
+    // ask for the new value
+    display_salesReportPromptPage(monthlyProfits, "Enter an edited value:", editingInfo);
+    double newValue;
+    scanf("%lf", &newValue);
+
+    // update the chosen option using that pointer
+    (*beingEdited) = newValue;
+    
+    // update the storage data as well
+    storage_updatePerMonthReportDataFromStorage(month, monthlyProfits[month]);
 }

@@ -40,7 +40,7 @@ int main()
 
 void main_initialize(struct Node **head, struct Cart *cart, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
-    cart->amountOfItems = 0;                                                 // this keeps track of the lenght of cart items
+    cart->amountOfItems = 0;                                                // this keeps track of the lenght of cart items
     settings.sortBy = 0;                                                    // sorting setting is initialized by 0. Default
     sales_initMonthlyProfits(monthlyProfits);                               // fill all the values with zero and sets monthly names
     storage_getItemsFromStorage(head);
@@ -57,7 +57,6 @@ void main_inventoryPageSessionHandler(struct Node **head, struct ReportPerMonth 
 
     while (true) {
         system("cls");
-        // TODO: sort here based on sortBy value first
         display_inventoryPage(head);
 
         bannerUserInput();
@@ -200,19 +199,39 @@ void main_reportsPageSessionHandler(struct ReportPerMonth monthlyProfits[])
 
         if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) return;
 
-        // if the user enters the number of month, it will be a string. so convert it to int
+        if (strcmp(action, "e") == 0 || strcmp(action, "E") == 0) {
+            sales_editPerMonthReportsHandler(monthlyProfits);
+            continue;
+        } 
+
         int month = atoi(action) - 1;
 
-        if (month < 0 || month > 11) continue;
+        if (month < 0 || month > 11) {
+            display_newUserMessagePage("Editing Reports", "", "Invalid input.", "", "", "", "");
+            sleep(SLEEP_TIME);
+            continue;
+        }
 
-        // render the report per day by passing the record using the month entered
-        system("cls");
-        display_salesPerDayReportPage(monthlyProfits[month].day, monthlyProfits, month);
-        
-        // allows the user to go back to monthly report
-        bannerUserInput();
-        fflush(stdin);
-        scanf("%s", action);
+        main_perDayReportsOfMonthSessionHandler(monthlyProfits, month);
     }
 }
 
+void main_perDayReportsOfMonthSessionHandler(struct ReportPerMonth monthlyProfits[], int month)
+{
+    char action[2];
+
+    while (true) {
+        system("cls");
+        display_salesPerDayReportPage(monthlyProfits[month].day, monthlyProfits, month); 
+        
+        bannerUserInput();
+        scanf("%s", action);
+
+        if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) return;
+        
+        if (strcmp(action, "e") == 0 || strcmp(action, "E") == 0) {
+            sales_editPerDayReportsHandler(monthlyProfits, month);
+            continue;
+        }
+    }
+}
