@@ -9,10 +9,8 @@
 
 ## Installation
 
-Installation hidden for now. However, the makefile is available so you're free to do it yourself if you know how to.
-
-<!-- Here's how you can install the application to your computer.
+Here's how you can install the application to your computer.
 
 1. Download the bin.exe file
 2. Put the file inside a folder to contain the files it will generate
-3. Open the bin.exe application -->
+3. Open the bin.exe application

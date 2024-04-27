@@ -27,6 +27,12 @@ void category_addCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *cate
         return;
     }
 
+    if (!category_isValidCategory(categories, categoriesLen, userInput)) {
+        display_newUserMessagePage(header, "", "Category already exists.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
     // if it passes all the error checks, we proceed to add it
     category_addCategory(categories, categoriesLen, userInput);
     storage_addCategoryToStorage(userInput);
@@ -100,22 +106,31 @@ void category_editCategoryHandler(struct Node **head, char categories[][CATEGORY
         return;
     }
 
-    char oldVer[CATEGORY_NAME_LEN];
-    strcpy(oldVer, categories[index]);
+    char oldCategoryName[CATEGORY_NAME_LEN];
+    char newCategoryName[CATEGORY_NAME_LEN];
+    strcpy(oldCategoryName, categories[index]);
 
     char message[50] = "Enter a new name for ";
     strcat(message, categories[index]);
 
     display_newUserMessagePage(header, "", message, "", "", "", "");
     fflush(stdin);
-    fgets(categories[index], CATEGORY_NAME_LEN, stdin);
-    utils_clearNewline(categories[index]);
+    fgets(newCategoryName, CATEGORY_NAME_LEN, stdin);
+    utils_clearNewline(newCategoryName);
+
+    if (!category_isValidCategory(categories, categoriesLen, newCategoryName)) {
+        display_newUserMessagePage(header, "", "Category already exists.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    strcpy(categories[index], newCategoryName);
 
     // update the list with the old category
-    item_updateItemsCategory(head, oldVer, categories[index]);
+    item_updateItemsCategory(head, oldCategoryName, newCategoryName);
 
     // update the data from storage
-    storage_editCategoryFromStorage(oldVer, categories[index]);
+    storage_editCategoryFromStorage(oldCategoryName, newCategoryName);
 }
 
 // function logic to add a category to the array, also used in getting categories from storage
@@ -127,12 +142,22 @@ void category_addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesL
 }
 
 // checks if the inputted category exists, returns 1 if true, 0 if false
-int category_isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *category)
+bool category_isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *category)
 {
-    for (int i = 0; i < *categoriesLen; i++) 
-        if (strcmp(categories[i], category) == 0) return 1;
+    char newCategory[CATEGORY_NAME_LEN];
+    char currentCategory[CATEGORY_NAME_LEN];
+
+    strcpy(newCategory, category);
+    utils_toLowercase(newCategory);
+
+    for (int i = 0; i < *categoriesLen; i++) {
+        strcpy(currentCategory, categories[i]);
+        utils_toLowercase(currentCategory);
+
+        if (strcmp(currentCategory, newCategory) == 0) return false;
+    }
     
-    return 0;
+    return true;
 }
 
 // the page that pops up when asking a user for a category 

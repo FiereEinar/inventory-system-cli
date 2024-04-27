@@ -3,7 +3,7 @@
 // handles the process of restocking an item
 void item_restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
-    if (*head == NULL){
+    if (*head == NULL) {
         display_newUserMessagePage("Restocking an Item", "Enter any key to go back", "No item to restock.", "", "", "", "");
     } else {
         display_inventoryPromptPage(head, "Enter the ID of the item you want to restock:", "Enter 'b' to go back");
@@ -11,48 +11,56 @@ void item_restockItemHandler(struct Node **head, struct ReportPerMonth monthlyPr
     
     int addedStocks;
     double additionalCosts;
+    char itemId[ID_LENGTH];
+    char messageWithName[100];
+    struct Node *item = NULL;
 
     // ask for id
-    char itemId[ID_LENGTH];
     scanf("%s", itemId);
 
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
 
     // get the item based on id
-    struct Node *current = item_getItemById(head, itemId);
+    item = item_getItemById(head, itemId);
 
     // if we didn't find the item, give them an error
-    if (current == NULL) {
+    if (item == NULL) {
         display_newUserMessagePage("Restocking an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // constructing the message to show on the page for the user
-    char messageWithName[100];
     strcpy(messageWithName, "Enter the amount of stocks added in ");
-    strcat(messageWithName, current->data.name);
-    display_itemDataPromptPage(current->data, "Restocking an Item", messageWithName, "");
+    strcat(messageWithName, item->data.name);
+    display_itemDataPromptPage(item->data, "Restocking an Item", messageWithName, "");
     scanf("%d", &addedStocks);
 
     // TODO: ask the user for costs again, but have an option to use the previous costs
 
+    // display_itemDataPromptPage(item->data, "Restocking an Item", "Enter the original price of each item to calculate its costs", "Enter '1' to use the previous costs");
+    // display_itemDataPromptPage(item->data, "Restocking an Item", "Enter the original price of each item to calculate its costs", "Enter '0' to use the previous costs");
+    // char costs[10];
+    // scanf("%s", costs);
+    // atoi()
+    // if (strcmp())
+
     // update the stocks and base stocks
-    current->data.stocks += addedStocks;
-    if (current->data.stocks > current->data.baseStocks) current->data.baseStocks = current->data.stocks;
+    item->data.stocks += addedStocks;
+    if (item->data.stocks > item->data.baseStocks) item->data.baseStocks = item->data.stocks;
 
     display_newUserMessagePage("Restocking an Item", "", "Enter additional costs if there are any:", "", "", "", "");
     scanf("%lf", &additionalCosts);
 
     // tally the costs
-    sales_updateCosts(monthlyProfits, addedStocks, current->data.originalPrice);
+    sales_updateCosts(monthlyProfits, addedStocks, item->data.originalPrice);
     sales_updateAdditionalCosts(monthlyProfits, additionalCosts);
     
     // update the data from storage
     sales_updateReportsFromStorage(monthlyProfits);
-    storage_editItemFromStorageById(current->data.id, current->data);
+    storage_editItemFromStorageById(item->data.id, item->data);
 
-    utils_updateDate(current->data.lastUpdated);
+    utils_updateDate(item->data.lastUpdated);
     display_newUserMessagePage("Restocking an Item", "", "Item restocked successfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
@@ -168,14 +176,14 @@ void item_deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyPro
 
     // get the ID to be deleted
     char idToDelete[ID_LENGTH];
+    // we keep track of the deleted Node to free its memory since it was dynamically allocated
+    struct Node *deleted = NULL;
+    // we create a current variable so that we don't manipulate the pointer of the head
+    struct Node *current = *head;
+
     scanf("%s", idToDelete);
 
     if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0 || *head == NULL) return;
-
-    // we create a current variable so that we don't manipulate the pointer of the head
-    struct Node *current = *head;
-    // we keep track of the deleted Node to free its memory since it was dynamically allocated
-    struct Node *deleted = NULL;
 
     // if the user is trying to delete the first item, we simply set the head to point to the next node
     if (strcmp(current->data.id, idToDelete) == 0) {
@@ -231,6 +239,8 @@ void item_editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LE
 
     // the options to edit
     int toUpdate;
+    // this is just to dynamically show a message with the name of item
+    char headerWithName[100];
     // this will hold the index of item to be deleted
     char itemId[ID_LENGTH];
     scanf("%s", itemId);
@@ -238,71 +248,69 @@ void item_editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LE
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
 
     // get the item
-    struct Node *current = item_getItemById(head, itemId);
+    struct Node *item = item_getItemById(head, itemId);
 
     // if we didn't find the item, give them an error
-    if (current == NULL) {
+    if (item == NULL) {
         display_newUserMessagePage("Editing an Item", "", "Error: Item does not exist. Please try again", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
-    display_itemDataPromptPage(current->data, "Editing an Item", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?");
+    display_itemDataPromptPage(item->data, "Editing an Item", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?");
     // display_newUserMessagePage("Editing an Item", "", "Options:", "[ 1. name | 2. category | 3. selling price | 4. original price | 5. base stocks ]", "What do you want to edit?: ", "", "");
     scanf("%d", &toUpdate);
 
-    // this is just to dynamically show a message with the name of item
-    char headerWithName[100];
     // after that, we simply determine what the user wants to update and prompt the user for new data
     switch(toUpdate) {
         // EDITED: NAME
         case 1:
             strcpy(headerWithName, "Enter a new name for ");
-            strcat(headerWithName, current->data.name);
-            display_itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
+            strcat(headerWithName, item->data.name);
+            display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
 
             fflush(stdin);
-            fgets(current->data.name, NAME_SIZE, stdin);
-            utils_clearNewline(current->data.name);
+            fgets(item->data.name, NAME_SIZE, stdin);
+            utils_clearNewline(item->data.name);
             break;
         // EDITED: category
         case 2:
-            category_itemCategoryPrompter(current->data.category, categories, categoriesLen);
+            category_itemCategoryPrompter(item->data.category, categories, categoriesLen);
             break;
         // EDITED: selling price
         case 3:
             strcpy(headerWithName, "Enter an updated selling price of ");
-            strcat(headerWithName, current->data.name);
-            display_itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
+            strcat(headerWithName, item->data.name);
+            display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
 
-            scanf("%lf", &current->data.price);
-            current->data.profit = current->data.price - current->data.originalPrice;
+            scanf("%lf", &item->data.price);
+            item->data.profit = item->data.price - item->data.originalPrice;
             break;
         // EDITED: original price
         case 4:
             strcpy(headerWithName, "Enter an updated original price of ");
-            strcat(headerWithName, current->data.name);
-            display_itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
+            strcat(headerWithName, item->data.name);
+            display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
             
-            scanf("%lf", &current->data.originalPrice);
-            current->data.profit = current->data.price - current->data.originalPrice;
+            scanf("%lf", &item->data.originalPrice);
+            item->data.profit = item->data.price - item->data.originalPrice;
             break;
         // EDITED: base stocks
         case 5:
             strcpy(headerWithName, "Enter an updated base stocks of ");
-            strcat(headerWithName, current->data.name);
-            display_itemDataPromptPage(current->data, "Editing an Item", headerWithName, "");
+            strcat(headerWithName, item->data.name);
+            display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
 
-            scanf("%d", &current->data.baseStocks);
+            scanf("%d", &item->data.baseStocks);
             break;
         default:
             display_newUserMessagePage("Editing an Item", "", "Incorrect number entered", "", "", "", "");
             return;
     }
 
-    utils_updateDate(current->data.lastUpdated);
+    utils_updateDate(item->data.lastUpdated);
     // update the item in the storage
-    storage_editItemFromStorageById(itemId, current->data);
+    storage_editItemFromStorageById(itemId, item->data);
 
     display_newUserMessagePage("Editing an Item", "", "Item edited succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
@@ -366,6 +374,7 @@ void item_changeSortingHandler(struct Node **head)
     }
 
     settings.sortBy = userInput;
+    storage_updateSettingsFromStorage();
 }
 
 // gives you the item based on ID, returns NULL if not found
@@ -659,6 +668,21 @@ void item_insertItemAt(int index, struct Node **destination, struct Node **toIns
     current->next = newNode;
 
     newNode->next = rest;
+}
+
+void regenerateItemIdList(struct Node **head)
+{
+    struct Node *current = *head;
+    char oldID[ID_LENGTH];
+
+    while (current != NULL) {
+        strcpy(oldID, current->data.id);
+        utils_generateId(current->data.id);
+
+        storage_editItemFromStorageById(oldID, current->data);
+
+        current = current->next;
+    }
 }
 
 

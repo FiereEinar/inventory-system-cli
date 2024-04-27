@@ -42,6 +42,7 @@ void main_initialize(struct Node **head, struct Cart *cart, struct ReportPerMont
 {
     cart->amountOfItems = 0;                                                // this keeps track of the lenght of cart items
     settings.sortBy = 0;                                                    // sorting setting is initialized by 0. Default
+    storage_getSettingsFromStorage();
     sales_initMonthlyProfits(monthlyProfits);                               // fill all the values with zero and sets monthly names
     storage_getItemsFromStorage(head);
     storage_getCategoriesFromStorage(categories, categoriesLen);
@@ -88,6 +89,9 @@ void main_inventoryPageSessionHandler(struct Node **head, struct ReportPerMonth 
             break;
         case 's':
             item_changeSortingHandler(head);
+            break;
+        case 'p':
+            regenerateItemIdList(head);
             break;
         case 'b':
             return;

@@ -644,3 +644,31 @@ int storage_getReceiptFromStorageById(char *id, char *receiptBuffer)
 
     return 1;
 }
+
+void storage_getSettingsFromStorage()
+{
+    FILE *file;
+    char filename[] = "storedata/settings.txt";
+    
+    file = fopen(filename, "r");
+
+    if (file == NULL) return;
+
+    fscanf(file, "%d", &settings.sortBy);
+
+    fclose(file);
+}
+
+void storage_updateSettingsFromStorage()
+{
+    mkdir("storedata");
+
+    FILE *file;
+    char filename[] = "storedata/settings.txt";
+    
+    file = fopen(filename, "w");
+
+    fprintf(file, "%d", settings.sortBy);
+
+    fclose(file);
+}

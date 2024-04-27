@@ -154,6 +154,7 @@ bool item_isProfitLessThan(struct Item item1, struct Item item2);
 bool item_isProfitGreaterThan(struct Item item1,struct Item item2);
 
 void item_insertItemAt(int index, struct Node **destination, struct Node **toInsert);
+void regenerateItemIdList(struct Node **head);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -289,6 +290,9 @@ void storage_addRecieptToStorage(char *reciept, char *id);
 void storage_addRecieptMetaDataToStorage(char *recieptId, char *datePurchased);
 void storage_printReceiptsMetaDataFromStorage(int *counter);
 int storage_getReceiptFromStorageById(char *id, char *receiptBuffer);
+
+void storage_getSettingsFromStorage();
+void storage_updateSettingsFromStorage();
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -301,7 +305,7 @@ void category_deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *c
 void category_editCategoryHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 
 void category_addCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *categoryToAdd);
-int category_isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *category);
+bool category_isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categoriesLen, char *category);
 void category_itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 void category_viewCategoryItems(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
