@@ -380,14 +380,16 @@ void item_changeSortingHandler(struct Node **head)
 // gives you the item based on ID, returns NULL if not found
 struct Node *item_getItemById(struct Node **list, char itemId[])
 {
-    struct Node *current = *list;
+    // base case, if we reached the end and still haven't fount the item, return NULL
+    if (*list == NULL) return NULL;
 
-    while (current != NULL) {
-        if (strcmp(current->data.id, itemId) == 0) return current;
-        
-        current = current->next;
-    }
-    return NULL;
+    struct Node *currentItem = *list;
+
+    // if the currentItem item is equal to the given ID, return it
+    if (strcmp(currentItem->data.id, itemId) == 0) return currentItem;
+
+    // recursive call
+    return item_getItemById(&currentItem->next, itemId);
 }
 
 // handles the process of setting the data and tallying the costs, records of an item being added
@@ -445,30 +447,32 @@ void item_addItemToList(struct Node **head, struct Item item)
 // updates the category of the affected items in both the list and file storage. could be optimized but im not willing to write any more code
 void item_updateItemsCategory(struct Node **head, char *oldCategory, char *newCategory)
 {
-    struct Node *current = *head;
+    // base case, this indicates that we've reached the end
+    if (*head == NULL) return;
 
-    while (current != NULL) {
-        // if it matches the old category, replace it with the new one
-        if (strcmp(current->data.category, oldCategory) == 0) {
-            strcpy(current->data.category, newCategory);
-            storage_editItemFromStorageById(current->data.id, current->data);
-        }
-        current = current->next;
+    struct Node *currentItem = *head;
+
+    if (strcmp(currentItem->data.category, oldCategory) == 0) {
+        strcpy(currentItem->data.category, newCategory);
+        storage_editItemFromStorageById(currentItem->data.id, currentItem->data);
     }
+
+    // recursive call
+    item_updateItemsCategory(&currentItem->next, oldCategory, newCategory);
 }
 
 // gets the items with the given category and appends it in your desired placeholder
 void item_getItemsByCategory(struct Node **head, char *category, struct Node **placeholder)
 {
-    struct Node *current = *head;
+    // base case
+    if (*head == NULL) return;
 
-    while (current != NULL) {
-        // if the current item has the matching category, add it to the placeholder
-        if (strcmp(current->data.category, category) == 0) {
-            item_addItemToList(placeholder, current->data);
-        }
-        current = current->next;
-    }
+    struct Node *currentItem = *head;
+
+    if (strcmp(currentItem->data.category, category) == 0) item_addItemToList(placeholder, currentItem->data);
+
+    // recursive call
+    item_getItemsByCategory(&currentItem->next, category, placeholder);
 }
 
 void item_getStockStatus(char *status, int stocks, int baseStocks)
@@ -670,7 +674,7 @@ void item_insertItemAt(int index, struct Node **destination, struct Node **toIns
     newNode->next = rest;
 }
 
-void regenerateItemIdList(struct Node **head)
+void item_regenerateItemIdList(struct Node **head)
 {
     struct Node *current = *head;
     char oldID[ID_LENGTH];

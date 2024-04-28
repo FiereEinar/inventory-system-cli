@@ -91,7 +91,7 @@ void main_inventoryPageSessionHandler(struct Node **head, struct ReportPerMonth 
             item_changeSortingHandler(head);
             break;
         case 'p':
-            regenerateItemIdList(head);
+            item_regenerateItemIdList(head);
             break;
         case 'b':
             return;

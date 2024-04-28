@@ -118,6 +118,7 @@ void main_categoriesPageSessionHandler(struct Node **head, char categories[][CAT
 void main_posPageSessionHandler(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[]);
 void main_receiptsPageSessionHandler();
 void main_reportsPageSessionHandler(struct ReportPerMonth monthlyProfits[]);
+void main_perDayReportsOfMonthSessionHandler(struct ReportPerMonth monthlyProfits[], int month);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -154,7 +155,7 @@ bool item_isProfitLessThan(struct Item item1, struct Item item2);
 bool item_isProfitGreaterThan(struct Item item1,struct Item item2);
 
 void item_insertItemAt(int index, struct Node **destination, struct Node **toInsert);
-void regenerateItemIdList(struct Node **head);
+void item_regenerateItemIdList(struct Node **head);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -205,7 +206,6 @@ void sales_updateAdditionalCosts(struct ReportPerMonth monthlyProfits[], double 
 void sales_reduceCosts(struct ReportPerMonth monthlyProfits[], double deduction);
 void sales_updateReportsFromStorage(struct ReportPerMonth monthlyProfits[]);
 void sales_reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[], double deduction);
-void main_perDayReportsOfMonthSessionHandler(struct ReportPerMonth monthlyProfits[], int month);
 void sales_editPerMonthReportsHandler(struct ReportPerMonth monthlyProfits[]);
 void sales_editPerDayReportsHandler(struct ReportPerMonth monthlyProfits[], int month);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
