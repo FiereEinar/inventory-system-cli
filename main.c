@@ -96,9 +96,6 @@ void main_inventoryPageSessionHandler(struct Node **head, struct ReportPerMonth 
         case 's':
             item_changeSortingHandler(head);
             break;
-        case 'p':
-            item_regenerateItemIdList(head);
-            break;
         case 'b':
             return;
         }

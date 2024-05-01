@@ -3,7 +3,9 @@
 // handles the process of restocking an item
 void item_restockItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
-    if (*head == NULL) {
+    bool listIsEmpty = *head == NULL;
+
+    if (listIsEmpty) {
         display_newUserMessagePage("Restocking an Item", "Enter any key to go back", "No item to restock.", "", "", "", "");
     } else {
         display_inventoryPromptPage(head, "Enter the ID of the item you want to restock:", "Enter 'b' to go back");
@@ -18,7 +20,9 @@ void item_restockItemHandler(struct Node **head, struct ReportPerMonth monthlyPr
     // ask for id
     scanf("%s", itemId);
 
-    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
+    bool isTryingToGoBack = strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0;
+
+    if (isTryingToGoBack || listIsEmpty) return;
 
     // get the item based on id
     item = item_getItemById(head, itemId);
@@ -31,8 +35,7 @@ void item_restockItemHandler(struct Node **head, struct ReportPerMonth monthlyPr
     }
 
     // constructing the message to show on the page for the user
-    strcpy(messageWithName, "Enter the amount of stocks added in ");
-    strcat(messageWithName, item->data.name);
+    sprintf(messageWithName, "Enter the amount of stocks added in %s", item->data.name);
     display_itemDataPromptPage(item->data, "Restocking an Item", messageWithName, "");
     scanf("%d", &addedStocks);
 
@@ -68,7 +71,9 @@ void item_restockItemHandler(struct Node **head, struct ReportPerMonth monthlyPr
 // handles the searching of an item
 void item_searchItemHandler(struct Node **list)
 {
-    if (*list == NULL) {
+    bool listIsEmpty = *list == NULL;
+    
+    if (listIsEmpty) {
         display_newUserMessagePage("Searching an Item", "Enter any key to go back", "No item to search.", "", "", "", "");
     } else {
         display_newUserMessagePage("Searching an Item", "Enter 'b' to go back.", "Enter a keyword to search: ", "", "", "", "");
@@ -82,10 +87,11 @@ void item_searchItemHandler(struct Node **list)
 
     fflush(stdin);
     fgets(searchTerm, NAME_SIZE, stdin);
-
     utils_clearNewline(searchTerm);
 
-    if (strcmp(searchTerm, "b") == 0 || strcmp(searchTerm, "B") == 0 || *list == NULL) return;
+    bool isTryingToGoBack = strcmp(searchTerm, "b") == 0 || strcmp(searchTerm, "B") == 0;
+
+    if (isTryingToGoBack || listIsEmpty) return;
 
     // we traverse the list and on each iteration, check if searchTerm is a substring of the current data name
     while(current != NULL) {
@@ -114,6 +120,7 @@ void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfit
     // using item struct to store values, less variable declaration needed
     struct Item newItem;
     double additionalCosts;
+
     char message[][100] = 
     {
         "Enter the name of new item: ",
@@ -129,18 +136,19 @@ void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfit
     fgets(newItem.name, NAME_SIZE, stdin);
     utils_clearNewline(newItem.name);
 
-    if (strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "B") == 0) return;
+    bool isTryingToGoBack = strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "B") == 0;
+    if (isTryingToGoBack) return;
 
-    // if the name is too short or none at all, don't proceed
-    if (strlen(newItem.name) <= 1) {
+    bool nameTooShort = strlen(newItem.name) <= 1;
+    if (nameTooShort) {
         display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Items with no name are not allowed.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
     // TODO: fix this?
-    // if the name is too long, don't proceed
-    if (strlen(newItem.name) > NAME_SIZE - 1) {
+    bool nameTooLong = strlen(newItem.name) > NAME_SIZE - 1;
+    if (nameTooLong) {
         display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Item name is too long, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
@@ -171,7 +179,9 @@ void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfit
 // handles the process of deleting an item on the inventory based on ID
 void item_deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyProfits[])
 {
-    if (*head == NULL) {
+    bool listIsEmpty = *head == NULL;
+
+    if (listIsEmpty) {
         display_newUserMessagePage("Deleting an Item", "Enter any key to go back", "No item to delete.", "", "", "", "");
     } else {
         display_inventoryPromptPage(head, "Enter the ID of the item you want to delete:", "Enter 'b' to go back");
@@ -186,7 +196,9 @@ void item_deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyPro
 
     scanf("%s", idToDelete);
 
-    if (strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0 || *head == NULL) return;
+    bool isTryingToGoBack = strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0;
+    
+    if (isTryingToGoBack || listIsEmpty) return;
 
     // if the user is trying to delete the first item, we simply set the head to point to the next node
     if (strcmp(current->data.id, idToDelete) == 0) {
@@ -234,7 +246,9 @@ void item_deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyPro
 // handles the editing of an item
 void item_editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
-    if (*head == NULL) {
+    bool listIsEmpty = *head == NULL;
+
+    if (listIsEmpty) {
         display_newUserMessagePage("Editing an Item", "Enter any key to go back", "No item to edit.", "", "", "", "");
     } else {
         display_inventoryPromptPage(head, "Enter the ID of the item you want to edit:", "Enter 'b' to go back");
@@ -248,7 +262,9 @@ void item_editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LE
     char itemId[ID_LENGTH];
     scanf("%s", itemId);
 
-    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) return;
+    bool isTryingToGoBack = strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0;
+
+    if (isTryingToGoBack || listIsEmpty) return;
 
     // get the item
     struct Node *item = item_getItemById(head, itemId);
@@ -265,50 +281,51 @@ void item_editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LE
     scanf("%d", &toUpdate);
 
     // after that, we simply determine what the user wants to update and prompt the user for new data
-    switch(toUpdate) {
-        // EDITED: NAME
-        case 1:
-            strcpy(headerWithName, "Enter a new name for ");
-            strcat(headerWithName, item->data.name);
-            display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
+    switch(toUpdate) 
+    {
+    // EDITED: NAME
+    case 1:
+        strcpy(headerWithName, "Enter a new name for ");
+        strcat(headerWithName, item->data.name);
+        display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
 
-            fflush(stdin);
-            fgets(item->data.name, NAME_SIZE, stdin);
-            utils_clearNewline(item->data.name);
-            break;
-        // EDITED: category
-        case 2:
-            category_itemCategoryPrompter(item->data.category, categories, categoriesLen);
-            break;
-        // EDITED: selling price
-        case 3:
-            strcpy(headerWithName, "Enter an updated selling price of ");
-            strcat(headerWithName, item->data.name);
-            display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
+        fflush(stdin);
+        fgets(item->data.name, NAME_SIZE, stdin);
+        utils_clearNewline(item->data.name);
+        break;
+    // EDITED: category
+    case 2:
+        category_itemCategoryPrompter(item->data.category, categories, categoriesLen);
+        break;
+    // EDITED: selling price
+    case 3:
+        strcpy(headerWithName, "Enter an updated selling price of ");
+        strcat(headerWithName, item->data.name);
+        display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
 
-            scanf("%lf", &item->data.price);
-            item->data.profit = item->data.price - item->data.originalPrice;
-            break;
-        // EDITED: original price
-        case 4:
-            strcpy(headerWithName, "Enter an updated original price of ");
-            strcat(headerWithName, item->data.name);
-            display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
-            
-            scanf("%lf", &item->data.originalPrice);
-            item->data.profit = item->data.price - item->data.originalPrice;
-            break;
-        // EDITED: base stocks
-        case 5:
-            strcpy(headerWithName, "Enter an updated base stocks of ");
-            strcat(headerWithName, item->data.name);
-            display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
+        scanf("%lf", &item->data.price);
+        item->data.profit = item->data.price - item->data.originalPrice;
+        break;
+    // EDITED: original price
+    case 4:
+        strcpy(headerWithName, "Enter an updated original price of ");
+        strcat(headerWithName, item->data.name);
+        display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
+        
+        scanf("%lf", &item->data.originalPrice);
+        item->data.profit = item->data.price - item->data.originalPrice;
+        break;
+    // EDITED: base stocks
+    case 5:
+        strcpy(headerWithName, "Enter an updated base stocks of ");
+        strcat(headerWithName, item->data.name);
+        display_itemDataPromptPage(item->data, "Editing an Item", headerWithName, "");
 
-            scanf("%d", &item->data.baseStocks);
-            break;
-        default:
-            display_newUserMessagePage("Editing an Item", "", "Incorrect number entered", "", "", "", "");
-            return;
+        scanf("%d", &item->data.baseStocks);
+        break;
+    default:
+        display_newUserMessagePage("Editing an Item", "", "Incorrect number entered", "", "", "", "");
+        return;
     }
 
     utils_updateDate(item->data.lastUpdated);
@@ -322,19 +339,20 @@ void item_editItemHandler(struct Node **head, char categories[][CATEGORY_NAME_LE
 // handles the process of viewing more details of an item by asking for ID
 void item_viewItemDetailsHandler(struct Node **head)
 {
-    char itemId[ID_LENGTH];
-    if (*head == NULL){
+    bool listIsEmpty = *head == NULL;
+
+    if (listIsEmpty){
         display_newUserMessagePage("Viewing an Item", "Enter any key to go back", "No item to view.", "", "", "", "");
     } else {
         display_inventoryPromptPage(head, "Enter the ID of the item you want to view:", "Enter 'b' to go back");
     }
+
+    char itemId[ID_LENGTH];
     scanf("%s", itemId);
 
-    if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0 || *head == NULL) {
-        system("cls");
-        display_inventoryPage(head);
-        return;
-    }
+    bool isTryingToGoBack = strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0;
+
+    if (isTryingToGoBack || listIsEmpty) return;
 
     // get the item
     struct Node *itemData = item_getItemById(head, itemId);
@@ -482,16 +500,10 @@ void item_getStockStatus(char *status, int stocks, int baseStocks)
 {
     double percentage = utils_getPercentage(stocks, baseStocks);
 
-    if (percentage > 35.0) {
-        strcpy(status, "In Stock");
-        return;
-    } else if (percentage >= 0.1) {
-        strcpy(status, "Low Stock");
-        return;
-    } else {
-        strcpy(status, "No Stock");
-        return;
-    }
+    if (percentage == 100) strcpy(status, "Full Stock");
+    else if (percentage <= 99.0 && percentage >= 35.0) strcpy(status, "In Stock");
+    else if (percentage <= 34.0 && percentage >= 0.1) strcpy(status, "Low Stock");
+    else strcpy(status, "No Stock");
 }
 
 void item_determineWhatToSort(char *placeholder)

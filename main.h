@@ -30,8 +30,8 @@
 #define MAX_CATEGORIES          30                              // maximum amount of categories
 #define MAX_CART_ITEMS          15                              // maximum amount of item in the cart
 #define MAX_RECEIPT_LENGTH      4096                            // the receipt is one giant string and this is the size
-#define SHOP_NAME_LEN           30
-#define SHOP_LOC_LEN            30
+#define SHOP_NAME_LEN           30                              // length of the name of shop
+#define SHOP_LOC_LEN            30                              // length of the name of the shop location
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      STRUCTS

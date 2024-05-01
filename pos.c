@@ -3,11 +3,10 @@
 void pos_addCartItemHandler(struct Cart *cart, struct Node **head)
 {
     char header[] = "Point of Sale";
-    display_inventoryPromptPage(head, "Enter the item ID:", "Enter 'b' to go back");
-
     char itemId[ID_LENGTH];
     double quantity;
 
+    display_inventoryPromptPage(head, "Enter the item ID:", "Enter 'b' to go back");
     scanf("%s", itemId);
 
     // get the item with that ID
