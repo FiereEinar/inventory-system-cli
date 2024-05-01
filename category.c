@@ -163,16 +163,18 @@ bool category_isValidCategory(char categories[][CATEGORY_NAME_LEN], int *categor
 // the page that pops up when asking a user for a category 
 void category_itemCategoryPrompter(char *placeholder, char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
+    char index[2];
+    
     while (true) {
-        char index[2];
         system("cls");
         display_categoryPreview(categories, categoriesLen);
         bannerUserInput();
         scanf("%s", index);
 
-        if (strcmp(index, "n") == 0) {
+        // TODO: fix this?
+        if (strcmp(index, "n") == 0 || strcmp(index, "N") == 0) {
             strcpy(placeholder, "none");
-            break;
+            return;
         }
 
         // convert string to int 
@@ -181,7 +183,7 @@ void category_itemCategoryPrompter(char *placeholder, char categories[][CATEGORY
         // if the given index is valid, then break and proceed
         if (n >= 0 && n < *categoriesLen) {
             strcpy(placeholder, categories[n]);
-            break;
+            return;
         }
     }
 }

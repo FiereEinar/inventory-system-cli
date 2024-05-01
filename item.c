@@ -89,9 +89,11 @@ void item_searchItemHandler(struct Node **list)
 
     // we traverse the list and on each iteration, check if searchTerm is a substring of the current data name
     while(current != NULL) {
-        // strstr() is a function in <string.h> that will check if a string is a substring of another string. in simple term, if it fits the searchTerm
+        // strstr() is a function in <string.h> that will check if a string is a substring of another string. in simple terms, if it fits the searchTerm
         if(strstr(current->data.name, searchTerm) != NULL) 
+            // if it is a substring, add it to the results
             item_addItemToList(&results, current->data);
+        
         // go to next node (iterator)
         current = current->next;
     }
@@ -136,6 +138,7 @@ void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfit
         return;
     }
 
+    // TODO: fix this?
     // if the name is too long, don't proceed
     if (strlen(newItem.name) > NAME_SIZE - 1) {
         display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Item name is too long, please try again.", "", "", "", "");

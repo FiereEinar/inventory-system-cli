@@ -30,6 +30,8 @@
 #define MAX_CATEGORIES          30                              // maximum amount of categories
 #define MAX_CART_ITEMS          15                              // maximum amount of item in the cart
 #define MAX_RECEIPT_LENGTH      4096                            // the receipt is one giant string and this is the size
+#define SHOP_NAME_LEN           30
+#define SHOP_LOC_LEN            30
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      STRUCTS
@@ -97,6 +99,8 @@ struct Cart
 struct Settings
 {
     int sortBy;                                                 // what to sort the item by. 0. Default | 1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit
+    char shopName[SHOP_NAME_LEN];
+    char shopLocation[SHOP_LOC_LEN];
 };
 
 // global declaration of settings
@@ -119,6 +123,7 @@ void main_posPageSessionHandler(struct Cart *cart, struct Node **head, struct Re
 void main_receiptsPageSessionHandler();
 void main_reportsPageSessionHandler(struct ReportPerMonth monthlyProfits[]);
 void main_perDayReportsOfMonthSessionHandler(struct ReportPerMonth monthlyProfits[], int month);
+void main_settingsPageSessionHandler();
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -218,6 +223,8 @@ void sales_editPerDayReportsHandler(struct ReportPerMonth monthlyProfits[], int 
 void display_recieptsPage();
 void display_recieptsPromptPage(char *message1, char *message2);
 void display_printRecieptsHeader();
+// SETTINGS
+void display_settingsPage();
 // CART PAGE
 void display_pointOfSalePromptPage(struct CartItem items[], int *amountOfItems, char *message1, char *message2);
 void display_pointOfSalePage(struct CartItem items[], int *amountOfItems);
@@ -322,9 +329,21 @@ void pos_checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPer
 
 void pos_addItemToCart(struct Cart *cart, int quantity, struct Item item);
 void pos_resetCart(struct Cart *cart);
-void pos_generateReceipt(struct Cart *cart, char *receiptBuffer);
+void pos_generateReceipt(struct Cart *cart, double totalPrice, double cash, char *cashier, char *receiptBuffer);
 void pos_saveRecieptMetaData(char *recieptId);
 void pos_viewReceiptHandler();
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      FILE: settings.c
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// handlers
+void settings_changeShopNameHandler();
+void settings_changeShopLocationHandler();
+
+void settings_changeShopLocation(char *newShopLocation);
+void settings_changeShopName(char *newShopName);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #endif
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

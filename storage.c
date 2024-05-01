@@ -654,7 +654,7 @@ void storage_getSettingsFromStorage()
 
     if (file == NULL) return;
 
-    fscanf(file, "%d", &settings.sortBy);
+    fscanf(file, "%d,%29[^,],%29[^,]", &settings.sortBy, settings.shopName, settings.shopLocation);
 
     fclose(file);
 }
@@ -668,7 +668,7 @@ void storage_updateSettingsFromStorage()
     
     file = fopen(filename, "w");
 
-    fprintf(file, "%d", settings.sortBy);
+    fprintf(file, "%d,%s,%s", settings.sortBy, settings.shopName, settings.shopLocation);
 
     fclose(file);
 }

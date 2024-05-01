@@ -1,0 +1,25 @@
+                     [Default Shop Name]                     
+                   [Default Shop Location]                   
+             Date Purchased: 2024-05-01 08:23 AM             
+                                                             
+-------------------------------------------------------------
+Item                           Quantity   Price      Total   
+-------------------------------------------------------------
+paper clip                     1          P10.00     P10.00  
+gold pickaxe                   2          P85.00     P170.00 
+imissyou                       3          P15.00     P45.00  
+ballpen                        2          P10.00     P20.00  
+                                                             
+Total Price                                          P245.00 
+Cash                                                 P500.00 
+Change                                               P255.00 
+                                                             
+Cashier                                              Danii   
+No. of Items                                         4       
+VATable Sales                                        P215.60 
+VAT                                                  P29.40  
+-------------------------------------------------------------
+                                                             
+                THIS IS YOUR OFFICIAL RECEIPT                
+                     Receipt ID: 31868069                     
+               Thank You - [Default Shop Name]               

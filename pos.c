@@ -103,7 +103,7 @@ void pos_checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPer
     if (cart->amountOfItems == 0) {
         display_newUserMessagePage(header, "Enter any key to go back", "No items in the cart to checkout", "", "", "", "");
     } else {
-        display_newUserMessagePage("Point of Sale", "", "Are you sure you want to checkout", "all items in the cart?", "[ y / n ]", "", "");
+        display_newUserMessagePage(header, "", "Are you sure you want to checkout", "all items in the cart?", "[ y / n ]", "", "");
     }
 
     char action;
@@ -114,6 +114,35 @@ void pos_checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPer
     
     utils_generateId(cart->cartId);
     char reciept[MAX_RECEIPT_LENGTH];
+
+    double totalPrice = 0.0;
+
+    // get the total price
+    for (int i = 0; i < cart->amountOfItems; i++) {
+        int quantity = cart->items[i].quantity;
+
+        struct Node *current = item_getItemById(head, cart->items[i].itemId);
+
+        totalPrice += quantity * current->data.price;
+    }
+
+    char totalPriceStr[69];
+    char cashier[69];
+    double cash;
+    sprintf(totalPriceStr, "Total price is: %.2lf", totalPrice);
+    display_newUserMessagePage(header, "", totalPriceStr, "Enter the cash:", "", "", "");
+    scanf("%lf", &cash);
+
+    // if the cash entered is not enough, don't proceed
+    if (cash < totalPrice) {
+        display_newUserMessagePage(header, "", "Transaction failed. Not enough cash.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    // get the cashier name
+    display_newUserMessagePage(header, "", "Enter the name of cashier: (First name only)", "", "", "", "");
+    scanf("%s", cashier);
 
     // TODO: maybe separate this into a function
     // deduct all items from the inventory and tally the revenues
@@ -138,7 +167,7 @@ void pos_checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPer
     // generate a reciept
     system("cls");
     printf("\n\n\n\n\n");
-    pos_generateReceipt(cart, reciept);
+    pos_generateReceipt(cart, totalPrice, cash, cashier, reciept);
     storage_addRecieptToStorage(reciept, cart->cartId);
     pos_saveRecieptMetaData(cart->cartId);
     printf("%s", reciept);
@@ -206,47 +235,82 @@ void pos_addItemToCart(struct Cart *cart, int quantity, struct Item item)
     cart->amountOfItems += 1;
 }
 
-void pos_generateReceipt(struct Cart *cart, char *receiptBuffer) 
+void pos_generateReceipt(struct Cart *cart, double totalPrice, double cash, char *cashier, char *receiptBuffer) 
 {
     // width of the reciept
     int width = 62;
+    int receiptTextLength = 60;
+    double vatPercentage = 0.12;
 
     // constructing a centered id
-    char idText[100];
-    sprintf(idText, " Receipt ID: %s", cart->cartId);
+    char idText[receiptTextLength];
+    sprintf(idText, "Receipt ID: %s", cart->cartId);
     utils_centerText(width, idText);
 
+    // constructing a centered shop name
+    char shopNameText[receiptTextLength];
+    strcpy(shopNameText, settings.shopName);
+    utils_centerText(width, shopNameText);
+
+    // constructing a centered shop location
+    char shopLocationText[receiptTextLength];
+    strcpy(shopLocationText, settings.shopLocation);
+    utils_centerText(width, shopLocationText);
+
     // constructing a centered date
-    char dateText[100];
+    char dateText[receiptTextLength];
     sprintf(dateText, "Date Purchased: %s %s", utils_getCurrentDate(), utils_getCurrentTime());
     utils_centerText(width, dateText);
 
+    char bottomText[receiptTextLength];
+    strcpy(bottomText, "THIS IS YOUR OFFICIAL RECEIPT");
+    utils_centerText(width, bottomText);
+
     // constructing a centered thank you
-    char tyText[100] = "Thank You and Come Again!";
+    char tyText[receiptTextLength];
+    // strcpy(tyText, "Thank You and Come Again!");
+    sprintf(tyText, "Thank You - %s", settings.shopName);
     utils_centerText(width, tyText);
 
-    // using snprintf to connect everything into a single string, could've used strcat but someone said this is more efficient because we are manually setting the size of the string each addition
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "_______________________________________________________________\n");
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%s|\n", idText);
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%s|\n", dateText);
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|-------------------------------------------------------------|\n");
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%-30s %-10s %-10s %-8s|\n", "Item", "Quantity", "Price", "Total");
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|-------------------------------------------------------------|\n");
+    char blankSpace[receiptTextLength];
+    strcpy(blankSpace, " ");
+    utils_centerText(width, blankSpace);
 
-    double totalPrice = 0.0;
+    // using snprintf to connect everything into a single string, could've used strcat but someone said this is more efficient because we are manually setting the size of the string each addition
+    snprintf(receiptBuffer, MAX_RECEIPT_LENGTH, "%s\n", shopNameText);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", shopLocationText);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", dateText);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", blankSpace);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "-------------------------------------------------------------\n");
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-30s %-10s %-10s %-8s\n", "Item", "Quantity", "Price", "Total");
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "-------------------------------------------------------------\n");
 
     // each individual item
     for (int i = 0; i < cart->amountOfItems; i++) {
         struct CartItem item = cart->items[i];
         double totalItemPrice = item.quantity * item.price;
-        totalPrice += totalItemPrice;
-        snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%-30s %-10d P%-9.2f P%-7.2f|\n", item.name, item.quantity, item.price, totalItemPrice);
+        snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-30s %-10d P%-9.2lf P%-7.2lf\n", item.name, item.quantity, item.price, totalItemPrice);
     }
 
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|-------------------------------------------------------------|\n");
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%-52s P%-7.2f|\n", "Total Price:", totalPrice);
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|%s|\n", tyText);
-    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|_____________________________________________________________|\n");
+    double VAT = vatPercentage * totalPrice;
+    double VATable = totalPrice - VAT;
+
+    // snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "|------------------------------------------------------------|\n");
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", blankSpace);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-52s P%-7.2lf\n", "Total Price", totalPrice);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-52s P%-7.2lf\n", "Cash", cash);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-52s P%-7.2lf\n", "Change", cash - totalPrice);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", blankSpace);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-52s %-8s\n", "Cashier", cashier);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-52s %-8d\n", "No. of Items", cart->amountOfItems);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-52s P%-7.2lf\n", "VATable Sales", VATable);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%-52s P%-7.2lf\n", "VAT", VAT);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "-------------------------------------------------------------\n");
+
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", blankSpace);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", bottomText);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", idText);
+    snprintf(receiptBuffer + strlen(receiptBuffer), MAX_RECEIPT_LENGTH - strlen(receiptBuffer), "%s\n", tyText);
 
 }
 

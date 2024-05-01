@@ -1,5 +1,19 @@
 #include "main.h"
 
+void main_initialize(struct Node **head, struct Cart *cart, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
+{
+    cart->amountOfItems = 0;                                                // this keeps track of the lenght of cart items
+    settings.sortBy = 0;                                                    // sorting setting is initialized by 0. Default
+    strcpy(settings.shopName, "[Default Shop Name]");
+    strcpy(settings.shopLocation, "[Default Shop Location]");
+    sales_initMonthlyProfits(monthlyProfits);                               // fill all the values with zero and sets monthly names
+    
+    storage_getSettingsFromStorage();
+    storage_getItemsFromStorage(head);
+    storage_getCategoriesFromStorage(categories, categoriesLen);
+    storage_checkReportsFromStorage(monthlyProfits);                        // check the storage if there is any record, if yes then read it, if no then make one and initialize it with zeros
+}
+
 int main()
 {
     display_askUserToFullScreen();
@@ -32,21 +46,13 @@ int main()
         case '3':
             main_reportsPageSessionHandler(monthlyProfits);
             break;
+        case '4':
+            main_settingsPageSessionHandler();
+            break;
         case 'q':
             return 0;
         }
     }
-}
-
-void main_initialize(struct Node **head, struct Cart *cart, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
-{
-    cart->amountOfItems = 0;                                                // this keeps track of the lenght of cart items
-    settings.sortBy = 0;                                                    // sorting setting is initialized by 0. Default
-    storage_getSettingsFromStorage();
-    sales_initMonthlyProfits(monthlyProfits);                               // fill all the values with zero and sets monthly names
-    storage_getItemsFromStorage(head);
-    storage_getCategoriesFromStorage(categories, categoriesLen);
-    storage_checkReportsFromStorage(monthlyProfits);                        // check the storage if there is any record, if yes then read it, if no then make one and initialize it with zeros
 }
 
 // all the functions defined in main are page handlers
@@ -236,6 +242,31 @@ void main_perDayReportsOfMonthSessionHandler(struct ReportPerMonth monthlyProfit
         if (strcmp(action, "e") == 0 || strcmp(action, "E") == 0) {
             sales_editPerDayReportsHandler(monthlyProfits, month);
             continue;
+        }
+    }
+}
+
+void main_settingsPageSessionHandler()
+{
+    char action;
+
+    while (true) {
+        system("cls");
+        display_settingsPage();
+
+        bannerUserInput();
+        scanf("%c", &action);
+
+        switch (action)
+        {
+        case '1':
+            settings_changeShopNameHandler();
+            break;
+        case '2':
+            settings_changeShopLocationHandler();
+            break;
+        case 'b':
+            return;
         }
     }
 }

@@ -59,6 +59,31 @@ void display_printRecieptsHeader()
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//      SETTINGS PAGE
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+void display_settingsPage()
+{
+    display_topBar("Settings");
+
+    for (int i = 0; i < 10; i++) bannerBlankBorder();
+
+    bannerBlankBorderTextCen("Select an action");
+
+    bannerBlankBorder();
+
+    bannerBlankBorderTextCen("1. Change shop name");
+    bannerBlankBorderTextCen("2. Change shop location");
+
+    for (int i = 0; i < 14; i++) bannerBlankBorder();
+
+    bannerBlankBorderTextCen("Enter 'b' to go back.");
+    bannerFullBorder();
+}
+
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //      CART PAGE
@@ -584,8 +609,9 @@ void display_menuPage()
     bannerBlankBorderTextCen("1. Inventory Page");
     bannerBlankBorderTextCen("2. Point of Sale Page");
     bannerBlankBorderTextCen("3. Sales Reports");
+    bannerBlankBorderTextCen("4. Settings");
 
-    for (int i = 0; i < 13; i++) bannerBlankBorder();
+    for (int i = 0; i < 12; i++) bannerBlankBorder();
 
     bannerBlankBorderTextCen("Type 'q' to quit.");
     bannerFullBorder();
