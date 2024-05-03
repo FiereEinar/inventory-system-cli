@@ -123,10 +123,10 @@ void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfit
 
     char message[][100] = 
     {
-        "Enter the name of new item: ",
-        "Enter the the initial stocks of item: ",
-        "Enter the selling price of item: ",
-        "Enter the original price of item: ",
+        "Enter the name of new item:",
+        "Enter the the initial stocks of item:",
+        "Enter the selling price of item: (per stock)",
+        "Enter the original price of item: (per stock)",
         "Enter additional costs if there are any:",
         "Enter the index of category for the new item. Press enter to skip"
     };
