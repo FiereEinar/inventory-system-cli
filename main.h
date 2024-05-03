@@ -161,6 +161,7 @@ bool item_isProfitGreaterThan(struct Item item1,struct Item item2);
 
 void item_insertItemAt(int index, struct Node **destination, struct Node **toInsert);
 void item_regenerateItemIdList(struct Node **head);
+void item_reverseItemList(struct Node **head, struct Node **output);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

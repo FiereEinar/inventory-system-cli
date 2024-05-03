@@ -1,0 +1,23 @@
+                         GAISANO MALL                         
+                     Sayre Highway Street                     
+             Date Purchased: 2024-05-03 10:20 AM             
+                                                             
+-------------------------------------------------------------
+Item                           Quantity   Price      Total   
+-------------------------------------------------------------
+paper clip                     2          P10.00     P20.00  
+paper                          1          P55.00     P55.00  
+                                                             
+Total Price                                          P75.00  
+Cash                                                 P500.00 
+Change                                               P425.00 
+                                                             
+Cashier                                              Nick    
+No. of Items                                         2       
+VATable Sales                                        P66.00  
+VAT                                                  P9.00   
+-------------------------------------------------------------
+                                                             
+                THIS IS YOUR OFFICIAL RECEIPT                
+                     Receipt ID: 62870833                     
+                   Thank You - GAISANO MALL                   

@@ -1,0 +1,23 @@
+@                     [Default Shop Name]                     
+                   [Default Shop Location]                   
+             Date Purchased: 2024-05-01 08:17 AM             
+                                                             
+-------------------------------------------------------------
+Item                           Quantity   Price      Total   
+-------------------------------------------------------------
+imissyou                       2          P15.00     P30.00  
+ben 10 brief                   2          P75.00     P150.00 
+watatops                       3          P4.00      P12.00  
+                                                             
+Total Price                                          P192.00 
+Cash                                                 P500.00 
+Change                                               P308.00 
+                                                             
+Cashier                                              Nikk 
+No. of Items                                         3       
+VATable Sales                                        P168.96 
+VAT                                                  P23.04  
+-------------------------------------------------------------|
+                THIS IS YOUR OFFICIAL RECEIPT                
+                     Receipt ID: 34262758                     
+               Thank You - [Default Shop Name]               

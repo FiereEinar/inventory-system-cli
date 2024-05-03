@@ -131,23 +131,24 @@ void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfit
         "Enter the index of category for the new item. Press enter to skip"
     };
 
+    // get the name of the item
     display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", message[0], "", "", "", "");
     fflush(stdin);
     fgets(newItem.name, NAME_SIZE, stdin);
     utils_clearNewline(newItem.name);
 
     bool isTryingToGoBack = strcmp(newItem.name, "b") == 0 || strcmp(newItem.name, "B") == 0;
+    bool nameTooShort = strlen(newItem.name) <= 1;
+    bool nameTooLong = strlen(newItem.name) > NAME_SIZE - 1;
+
     if (isTryingToGoBack) return;
 
-    bool nameTooShort = strlen(newItem.name) <= 1;
     if (nameTooShort) {
         display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Items with no name are not allowed.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
-    // TODO: fix this?
-    bool nameTooLong = strlen(newItem.name) > NAME_SIZE - 1;
     if (nameTooLong) {
         display_newUserMessagePage("Adding an Item", "Enter 'b' to go back", "Item name is too long, please try again.", "", "", "", "");
         sleep(SLEEP_TIME);
@@ -157,21 +158,26 @@ void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfit
     // ask the user for the category
     category_itemCategoryPrompter(newItem.category, categories, categoriesLen);
 
+    // ask for the stocks
     display_newUserMessagePage("Adding an Item", "", message[1], "", "", "", "");
     scanf("%d", &newItem.stocks);
     newItem.baseStocks = newItem.stocks;
 
+    // ask for the price
     display_newUserMessagePage("Adding an Item", "", message[2], "", "", "", "");
     scanf("%lf", &newItem.price);
 
+    // ask for the original price
     display_newUserMessagePage("Adding an Item", "", message[3], "", "", "", "");
     scanf("%lf", &newItem.originalPrice);
 
+    // ask for the additional costs
     display_newUserMessagePage("Adding an Item", "", message[4], "", "", "", "");
     scanf("%lf", &additionalCosts);
     
     // after getting all the necessary data from user, add it to the list
     item_addItemMetaData(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, newItem.category, additionalCosts);
+
     display_newUserMessagePage("Adding an Item", "", "Item added succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
@@ -381,14 +387,14 @@ void item_changeSortingHandler(struct Node **head)
         sleep(SLEEP_TIME);
         return;
     } else {
-        display_inventoryPromptPage(head, "0. Default | 1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit", "Sort items by:");
+        display_inventoryPromptPage(head, "1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit | 7. First Added | 8. Last Added", "Sort items by:");
     }
 
     int userInput;
     scanf("%d", &userInput);
 
     // if the input is out of bounds, don't proceed
-    if (userInput < 0 || userInput > 6) {
+    if (userInput < 0 || userInput > 8) {
         display_newUserMessagePage("Sorting Items", "", "Invalid Input.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
@@ -436,6 +442,7 @@ void item_addItemMetaData(struct Node **head, struct ReportPerMonth monthlyProfi
     // tally the costs
     sales_updateCosts(monthlyProfits, newItem.stocks, newItem.originalPrice);
     sales_updateAdditionalCosts(monthlyProfits, additionalCost);
+    
     // update the storage
     sales_updateReportsFromStorage(monthlyProfits);
 
@@ -528,8 +535,11 @@ void item_determineWhatToSort(char *placeholder)
     case 6:
         strcpy(placeholder, "High Profit");
         break;
-    case 0:
-        strcpy(placeholder, "Default");
+    case 7:
+        strcpy(placeholder, "First Added");
+        break;
+    case 8:
+        strcpy(placeholder, "Last Added");
         break;
     }
 }
@@ -560,8 +570,11 @@ void item_getSortedItems(struct Node **head, struct Node **output)
     case 6:
         item_sortItemsBy(item_isProfitGreaterThan, head, output);
         break;
-    case 0:
+    case 7:
         *output = *head;
+        break;
+    case 8:
+        item_reverseItemList(head, output);
         break;
     }
 }
@@ -701,6 +714,24 @@ void item_regenerateItemIdList(struct Node **head)
         storage_editItemFromStorageById(oldID, current->data);
 
         current = current->next;
+    }
+}
+
+void item_reverseItemList(struct Node **head, struct Node **output)
+{
+    struct Item stack[utils_getListSize(head)];
+    struct Node *current = *head;
+    int i = 0;
+
+    while (current != NULL) {
+        stack[i] = current->data;
+
+        current = current->next;
+        i++;
+    }
+
+    for (int j = i - 1; j >= 0; j--) {
+        item_addItemToList(output, stack[j]);
     }
 }
 

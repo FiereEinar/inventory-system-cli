@@ -490,7 +490,7 @@ void display_printPerDayReports(struct ReportPerDay day[], struct ReportPerMonth
 
 void display_printMonthlyReportHeader(char *month)
 {
-    printf("::  %s\t\t\t\t\tCosts\t\t\tExtra Costs\t\tRevenue\t\t\tProfit\t\t  ::\n", month);
+    printf("::  %-15s\t\t\t\tCosts\t\t\tExtra Costs\t\tRevenue\t\t\tProfit\t\t  ::\n", month);
 }
 
 void display_printReportHeader()
@@ -582,13 +582,16 @@ void display_printItemList(struct Node **head)
     {
         char stocksPercentage[12];
         char stocksStatus[12];
+        char itemName[NAME_SIZE];
+        strcpy(itemName, current->data.name);
+        utils_capitalizeFirst(itemName);
         // utils_getStringPercentage(stocksPercentage, current->data.stocks, current->data.baseStocks);
         utils_joinStocks(stocksPercentage, current->data.stocks, current->data.baseStocks);
         item_getStockStatus(stocksStatus, current->data.stocks, current->data.baseStocks);
 
         printf(
             "::  %-10s %-30s\t %-30s %-10s\t P%-11.2lf P%-11.2lf %-13s  ::\n",
-            current->data.id, current->data.name, current->data.category, stocksPercentage, current->data.price, current->data.profit, stocksStatus
+            current->data.id, itemName, current->data.category, stocksPercentage, current->data.price, current->data.profit, stocksStatus
         );
 
         // iterator

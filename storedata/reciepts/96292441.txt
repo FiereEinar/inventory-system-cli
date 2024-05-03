@@ -1,0 +1,22 @@
+                         GAISANO MALL                         
+                     Sayre Highway Street                     
+             Date Purchased: 2024-05-03 10:37 AM             
+                                                             
+-------------------------------------------------------------
+Item                           Quantity   Price      Total   
+-------------------------------------------------------------
+test                           5          P8.00      P40.00  
+                                                             
+Total Price                                          P40.00  
+Cash                                                 P50.00  
+Change                                               P10.00  
+                                                             
+Cashier                                              nick    
+No. of Items                                         1       
+VATable Sales                                        P35.20  
+VAT                                                  P4.80   
+-------------------------------------------------------------
+                                                             
+                THIS IS YOUR OFFICIAL RECEIPT                
+                     Receipt ID: 96292441                     
+                   Thank You - GAISANO MALL                   

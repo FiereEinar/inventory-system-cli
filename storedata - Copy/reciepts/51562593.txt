@@ -1,0 +1,22 @@
+                     [Default Shop Name]                     
+                   [Default Shop Location]                   
+             Date Purchased: 2024-05-01 08:29 AM             
+                                                             
+-------------------------------------------------------------
+Item                           Quantity   Price      Total   
+-------------------------------------------------------------
+gold pickaxe                   1          P85.00     P85.00  
+                                                             
+Total Price                                          P85.00  
+Cash                                                 P100.00 
+Change                                               P15.00  
+                                                             
+Cashier                                              Danica  
+No. of Items                                         1       
+VATable Sales                                        P74.80  
+VAT                                                  P10.20  
+-------------------------------------------------------------
+                                                             
+                THIS IS YOUR OFFICIAL RECEIPT                
+                     Receipt ID: 51562593                     
+               Thank You - [Default Shop Name]               

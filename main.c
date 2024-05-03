@@ -3,7 +3,7 @@
 void main_initialize(struct Node **head, struct Cart *cart, struct ReportPerMonth monthlyProfits[], char categories[][CATEGORY_NAME_LEN], int *categoriesLen)
 {
     cart->amountOfItems = 0;                                                // this keeps track of the lenght of cart items
-    settings.sortBy = 0;                                                    // sorting setting is initialized by 0. Default
+    settings.sortBy = 1;                                                    // sorting setting is initialized by 1. Low Stock. See the Settings header to view the options
     strcpy(settings.shopName, "[Default Shop Name]");
     strcpy(settings.shopLocation, "[Default Shop Location]");
     sales_initMonthlyProfits(monthlyProfits);                               // fill all the values with zero and sets monthly names
