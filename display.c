@@ -21,7 +21,7 @@ void display_recieptsPage()
     display_printMinimumScreenHeight(receiptsCount);
     bannerBlankBorder();
 
-    bannerBlankBorderTextCen("1. view receipt");
+    bannerBlankBorderTextCen("1. view receipt | 2. delete receipt");
     bannerBlankBorderTextCen("'b' to go back");
 
     bannerFullBorder();
@@ -55,6 +55,18 @@ void display_recieptsPromptPage(char *message1, char *message2)
 void display_printRecieptsHeader()
 {
     printf("::  \tReceipt ID:\t\t\t\t\tDate Purchased:\t\t\t\t\t\t\t\t\t  ::\n");
+}
+
+void display_printReceipt(char *receipt, char *message1, char *message2)
+{
+    system("cls");
+
+    printf("\n\n\n\n\n");
+    printf(receipt);
+    printf("\n%s", message1);
+    printf("\n%s", message2);
+
+    bannerUserInput();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

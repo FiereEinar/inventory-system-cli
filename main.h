@@ -224,6 +224,7 @@ void sales_editPerDayReportsHandler(struct ReportPerMonth monthlyProfits[], int 
 void display_recieptsPage();
 void display_recieptsPromptPage(char *message1, char *message2);
 void display_printRecieptsHeader();
+void display_printReceipt(char *receipt, char *message1, char *message2);
 // SETTINGS
 void display_settingsPage();
 // CART PAGE
@@ -298,6 +299,8 @@ void storage_addRecieptToStorage(char *reciept, char *id);
 void storage_addRecieptMetaDataToStorage(char *recieptId, char *datePurchased);
 void storage_printReceiptsMetaDataFromStorage(int *counter);
 int storage_getReceiptFromStorageById(char *id, char *receiptBuffer);
+void storage_deleteReceiptFromStorage(char *id);
+void storage_deleteReceiptFileFromStorage(char *id);
 
 void storage_getSettingsFromStorage();
 void storage_updateSettingsFromStorage();
@@ -333,6 +336,7 @@ void pos_resetCart(struct Cart *cart);
 void pos_generateReceipt(struct Cart *cart, double totalPrice, double cash, char *cashier, char *receiptBuffer);
 void pos_saveRecieptMetaData(char *recieptId);
 void pos_viewReceiptHandler();
+void pos_deleteReceiptHandler();
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

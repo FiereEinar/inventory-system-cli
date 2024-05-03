@@ -209,12 +209,41 @@ void pos_viewReceiptHandler()
         return;
     } 
 
-    system("cls");
-    printf("\n\n\n\n\n");
-    printf(receipt);
-    printf("\nEnter any key to go back.");
-    bannerUserInput();
+    display_printReceipt(receipt, "Here is the receipt.", "Enter any key to go back.");
     getch();
+}
+
+void pos_deleteReceiptHandler()
+{
+    char id[ID_LENGTH];
+    char receipt[MAX_RECEIPT_LENGTH];
+    char confirmation;
+
+    display_recieptsPromptPage("Enter the ID of the receipt you want to delete:", "Enter 'b' to go back");
+    fflush(stdin);
+    scanf("%s", id);
+
+    if (strcmp(id, "b") == 0 || strcmp(id, "B") == 0) return;
+    
+    int status = storage_getReceiptFromStorageById(id, receipt);
+
+    if (status == 0) {
+        display_newUserMessagePage("Deleting a Receipt", "", "Receipt not found.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    } 
+
+    // ask for confirmation to delete
+    display_printReceipt(receipt, "Are you sure you want to delete this receipt? [ y / n ]", "This action is irreversable.");
+    fflush(stdin);
+    scanf("%c", &confirmation);
+
+    if (confirmation != 'y' && confirmation != 'Y') return;
+
+    storage_deleteReceiptFromStorage(id);
+
+    display_newUserMessagePage("Deleting a receipt", "", "Receipt deleted succesfully!", "", "", "", "");
+    sleep(SLEEP_TIME);
 }
 
 void pos_resetCart(struct Cart *cart)

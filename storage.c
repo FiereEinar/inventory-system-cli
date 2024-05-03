@@ -672,3 +672,46 @@ void storage_updateSettingsFromStorage()
 
     fclose(file);
 }
+
+void storage_deleteReceiptFromStorage(char *id)
+{
+    // delete the receipt file
+    storage_deleteReceiptFileFromStorage(id);
+
+    // delete the receipt from the record
+    FILE *file;
+    FILE *tempFile;
+
+    int maxLine = 50;
+    char filename[] = "storedata/reciepts/recieptsMetaData.csv";
+    char tempFilename[] = "storedata/reciepts/temp__recieptsMetaData.csv";
+    char placeholder[maxLine];
+    char currentId[ID_LENGTH];
+    char currentDate[DATE_LENGTH];
+
+    file = fopen(filename, "r");
+    tempFile = fopen(tempFilename, "w");
+
+    while (fgets(placeholder, maxLine, file) != NULL) {
+        sscanf(placeholder, "%9[^,],%29[^,]", currentId, currentDate);
+
+        if (strcmp(currentId, id) != 0) fputs(placeholder, tempFile);        
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    remove(filename);
+    rename(tempFilename, filename);
+}
+
+void storage_deleteReceiptFileFromStorage(char *id)
+{
+    // construct the filename with the given id
+    char filename[100] = "storedata/reciepts/";
+    strcat(filename, id);
+    strcat(filename, ".txt");
+
+    // remove that file
+    remove(filename);
+}

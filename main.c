@@ -184,6 +184,9 @@ void main_receiptsPageSessionHandler()
         case '1':
             pos_viewReceiptHandler();
             break;
+        case '2':
+            pos_deleteReceiptHandler();
+            break;
         
         case 'b':
             return;
