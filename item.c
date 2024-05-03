@@ -176,7 +176,7 @@ void item_addItemHandler(struct Node **head, struct ReportPerMonth monthlyProfit
     scanf("%lf", &additionalCosts);
     
     // after getting all the necessary data from user, add it to the list
-    item_addItemMetaData(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, newItem.category, additionalCosts);
+    item_addItem(head, monthlyProfits, newItem.name, newItem.stocks, newItem.price, newItem.originalPrice, newItem.category, additionalCosts);
 
     display_newUserMessagePage("Adding an Item", "", "Item added succesfully!", "", "", "", "");
     sleep(SLEEP_TIME);
@@ -199,12 +199,20 @@ void item_deleteItemHandler(struct Node **head, struct ReportPerMonth monthlyPro
     struct Node *deleted = NULL;
     // we create a current variable so that we don't manipulate the pointer of the head
     struct Node *current = *head;
+    char confirmation;
 
     scanf("%s", idToDelete);
 
     bool isTryingToGoBack = strcmp(idToDelete, "b") == 0 || strcmp(idToDelete, "B") == 0;
     
     if (isTryingToGoBack || listIsEmpty) return;
+
+    // ask for confirmation to delete
+    display_newUserMessagePage("Deleting an Item", "", "Are you sure you want to delete this item?", "[ y / n ]", "", "", "");
+    fflush(stdin);
+    scanf("%c", &confirmation);
+
+    if (confirmation != 'y' && confirmation != 'Y') return;
 
     // if the user is trying to delete the first item, we simply set the head to point to the next node
     if (strcmp(current->data.id, idToDelete) == 0) {
@@ -420,7 +428,7 @@ struct Node *item_getItemById(struct Node **list, char itemId[])
 }
 
 // handles the process of setting the data and tallying the costs, records of an item being added
-void item_addItemMetaData(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost)
+void item_addItem(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost)
 {
     // tbh, i could've just passed the entire Item struct, but im using this function for generating test items as well so...
     struct Item newItem;

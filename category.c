@@ -45,6 +45,7 @@ void category_deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *c
 {
     char header[] = "Deleting a Category";
     char userInput[2];
+    char confirmation;
 
     if (*categoriesLen == 0) {
         display_newUserMessagePage(header, "Enter any key to go back", "No category to be deleted", "", "", "", "");
@@ -65,6 +66,13 @@ void category_deleteCategoryHandler(char categories[][CATEGORY_NAME_LEN], int *c
         sleep(SLEEP_TIME);
         return;
     }
+
+    // ask for confirmation to delete
+    display_newUserMessagePage("Deleting a Category", "", "Are you sure you want to delete this item?", "[ y / n ]", "", "", "");
+    fflush(stdin);
+    scanf("%c", &confirmation);
+
+    if (confirmation != 'y' && confirmation != 'Y') return;
 
     // delete it from file storage first
     storage_deleteCategoryFromStorage(categories[index]);
@@ -131,6 +139,9 @@ void category_editCategoryHandler(struct Node **head, char categories[][CATEGORY
 
     // update the data from storage
     storage_editCategoryFromStorage(oldCategoryName, newCategoryName);
+
+    display_newUserMessagePage(header, "", "Category edited successfully!", "", "", "", "");
+    sleep(SLEEP_TIME);
 }
 
 // function logic to add a category to the array, also used in getting categories from storage

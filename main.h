@@ -139,7 +139,7 @@ void item_restockItemHandler(struct Node **head, struct ReportPerMonth monthlyPr
 void item_changeSortingHandler(struct Node **head);
 void item_viewItemDetailsHandler(struct Node **head);
 
-void item_addItemMetaData(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost);
+void item_addItem(struct Node **head, struct ReportPerMonth monthlyProfits[], char name[], int stocks, double price, double originalPrice, char category[], double additionalCost);
 struct Node *item_getItemById(struct Node **list, char itemId[]);
 void item_addItemToList(struct Node **head, struct Item newItem);
 void item_updateItemsCategory(struct Node **head, char *oldCategory, char *newCategory);

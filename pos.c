@@ -48,6 +48,7 @@ void pos_deleteCartItemHandler(struct Cart *cart)
         display_pointOfSalePromptPage(cart->items, &cart->amountOfItems, "Enter the number of the item in the cart:", "Enter 'b' to go back");
     }
 
+    char confirmation;
     char userInput[2];
     fflush(stdin);
     scanf("%s", userInput);
@@ -62,6 +63,13 @@ void pos_deleteCartItemHandler(struct Cart *cart)
         sleep(SLEEP_TIME);
         return;
     }
+
+    // ask for confirmation to delete
+    display_newUserMessagePage("Deleting an Item", "", "Are you sure you want to delete this item?", "[ y / n ]", "", "", "");
+    fflush(stdin);
+    scanf("%c", &confirmation);
+
+    if (confirmation != 'y' && confirmation != 'Y') return;
 
     // shift the items to the left, overwritting the deleted item
     for (int i = index; i < cart->amountOfItems - 1; i++)
