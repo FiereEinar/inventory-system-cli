@@ -222,7 +222,7 @@ void storage_checkReportsFromStorage(struct ReportPerMonth monthlyProfits[])
     char monthFilename[] = "storedata/reports/monthlyReport.csv";  
     // if there's no current record, initialize it with our current record which contains zeros. otherwise, get the records
     struct stat st;                                         // i don't know what this is, all I know is that it checks if the file exists
-    if (stat(monthFilename, &st) != 0) {
+    if (stat(monthFilename, &st) != 0) {                    // this condition checks if the file exists
         // if there's no current record, initialize it with our own record, which is just full of zeros at this point
         storage_initializeReportsFromStorage(monthlyProfits);
     } else {
@@ -553,6 +553,7 @@ void storage_editCategoryFromStorage(char *oldCategory, char *newCategory)
 void storage_addRecieptToStorage(char *reciept, char *id)
 {
     FILE *file;
+
     char filename[100] = "storedata/reciepts/";
     strcat(filename, id);
     strcat(filename, ".txt");
@@ -580,6 +581,7 @@ void storage_addRecieptMetaDataToStorage(char *recieptId, char *datePurchased)
 
     mkdir("storedata");
     mkdir("storedata/reciepts");
+
     char filename[] = "storedata/reciepts/recieptsMetaData.csv";
 
     file = fopen(filename, "a");
@@ -683,9 +685,12 @@ void storage_deleteReceiptFromStorage(char *id)
     FILE *tempFile;
 
     int maxLine = 50;
+
     char filename[] = "storedata/reciepts/recieptsMetaData.csv";
     char tempFilename[] = "storedata/reciepts/temp__recieptsMetaData.csv";
+
     char placeholder[maxLine];
+
     char currentId[ID_LENGTH];
     char currentDate[DATE_LENGTH];
 

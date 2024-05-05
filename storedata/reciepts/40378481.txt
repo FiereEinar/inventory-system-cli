@@ -1,0 +1,23 @@
+                         GAISANO MALL                         
+                     Sayre Highway Street                     
+             Date Purchased: 2024-05-05 01:11 PM             
+                                                             
+-------------------------------------------------------------
+Item                           Quantity   Price      Total   
+-------------------------------------------------------------
+white tee                      1          P25.00     P25.00  
+Gaming Chair                   1          P399.00    P399.00 
+                                                             
+Total Price                                          P424.00 
+Cash                                                 P500.00 
+Change                                               P76.00  
+                                                             
+Cashier                                              danica  
+No. of Items                                         2       
+VATable Sales                                        P373.12 
+VAT                                                  P50.88  
+-------------------------------------------------------------
+                                                             
+                THIS IS YOUR OFFICIAL RECEIPT                
+                     Receipt ID: 40378481                     
+                   Thank You - GAISANO MALL                   

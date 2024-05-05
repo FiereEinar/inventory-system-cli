@@ -395,7 +395,7 @@ void item_changeSortingHandler(struct Node **head)
         sleep(SLEEP_TIME);
         return;
     } else {
-        display_inventoryPromptPage(head, "1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit | 7. First Added | 8. Last Added", "Sort items by:");
+        display_inventoryPromptPage(head, "1. Low Stock | 2. High Stocks | 3. Low Price | 4. High Price | 5. Low Profit | 6. High Profit | 7. First Added | 8. Recently Added", "Sort items by:");
     }
 
     int userInput;
@@ -547,7 +547,7 @@ void item_determineWhatToSort(char *placeholder)
         strcpy(placeholder, "First Added");
         break;
     case 8:
-        strcpy(placeholder, "Last Added");
+        strcpy(placeholder, "Recently Added");
         break;
     }
 }

@@ -330,13 +330,15 @@ void pos_addCartItemHandler(struct Cart *cart, struct Node **head);
 void pos_deleteCartItemHandler(struct Cart *cart);
 void pos_resetCartHandler(struct Cart *cart);
 void pos_checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPerMonth monthlyProfits[]);
+void pos_viewReceiptHandler();
+void pos_deleteReceiptHandler();
 
+void pos_deleteItemFromCart(struct Cart *cart, int indexToDelete);
 void pos_addItemToCart(struct Cart *cart, int quantity, struct Item item);
+bool pos_isAlreadyInCart(struct Cart *cart, char *itemId);
 void pos_resetCart(struct Cart *cart);
 void pos_generateReceipt(struct Cart *cart, double totalPrice, double cash, char *cashier, char *receiptBuffer);
 void pos_saveRecieptMetaData(char *recieptId);
-void pos_viewReceiptHandler();
-void pos_deleteReceiptHandler();
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

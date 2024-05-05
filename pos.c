@@ -10,12 +10,18 @@ void pos_addCartItemHandler(struct Cart *cart, struct Node **head)
     scanf("%s", itemId);
 
     // get the item with that ID
-    struct Node *current = item_getItemById(head, itemId);
+    struct Node *currentItem = item_getItemById(head, itemId);
 
     if (strcmp(itemId, "b") == 0 || strcmp(itemId, "B") == 0) return;
 
-    if (current == NULL) {
+    if (currentItem == NULL) {
         display_newUserMessagePage(header, "", "Item not found, please try again.", "", "", "", "");
+        sleep(SLEEP_TIME);
+        return;
+    }
+
+    if (pos_isAlreadyInCart(cart, itemId)) {
+        display_newUserMessagePage(header, "", "Item already in the cart.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
@@ -25,18 +31,17 @@ void pos_addCartItemHandler(struct Cart *cart, struct Node **head)
     scanf("%lf", &quantity);
 
     // if there's not enough stocks, don't proceed
-    if (current->data.stocks < quantity) {
+    if (currentItem->data.stocks < quantity) {
         display_newUserMessagePage(header, "", "Not enough stocks to fulfill the purchase.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;
     }
 
-    pos_addItemToCart(cart, quantity, current->data);
+    pos_addItemToCart(cart, quantity, currentItem->data);
 
     display_newUserMessagePage(header, "", "Item added to cart!", "", "", "", "");
     sleep(SLEEP_TIME);
 }
-
 
 void pos_deleteCartItemHandler(struct Cart *cart)
 {
@@ -71,12 +76,7 @@ void pos_deleteCartItemHandler(struct Cart *cart)
 
     if (confirmation != 'y' && confirmation != 'Y') return;
 
-    // shift the items to the left, overwritting the deleted item
-    for (int i = index; i < cart->amountOfItems - 1; i++)
-        cart->items[i] = cart->items[i + 1];
-
-    // decrease the counter
-    cart->amountOfItems -= 1;
+    pos_deleteItemFromCart(cart, index);
 
     display_newUserMessagePage(header, "", "Item deleted from the cart!", "", "", "", "");
     sleep(SLEEP_TIME);
@@ -172,16 +172,15 @@ void pos_checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPer
     }
 
     // generate a reciept
-    system("cls");
-    printf("\n\n\n\n\n");
     pos_generateReceipt(cart, totalPrice, cash, cashier, reciept);
+    
+    // save the receipt
     storage_addRecieptToStorage(reciept, cart->cartId);
     pos_saveRecieptMetaData(cart->cartId);
-    printf("%s", reciept);
 
-    printf("\nEnter any key to continue");
-    bannerUserInput();
+    display_printReceipt(reciept, "", "Enter any key to continue");
     getch();
+
     // reset the cart
     pos_resetCart(cart);
 
@@ -246,6 +245,16 @@ void pos_deleteReceiptHandler()
     sleep(SLEEP_TIME);
 }
 
+void pos_deleteItemFromCart(struct Cart *cart, int indexToDelete)
+{
+    // shift the items to the left, overwritting the deleted item
+    for (int i = indexToDelete; i < cart->amountOfItems - 1; i++)
+        cart->items[i] = cart->items[i + 1];
+
+    // decrease the counter
+    cart->amountOfItems -= 1;
+}
+
 void pos_resetCart(struct Cart *cart)
 {
     // reset the name, itemId, quantity, and price of each item in the cart
@@ -269,6 +278,19 @@ void pos_addItemToCart(struct Cart *cart, int quantity, struct Item item)
     cart->items[cart->amountOfItems].profit = item.profit * quantity;
 
     cart->amountOfItems += 1;
+}
+
+bool pos_isAlreadyInCart(struct Cart *cart, char *itemId)
+{
+    char currentItemId[ID_LENGTH];
+
+    for (int i = 0; i < cart->amountOfItems; i++) {
+        strcpy(currentItemId, cart->items[i].itemId);
+
+        if (strcmp(currentItemId, itemId) == 0) return true;
+    }
+
+    return false;
 }
 
 void pos_generateReceipt(struct Cart *cart, double totalPrice, double cash, char *cashier, char *receiptBuffer) 
