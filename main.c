@@ -34,6 +34,7 @@ int main()
 
         bannerUserInput();
         scanf("%c", &action);
+        fflush(stdin);
 
         switch (action)
         {
@@ -69,6 +70,7 @@ void main_inventoryPageSessionHandler(struct Node **head, struct ReportPerMonth 
         bannerUserInput();
         fflush(stdin);
         scanf("%c", &action);
+        fflush(stdin);
 
         switch (action)
         {
@@ -113,6 +115,7 @@ void main_categoriesPageSessionHandler(struct Node **head, char categories[][CAT
         bannerUserInput();
         fflush(stdin);
         scanf("%c", &action);
+        fflush(stdin);
 
         switch (action)
         {
@@ -142,8 +145,10 @@ void main_posPageSessionHandler(struct Cart *cart, struct Node **head, struct Re
     while (true){
         system("cls");
         display_pointOfSalePage(cart->items, &cart->amountOfItems);
+        
         bannerUserInput();
         scanf("%c", &action);
+        fflush(stdin);
 
         switch (action)
         {
@@ -176,8 +181,10 @@ void main_receiptsPageSessionHandler()
     {
         system("cls");
         display_recieptsPage();
+
         bannerUserInput();
         scanf("%c", &action);
+        fflush(stdin);
 
         switch (action)
         {
@@ -206,6 +213,7 @@ void main_reportsPageSessionHandler(struct ReportPerMonth monthlyProfits[])
         bannerUserInput();
         fflush(stdin);
         scanf("%s", action);
+        fflush(stdin);
 
         if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) return;
 
@@ -236,6 +244,7 @@ void main_perDayReportsOfMonthSessionHandler(struct ReportPerMonth monthlyProfit
         
         bannerUserInput();
         scanf("%s", action);
+        fflush(stdin);
 
         if (strcmp(action, "b") == 0 || strcmp(action, "B") == 0) return;
         
@@ -256,6 +265,7 @@ void main_settingsPageSessionHandler()
 
         bannerUserInput();
         scanf("%c", &action);
+        fflush(stdin);
 
         switch (action)
         {

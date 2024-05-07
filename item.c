@@ -402,7 +402,7 @@ void item_changeSortingHandler(struct Node **head)
     scanf("%d", &userInput);
 
     // if the input is out of bounds, don't proceed
-    if (userInput < 0 || userInput > 8) {
+    if (userInput < 0 || userInput > 8 || userInput == 0) {
         display_newUserMessagePage("Sorting Items", "", "Invalid Input.", "", "", "", "");
         sleep(SLEEP_TIME);
         return;

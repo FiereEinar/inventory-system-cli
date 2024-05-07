@@ -178,6 +178,7 @@ void sales_reflectToMonthlyCostsOnDeletion(struct ReportPerMonth monthlyProfits[
     display_newUserMessagePage("Deleting an Item", "", "Do you want to deduct the total costs of deleted item to your monthly costs report?[y/n]", "", "", "", "");
     fflush(stdin);
     scanf("%c", &action);
+    fflush(stdin);
 
     // TODO: account for additional costs
     if (action == 'y' || action == 'Y') {

@@ -94,6 +94,7 @@ void pos_resetCartHandler(struct Cart *cart)
 
     fflush(stdin);
     scanf("%c", &action);
+    fflush(stdin);
 
     if (action == 'n' || action == 'N' || cart->amountOfItems == 0) return;
 
@@ -116,6 +117,7 @@ void pos_checkoutHandler(struct Cart *cart, struct Node **head, struct ReportPer
     char action;
     fflush(stdin);
     scanf("%c", &action);
+    fflush(stdin);
 
     if (action == 'n' || action == 'N' || cart->amountOfItems == 0) return;
     
