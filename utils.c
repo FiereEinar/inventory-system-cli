@@ -200,3 +200,22 @@ void utils_clearAllNewline(char *str)
         *newline = '\0'; // Replace newline with null terminator
     }
 }
+
+// Removes leading and trailing whitespace from a string
+void strtrim(char *str) 
+{
+    int start, end, len;
+
+    // Find the first non-whitespace character from the beginning
+    for (start = 0; isspace((unsigned char)str[start]); ++start);
+
+    // Find the last non-whitespace character from the end
+    len = strlen(str);
+    for (end = len - 1; end >= 0 && isspace((unsigned char)str[end]); --end);
+
+    // Shift the non-whitespace characters to the beginning of the string
+    memmove(str, str + start, end - start + 1);
+    
+    // Null-terminate the string
+    str[end - start + 1] = '\0';
+}

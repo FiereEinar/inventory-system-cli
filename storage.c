@@ -10,12 +10,12 @@ void storage_addItemToStorage(struct Item item)
     mkdir("storedata");
 
     // open the file inside that folder
-    file = fopen("storedata/items.csv", "a");
+    file = fopen("storedata/items.txt", "a");
 
     // write the data
     fprintf(
         file, 
-        "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s,%s\n",        // format of how they are written (csv)
+        "%-29s %-6d %-6d %-12lf %-12lf %-12lf %-30s %-29s %-9s %-29s\n",        // format of how they are written
         item.name,
         item.baseStocks,
         item.stocks,
@@ -43,7 +43,7 @@ void storage_getItemsFromStorage(struct Node **head)
     int read = 0;
 
     // open the file
-    file = fopen("storedata/items.csv", "r");
+    file = fopen("storedata/items.txt", "r");
 
     // if there's no current records the go back
     if (file == NULL) return;
@@ -51,7 +51,9 @@ void storage_getItemsFromStorage(struct Node **head)
     // while there is a record to read
     while ((read = fscanf(
         file, 
-        " %29[^,],%d,%d,%lf,%lf,%lf, %29[^,],%29[^,],%9[^,],%29[^,\n]", 
+        // " %29[^,],%d,%d,%lf,%lf,%lf, %29[^,],%29[^,],%9[^,],%29[^,\n]", 
+        // "%33s %d %d %lf %lf %lf %33s %33s %13s %33s",
+        "%29[^\n] %6d %6d %lf %lf %lf %29[^\n] %29[^\n] %9s %29[^\n]\n",
         newItem.name, 
         &newItem.baseStocks, 
         &newItem.stocks,
@@ -65,6 +67,13 @@ void storage_getItemsFromStorage(struct Node **head)
     )) == 10) 
     // get it, clear the newlines, and add it to the head(list)
     {
+        // remove the trailing whitespaces
+        strtrim(newItem.name);
+        strtrim(newItem.dateAdded);
+        strtrim(newItem.lastUpdated);
+        strtrim(newItem.id);
+        strtrim(newItem.category);
+
         utils_clearNewline(newItem.id);
         utils_clearNewline(newItem.category);
         item_addItemToList(head, newItem);
@@ -83,7 +92,7 @@ void storage_getItemsFromStorage(struct Node **head)
 // deletes and item in the file
 // to delete an item, we rewrite everything in a temporary file EXEPT for the item being deleted
 // after that the temporary file will contain the new list without the item that was deleted
-// then we simply rename that temporary file to storage file and deleted the old storage file, kinda like swapping them
+// then we simply rename that temporary file to storage file and delete the old storage file, kinda like swapping them
 void storage_deleteItemFromStorageById(char *id)
 {
     FILE *file;
@@ -92,8 +101,8 @@ void storage_deleteItemFromStorageById(char *id)
     int maxLine = 2000;                             // max line inside a file
 
     // original file and temporary file
-    char filename[50] = "storedata/items.csv";
-    char tempFile[50] = "storedata/temp__items.csv";
+    char filename[50] = "storedata/items.txt";
+    char tempFile[50] = "storedata/temp__items.txt";
 
     char placeholder[maxLine];                      // placeholder for data inside the file
 
@@ -111,7 +120,8 @@ void storage_deleteItemFromStorageById(char *id)
         // sscanf() to extract the data and store it in newItem, all we need here is the ID
         sscanf(
             placeholder,
-            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,],%29[^,]",
+            // "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,],%29[^,]",
+            "%29[^\n] %6d %6d %lf %lf %lf %29[^\n] %29[^\n] %9s %29[^\n]\n",
             newItem.name,
             &newItem.baseStocks,
             &newItem.stocks,
@@ -123,6 +133,13 @@ void storage_deleteItemFromStorageById(char *id)
             newItem.id,
             newItem.category
         );
+
+        // remove the trailing whitespaces
+        strtrim(newItem.name);
+        strtrim(newItem.dateAdded);
+        strtrim(newItem.lastUpdated);
+        strtrim(newItem.id);
+        strtrim(newItem.category);
 
         // clear the newline character from ID
         //  I AM SO MAD AT THIS, TOOK ME LONG TO FIGURE OUT AN ISSUE, IT WAS JUST A NEWLINE THE ENTIRE TIME
@@ -152,8 +169,8 @@ void storage_editItemFromStorageById(char *id, struct Item editedItem)
     struct Item currentItem;
     int maxLine = 2000;                             // max line inside a file
 
-    char filename[50] = "storedata/items.csv";
-    char tempFile[50] = "storedata/temp__items.csv";
+    char filename[50] = "storedata/items.txt";
+    char tempFile[50] = "storedata/temp__items.txt";
 
     char placeholder[maxLine];                      // placeholder for data inside the file
 
@@ -169,7 +186,8 @@ void storage_editItemFromStorageById(char *id, struct Item editedItem)
     while (fgets(placeholder, maxLine, file) != NULL) {
         sscanf(
             placeholder,
-            "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,],%29[^,]",
+            // "%29[^,],%d,%d,%lf,%lf,%lf,%29[^,],%29[^,],%9[^,],%29[^,]",
+            "%29[^\n] %6d %6d %lf %lf %lf %29[^\n] %29[^\n] %9s %29[^\n]\n",
             currentItem.name,
             &currentItem.baseStocks,
             &currentItem.stocks,
@@ -182,6 +200,13 @@ void storage_editItemFromStorageById(char *id, struct Item editedItem)
             currentItem.category
         );
 
+        // remove the trailing whitespaces
+        strtrim(currentItem.name);
+        strtrim(currentItem.dateAdded);
+        strtrim(currentItem.lastUpdated);
+        strtrim(currentItem.id);
+        strtrim(currentItem.category);
+
         utils_clearNewline(currentItem.id);
         utils_clearNewline(currentItem.category);
 
@@ -193,7 +218,8 @@ void storage_editItemFromStorageById(char *id, struct Item editedItem)
             // but instead put the new item
             fprintf(
                 temp, 
-                "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s,%s\n",
+                // "%s,%d,%d,%lf,%lf,%lf,%s,%s,%s,%s\n",
+                "%-29s %-6d %-6d %-12lf %-12lf %-12lf %-30s %-29s %-9s %-29s\n",
                 editedItem.name,
                 editedItem.baseStocks,
                 editedItem.stocks,

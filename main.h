@@ -184,6 +184,7 @@ void utils_getStringPercentage(char *output, int number, int base);
 double utils_getPercentage(int number, int base);
 void utils_centerText(int length, char *text);
 void utils_clearAllNewline(char *str);
+void strtrim(char *str);
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 

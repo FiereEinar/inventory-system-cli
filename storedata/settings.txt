@@ -1,1 +1,1 @@
-1,GAISANO MALL,Sayre Highway Street
+1,[Default Shop Name],[Default Shop Location]

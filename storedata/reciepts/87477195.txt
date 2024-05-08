@@ -1,0 +1,23 @@
+                     [Default Shop Name]                     
+                   [Default Shop Location]                   
+             Date Purchased: 2024-05-08 02:37 PM             
+                                                             
+-------------------------------------------------------------
+Item                           Quantity   Price      Total   
+-------------------------------------------------------------
+i miss you                     2          P10.00     P20.00  
+test                           3          P6.00      P18.00  
+                                                             
+Total Price                                          P38.00  
+Cash                                                 P100.00 
+Change                                               P62.00  
+                                                             
+Cashier                                              nikka   
+No. of Items                                         2       
+VATable Sales                                        P33.44  
+VAT                                                  P4.56   
+-------------------------------------------------------------
+                                                             
+                THIS IS YOUR OFFICIAL RECEIPT                
+                     Receipt ID: 87477195                     
+               Thank You - [Default Shop Name]               
